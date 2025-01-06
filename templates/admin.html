@@ -1,7 +1,38 @@
 {% extends "base.html" %}
 
-{% block title %}Hello World{% endblock %}
+{% block title %}Accueil Admin{% endblock %}
 
 {% block content %}
-<h1>ADMIN!</h1>
+<h1>ADMIN</h1>
+
+<div class="admin-section">
+    <h2>Gestion Candidats</h2>
+    <a href="/admin/create_candidate">
+        <button type="button">Créer un candidat</button>
+    </a>
+    <a href="/admin/manage_candidate">
+        <button type="button">Gérer les candidats</button>
+    </a>
+</div>
+
+<div class="admin-section">
+    <h2>Gestion Intervenants</h2>
+    <a href="/admin/create_participant">
+        <button type="button">Créer un intervenant</button>
+    </a>
+    <a href="/admin/manage_participant">
+        <button type="button">Gérer les intervenants</button>
+    </a>
+</div>
+
+<div class="admin-section">
+    <h2>Gestion Événements</h2>
+    <a href="/admin/create_event">
+        <button type="button">Créer un événement</button>
+    </a>
+    <a href="/admin/manage_event">
+        <button type="button">Gérer les événements</button>
+    </a>
+</div>
+
 {% endblock %}
