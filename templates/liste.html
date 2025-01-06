@@ -5,8 +5,14 @@
 {% block content %}
 <h1>LISTE!</h1>
 <ul>
-  {% for candidat in cand %}
-    <li>{{ candidat.prenom_candidat }}</li>
+  {% for candidat in candidats %}
+    <li>{{ candidat.prenom_candidat }} - {{ candidat.nom_candidat }}</li>
+  {% endfor %}
+</ul>
+<div class="divider"></div>
+<ul>
+  {% for intervenant in intervenants %}
+    <li>{{ intervenant.nom_intervenant }}</li>
   {% endfor %}
 </ul>
 {% endblock %}
