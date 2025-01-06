@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Hello World{% endblock %}
+
+{% block content %}
+<h1>LISTE!</h1>
+<ul>
+  {% for candidat in cand %}
+    <li>{{ candidat.prenom_candidat }}</li>
+  {% endfor %}
+</ul>
+{% endblock %}
