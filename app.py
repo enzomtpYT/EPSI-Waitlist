@@ -7,6 +7,7 @@ app = Flask(__name__)
 
 custom_route_names = {
     "/": "Acceuil",
+    "/admin": "Admin"
 }
 
 def get_routes():
