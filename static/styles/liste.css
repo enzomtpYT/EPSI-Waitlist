@@ -1,0 +1,29 @@
+tbody {
+    display: block;
+    height: 100%;
+    overflow: auto;
+}
+
+table {
+    display: block;
+    height: 100%;
+    overflow: auto;
+}
+
+th {
+    background-color: #f8f9fa;
+    padding: 1rem 2rem;
+    text-align: left;
+}
+
+td {
+    padding: 1rem 2rem;
+}
+
+tr:nth-child(even) {
+    background-color: #ffffff;
+}
+
+tr:nth-child(odd) {
+    background-color: #f8f9fa;
+}
