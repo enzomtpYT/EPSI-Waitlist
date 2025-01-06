@@ -2,25 +2,18 @@ from flask import Flask
 import os
 from routes.index import index
 from routes.admin import admin
-<<<<<<< Updated upstream
 from routes.liste import liste
-=======
 from routes.create_candidate import create_candidate
 from routes.manage_candidate import manage_candidate
 from routes.candidate import candidate
->>>>>>> Stashed changes
 
 app = Flask(__name__)
 
 custom_route_names = {
-<<<<<<< Updated upstream
-    "/": "Acceuil",
+
+    "/": "Accueil",
     "/admin": "Admin",
     "/liste": "Liste"
-=======
-    "/": "Accueil",
-    "/admin": "Admin"
->>>>>>> Stashed changes
 }
 
 @app.context_processor
