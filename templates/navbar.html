@@ -1,8 +1,8 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='styles/navbar.css') }}">
 <nav>
     <ul>
-        {% for route in routes %}
-        <li><a class="navitem" href="{{ route }}">{{ custom_route_names.get(route, route) }}</a></li>
+        {% for route, name in custom_route_names.items() %}
+        <li><a class="navitem" href="{{ route }}">{{ name }}</a></li>
         {% endfor %}
     </ul>
 </nav>
