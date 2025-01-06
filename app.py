@@ -3,11 +3,15 @@ import os
 from routes.index import index
 from routes.admin import admin
 from routes.liste import liste
+from routes.create_candidate import create_candidate
+from routes.manage_candidate import manage_candidate
+from routes.candidate import candidate
 
 app = Flask(__name__)
 
 custom_route_names = {
-    "/": "Acceuil",
+
+    "/": "Accueil",
     "/admin": "Admin",
     "/liste": "Liste"
 }
@@ -19,6 +23,9 @@ def inject_routes():
 app.add_url_rule("/", "index", index)
 app.add_url_rule("/liste", "liste", liste)
 app.add_url_rule("/admin", "admin", admin)
+app.add_url_rule("/admin/create_candidate", "create_candidate", create_candidate)
+app.add_url_rule("/admin/manage_candidate", "manage_candidate", manage_candidate)
+app.add_url_rule("/admin/manage_candidate/candidate", "candidate", candidate)
 
 if __name__ == "__main__":
     debug_mode = os.getenv('FLASK_ENV') == 'development'
