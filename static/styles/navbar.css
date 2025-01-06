@@ -2,15 +2,15 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 2rem;
+    padding: 1rem 1rem;
     background-color: #bcbdbf;
 }
 
-li {
+.navli {
     list-style-type: none;
 }
 
-ul {
+.navul {
     display: flex;
 }
 
