@@ -1,0 +1,19 @@
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: #bcbdbf;
+}
+
+li {
+    list-style-type: none;
+}
+
+ul {
+    display: flex;
+}
+
+.navitem {
+    margin-right: 1rem;
+}
