@@ -1,6 +1,7 @@
 from flask import Flask
 import os
 from routes.index import index
+from routes.admin import admin
 
 app = Flask(__name__)
 
@@ -20,6 +21,7 @@ def inject_routes():
     return dict(routes=get_routes(), custom_route_names=custom_route_names)
 
 app.add_url_rule("/", "index", index)
+app.add_url_rule("/", "admin", admin)
 
 if __name__ == "__main__":
     debug_mode = os.getenv('FLASK_ENV') == 'development'
