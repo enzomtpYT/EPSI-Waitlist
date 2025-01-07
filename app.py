@@ -9,7 +9,6 @@ from routes.event import event
 from routes.create_candidate import create_candidate_bp
 from routes.manage_candidate import manage_candidate_bp
 from routes.candidate import candidate_bp
-from routes.manage_event import manage_event
 from routes.create_event import create_event_bp
 
 app = Flask(__name__)

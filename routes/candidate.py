@@ -28,10 +28,7 @@ def edit_candidate(id_candidate):
 
         if error is None:
             try:
-                conn.execute(
-                    'UPDATE Candidate SET lastname_candidate = ?, name_candidate = ?, email_candidate = ? WHERE id_candidate = ?',
-                    (lastname, name, email, id_candidate)
-                )
+                conn.execute('UPDATE Candidate SET lastname_candidate = ?, name_candidate = ?, email_candidate = ? WHERE id_candidate = ?', (lastname, name, email, id_candidate))
                 conn.commit()
                 flash("Candidat mis à jour avec succès!", "success")
             except sqlite3.Error as e:
