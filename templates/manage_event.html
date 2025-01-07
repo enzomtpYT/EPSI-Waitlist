@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Gérer Évenemments{% endblock %}
+
+{% block content %}
+<h1>Gérer Évenemments</h1>
+
+<div class="admin-section">
+    <h2>Liste des Évenemments</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for event in events %}
+            <tr>
+                <td>{{ event.name_event }}</td>
+                <td>{{ event.date_event }}</td>
+                <td>
+                    <a href="/admin/manage_event/event/{{ event.id }}">
+                        <button type="button">Voir</button>
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
+

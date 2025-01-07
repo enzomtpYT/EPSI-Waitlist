@@ -27,6 +27,22 @@ def get_event():
     finally:
         conn.close()
 
+def get_allevents():
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreure base de donnée"
+    try:
+        events = conn.execute(f'SELECT * FROM Event').fetchall()
+        if events:
+            return events, None
+        else:
+            return None, "Pas d'événement aujourd'hui"
+    except sqlite3.Error as e:
+        print(f"Erreure requete base de donnée: {e}")
+        return None, "Erreure requete base de donnée"
+    finally:
+        conn.close()
+
 def get_event_candidats(todayevent):
     conn = get_db_connection()
     if conn is None:
