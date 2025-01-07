@@ -27,7 +27,7 @@ def get_event():
     finally:
         conn.close()
 
-def get_candidats(todayevent):
+def get_event_candidats(todayevent):
     conn = get_db_connection()
     if conn is None:
         return None, "Database connection error"
@@ -43,7 +43,7 @@ def get_candidats(todayevent):
         conn.close()
     return candid, None
 
-def get_intervenant(todayevent):
+def get_event_intervenant(todayevent):
     conn = get_db_connection()
     if conn is None:
         return None, "Database connection error"
