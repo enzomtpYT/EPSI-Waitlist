@@ -45,7 +45,7 @@ if __name__ == "__main__":
     debug_mode = os.getenv('FLASK_ENV') == 'development'
     app.run(host="127.0.0.1", port=8080, debug=debug_mode)
 
-@app.route('/database', methods=['GET', 'POST'])
+@app.route('/database', methods=['GET', 'POST', 'UPDATE', 'DELETE'])
 def database():
     query = []
     for i in session.query(models.BlogPost):
