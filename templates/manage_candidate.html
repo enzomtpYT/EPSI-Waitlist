@@ -7,6 +7,7 @@
 
 <div class="admin-section">
     <h2>Liste des Candidats</h2>
+    {% if candidates %}
     <table>
         <thead>
             <tr>
@@ -19,18 +20,24 @@
         <tbody>
             {% for candidate in candidates %}
             <tr>
-                <td>{{ candidate.lastname }}</td>
-                <td>{{ candidate.name }}</td>
-                <td>{{ candidate.email }}</td>
+                <td>{{ candidate.lastname_candidate }}</td>
+                <td>{{ candidate.name_candidate }}</td>
+                <td>{{ candidate.email_candidate }}</td>
                 <td>
-                    <a href="/admin/manage_candidate/candidate/{{ candidat.id }}">
+                    <a href="/admin/manage_candidate/candidate/{{ candidate.id_candidate }}">
                         <button type="button">Voir</button>
                     </a>
+                    <form action="/admin/manage_candidate/candidate/{{ candidate.id_candidate }}/delete" method="post" style="display:inline;">
+                        <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce candidat ?');">Supprimer</button>
+                    </form>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    {% else %}
+    <p>Aucun candidat n'existe.</p>
+    {% endif %}
 </div>
 
 {% endblock %}
