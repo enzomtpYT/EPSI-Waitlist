@@ -1,74 +1,74 @@
-CREATE TABLE Candidat(
-   id_candidat INTEGER,
-   nom_candidat TEXT NOT NULL,
-   prenom_candidat TEXT NOT NULL,
-   adresse_mail_candidat TEXT NOT NULL,
-   PRIMARY KEY(id_candidat)
+CREATE TABLE Candidate(
+   id_candidate INTEGER,
+   lastname_candidate TEXT NOT NULL,
+   name_candidate TEXT NOT NULL,
+   email_address_candidate TEXT NOT NULL,
+   PRIMARY KEY(id_candidate)
 );
 
-CREATE TABLE Intervenant(
-   id_intervenant INTEGER,
-   nom_intervenant TEXT NOT NULL,
-   adresse_mail_intervenant TEXT,
-   PRIMARY KEY(id_intervenant)
+CREATE TABLE Participant(
+   id_Participant INTEGER,
+   name_participant TEXT NOT NULL,
+   email_address_participant TEXT,
+   PRIMARY KEY(id_participant)
 );
 
-CREATE TABLE Evenement(
-   id_evenement INTEGER,
-   nom_evenement TEXT NOT NULL,
-   date_evenement NUMERIC NOT NULL,
-   PRIMARY KEY(id_evenement)
+CREATE TABLE Event(
+   id_event INTEGER,
+   name_event TEXT NOT NULL,
+   date_event NUMERIC NOT NULL,
+   PRIMARY KEY(id_event)
 );
 
-CREATE TABLE Entretien(
-   id_entretien INTEGER,
-   id_intervenant INTEGER NOT NULL,
-   id_evenement INTEGER NOT NULL,
-   id_candidat INTEGER NOT NULL,
-   PRIMARY KEY(id_entretien),
-   FOREIGN KEY(id_intervenant) REFERENCES Intervenant(id_intervenant),
-   FOREIGN KEY(id_evenement) REFERENCES Evenement(id_evenement),
-   FOREIGN KEY(id_candidat) REFERENCES Candidat(id_candidat)
+CREATE TABLE Interview(
+   id_interview INTEGER,
+   id_participant INTEGER NOT NULL,
+   id_event INTEGER NOT NULL,
+   id_candidate INTEGER NOT NULL,
+   PRIMARY KEY(id_interview),
+   FOREIGN KEY(id_participant) REFERENCES participant(id_participant),
+   FOREIGN KEY(id_event) REFERENCES Event(id_event),
+   FOREIGN KEY(id_candidate) REFERENCES Candidate(id_candidate)
 );
 
-CREATE TABLE Participe(
-   id_candidat INTEGER,
-   id_evenement INTEGER,
-   PRIMARY KEY(id_candidat, id_evenement),
-   FOREIGN KEY(id_candidat) REFERENCES Candidat(id_candidat),
-   FOREIGN KEY(id_evenement) REFERENCES Evenement(id_evenement)
+CREATE TABLE Participates(
+   id_candidate INTEGER,
+   id_event INTEGER,
+   PRIMARY KEY(id_candidate, id_event),
+   FOREIGN KEY(id_candidate) REFERENCES Candidate(id_candidate),
+   FOREIGN KEY(id_event) REFERENCES Event(id_event)
 );
 
-CREATE TABLE Assiste(
-   id_intervenant INTEGER,
-   id_evenement INTEGER,
-   PRIMARY KEY(id_intervenant, id_evenement),
-   FOREIGN KEY(id_intervenant) REFERENCES Intervenant(id_intervenant),
-   FOREIGN KEY(id_evenement) REFERENCES Evenement(id_evenement)
+CREATE TABLE Attends(
+   id_participant INTEGER,
+   id_event INTEGER,
+   PRIMARY KEY(id_participant, id_event),
+   FOREIGN KEY(id_participant) REFERENCES Participant(id_participant),
+   FOREIGN KEY(id_event) REFERENCES Event(id_event)
 );
 
-INSERT INTO Candidat (id_candidat, nom_candidat, prenom_candidat, adresse_mail_candidat) VALUES
+INSERT INTO Candidate (id_candidate, lastname_candidate, name_candidate, email_address_candidate) VALUES
 (1, 'Doe', 'John', 'john.doe@example.com'),
 (2, 'Smith', 'Jane', 'jane.smith@example.com'),
 (3, 'Brown', 'Charlie', 'charlie.brown@example.com');
 
-INSERT INTO Intervenant (id_intervenant, nom_intervenant, adresse_mail_intervenant) VALUES
+INSERT INTO Participant (id_participant, name_participant, email_address_participant) VALUES
 (1, 'Williams', 'williams@example.com'),
 (2, 'Johnson', 'johnson@example.com');
 
-INSERT INTO Evenement (id_evenement, nom_evenement, date_evenement) VALUES
+INSERT INTO Event (id_event, name_event, date_event) VALUES
 (1, 'Tech Conference', '2023-11-01'),
 (2, 'Job Fair', '2023-12-15');
 
-INSERT INTO Entretien (id_entretien, id_intervenant, id_evenement, id_candidat) VALUES
+INSERT INTO Interview (id_interview, id_participant, id_event, id_candidate) VALUES
 (1, 1, 1, 1),
 (2, 2, 2, 2);
 
-INSERT INTO Participe (id_candidat, id_evenement) VALUES
+INSERT INTO Participates (id_candidate, id_event) VALUES
 (1, 1),
 (2, 2),
 (3, 1);
 
-INSERT INTO Assiste (id_intervenant, id_evenement) VALUES
+INSERT INTO Attends (id_participant, id_event) VALUES
 (1, 1),
 (2, 2);
