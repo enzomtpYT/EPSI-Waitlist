@@ -75,6 +75,34 @@ def get_event_candidats(todayevent):
         conn.close()
     return candid, None
 
+def delete_event(id_event):
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreure base de donnée"
+    try:
+        conn.execute("DELETE FROM Event WHERE id_event = ?", (id_event,))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la suppression de l'évenement: {e}")
+        return "Erreur lors de la suppression de l'évenement"
+    finally:
+        conn.close()
+    return None
+
+def delete_candidate(id_candidate):
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreure base de donnée"
+    try:
+        conn.execute("DELETE FROM Candidate WHERE id_candidate = ?", (id_candidate,))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la suppression du candidat: {e}")
+        return "Erreur lors de la suppression du candidat"
+    finally:
+        conn.close()
+    return None
+
 def get_event_intervenant(todayevent):
     conn = get_db_connection()
     if conn is None:
@@ -108,3 +136,71 @@ def get_even_interview_candidate(todayevent, id_participant):
         return None, "Erreure requete base de donnée"
     finally:
         conn.close()
+
+def get_candidate(candidate_id):
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreure base de donnée"
+    try:
+        candidate = conn.execute('SELECT * FROM Candidate WHERE id_candidate = ?', (candidate_id,)).fetchone()
+        return candidate, None
+    except sqlite3.Error as e:
+        print(f"Erreure requete base de donnée: {e}")
+        return None, "Erreure requete base de donnée"
+    finally:
+        conn.close()
+
+def get_event(event_id):
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreure base de donnée"
+    try:
+        event = conn.execute('SELECT * FROM Event WHERE id_event = ?', (event_id,)).fetchone()
+        return event, None
+    except sqlite3.Error as e:
+        print(f"Erreure requete base de donnée: {e}")
+        return None, "Erreure requete base de donnée"
+    finally:
+        conn.close()
+
+def get_participant(participant_id):
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreure base de donnée"
+    try:
+        participant = conn.execute('SELECT * FROM Participant WHERE id_participant = ?', (participant_id,)).fetchone()
+        return participant, None
+    except sqlite3.Error as e:
+        print(f"Erreure requete base de donnée: {e}")
+        return None, "Erreure requete base de donnée"
+    finally:
+        conn.close()
+
+
+def edit_candidate(lastname, name, email, id_candidate):
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreure base de donnée"
+    try:
+        conn.execute('UPDATE Candidate SET lastname_candidate = ?, name_candidate = ?, email_candidate = ? WHERE id_candidate = ?', (lastname, name, email, id_candidate))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la mise à jour du candidat: {e}")
+        return "Erreur lors de la mise à jour du candidat"
+    finally:
+        conn.close()
+    return None
+
+def edit_event(name, date, id_event):
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreure base de donnée"
+    try:
+        conn.execute('UPDATE Event SET name_event = ?, date_event = ? WHERE id_event = ?', (name, date, id_event))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la mise à jour de l'évennement: {e}")
+        return "Erreur lors de la mise à jour de l'évennement"
+    finally:
+        conn.close()
+    return None

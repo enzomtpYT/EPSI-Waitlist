@@ -30,8 +30,8 @@
 
 <div class="admin-section">
     <h2>Supprimer le candidat</h2>
-    <form action="/admin/manage_candidate/candidate/{{ candidate.id_candidate }}/delete" method="post">
-        <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce candidat ?');">Supprimer</button>
+    <form action="/admin/manage_candidate/{{ candidate.id_candidate }}/delete" method="post">
+        <button class="delete" type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce candidat ?');">Supprimer</button>
     </form>
 </div>
 

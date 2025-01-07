@@ -27,8 +27,8 @@
                     <a href="/admin/manage_candidate/candidate/{{ candidate.id_candidate }}">
                         <button type="button">Voir</button>
                     </a>
-                    <form action="/admin/manage_candidate/candidate/{{ candidate.id_candidate }}/delete" method="post" style="display:inline;">
-                        <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce candidat ?');">Supprimer</button>
+                    <form action="/admin/manage_candidate/{{ candidate.id_candidate }}/delete" method="post" style="display:inline;">
+                        <button class="delete" type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce candidat ?');">Supprimer</button>
                     </form>
                 </td>
             </tr>

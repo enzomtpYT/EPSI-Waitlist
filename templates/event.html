@@ -7,9 +7,9 @@
 
 <div class="admin-section">
     <h2>Modifier les informations du Evennement</h2>
-    <form action="/event/{{ event.id_event }}/edit" method="post">
+    <form action="/admin/manage_event/event/{{ event.id_event }}" method="post">
         <label for="date_event">Nom:</label>
-        <input type="text" id="date_event" name="date_event" value="{{ event.name_event }}">
+        <input type="text" id="name_event" name="name_event" value="{{ event.name_event }}">
 
         <label for="date_event">Date:</label>
         <input type="date" id="date_event" name="date_event" value="{{ event.date_event }}">
@@ -27,8 +27,8 @@
 
 <div class="admin-section">
     <h2>Supprimer le Evennement</h2>
-    <form action="/event/{{ event.id_event }}/delete" method="post">
-        <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet Évennement ?');">Supprimer</button>
+    <form action="/admin/manage_event/event/{{ event.id_event }}/delete" method="post">
+        <button class="delete" type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet Évennement ?');">Supprimer</button>
     </form>
 </div>
 
