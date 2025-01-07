@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 
-{% block title %}Admin - Créer Évenement{% endblock %}
+{% block title %}Admin - Créer Événement{% endblock %}
 
 {% block content %}
-<h1>Créer Évenement</h1>
+<h1>Créer Événement</h1>
 
 <div class="admin-section">
-    <h2>Créer un Évenement</h2>
+    <h2>Créer un Événement</h2>
     <form action="{{ url_for('create_event.create_event') }}" method="post">
         <label for="name_event">Nom:</label>
         <input type="text" id="name_event" name="name_event">
-        
+
         <label for="date_event">Date:</label>
         <input type="date" id="date_event" name="date_event">
 

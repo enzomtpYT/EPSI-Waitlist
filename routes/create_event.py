@@ -23,9 +23,9 @@ def create_event():
                     "INSERT INTO Event (name_event, date_event) VALUES (?, ?)", (name, date),
                 )
                 conn.commit()
-                flash("L'evennement a été créer avec succès!", "success")
+                flash("L'événement a été créer avec succès!", "success")
             except sqlite3.Error as e:
-                flash(f"Erreur lors de la création de l'évenement: {e}", "danger")
+                flash(f"Erreur lors de la création de l'événement: {e}", "danger")
             finally:
                 conn.close()
         return redirect(url_for('create_event.create_event'))

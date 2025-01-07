@@ -16,19 +16,19 @@ def edit_event(id_event):
         name = request.form['name_event']
         date = request.form['date_event']
         error = None
-        
+
         if not name:
-            error = 'Le Nom est obligatoire.'
+            error = 'Le nom est obligatoire.'
         elif not date:
             error = 'La date est obligatoire.'
 
         if error is None:
             error = database.edit_event(name, date, id_event)
             if error is None:
-                flash("Evenement mis à jour avec succès!", "success")
+                flash("Évennement mis à jour avec succès!", "success")
                 return redirect(url_for('event.edit_event', id_event=id_event))
             else:
-                flash(f"Erreur lors de la mise à jour de l'événement: {error}", "danger")
+                flash(f"Erreur lors de la mise à jour de l'Évennement: {error}", "danger")
     return render_template('event.html', event=event)
 
 @event_bp.route("/admin/manage_event/event/<int:id_event>/delete", methods=['POST'])
