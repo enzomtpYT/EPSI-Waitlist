@@ -16,9 +16,9 @@ def get_event():
     if conn is None:
         return None, "Erreure base de donnée"
     try:
-        events = conn.execute(f'SELECT id_evenement FROM Evenement WHERE date_evenement = \'{today}\'').fetchall()
+        events = conn.execute(f'SELECT id_event FROM Event WHERE date_event = \'{today}\'').fetchall()
         if events:
-            return events[0]['id_evenement'], None
+            return events[0]['id_event'], None
         else:
             return None, "Pas d'événement aujourd'hui"
     except sqlite3.Error as e:
@@ -32,10 +32,10 @@ def get_event_candidats(todayevent):
     if conn is None:
         return None, "Erreure base de donnée"
     try:
-        candids = conn.execute(f'SELECT id_candidat FROM Participe WHERE id_evenement = \'{todayevent}\'').fetchall()
+        candids = conn.execute(f'SELECT id_candidate FROM Participates WHERE id_event = \'{todayevent}\'').fetchall()
         candid = []
         for candidat in candids:
-            candid.append(conn.execute(f'SELECT * FROM Candidat WHERE id_candidat = \'{candidat["id_candidat"]}\'').fetchall()[0])
+            candid.append(conn.execute(f'SELECT * FROM Candidate WHERE id_candidate = \'{candidat["id_candidate"]}\'').fetchall()[0])
     except sqlite3.Error as e:
         print(f"Erreure requete base de donnée: {e}")
         return None, "Erreure requete base de donnée"
@@ -48,13 +48,31 @@ def get_event_intervenant(todayevent):
     if conn is None:
         return None, "Erreure base de donnée"
     try:
-        inters = conn.execute(f'SELECT id_intervenant FROM Assiste WHERE id_evenement = \'{todayevent}\'').fetchall()
+        inters = conn.execute(f'SELECT id_participant FROM Attends WHERE id_event = \'{todayevent}\'').fetchall()
         inter = []
         for intervenant in inters:
-            inter.append(conn.execute(f'SELECT * FROM Intervenant WHERE id_intervenant = \'{intervenant["id_intervenant"]}\'').fetchall()[0])
+            inter.append(conn.execute(f'SELECT * FROM Participant WHERE id_participant = \'{intervenant["id_participant"]}\'').fetchall()[0])
     except sqlite3.Error as e:
         print(f"Erreure requete base de donnée: {e}")
         return None, "Erreure requete base de donnée"
     finally:
         conn.close()
     return inter, None
+
+def get_even_interview_candidate(todayevent, id_participant):
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreure base de donnée"
+    try:
+        list = conn.execute(f'SELECT id_candidate FROM Interview WHERE id_event = \'{todayevent}\' AND id_participant = \'{id_participant}\'').fetchall()
+        candid = []
+        for candidat in list:
+            cad = conn.execute(f'SELECT * FROM Candidate WHERE id_candidate = \'{candidat["id_candidate"]}\'').fetchall()
+            for el in cad:
+                candid.append(el)
+        return candid, None
+    except sqlite3.Error as e:
+        print(f"Erreure requete base de donnée: {e}")
+        return None, "Erreure requete base de donnée"
+    finally:
+        conn.close()
