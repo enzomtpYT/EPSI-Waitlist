@@ -21,9 +21,12 @@
                 <td>{{ event.name_event }}</td>
                 <td>{{ event.date_event }}</td>
                 <td>
-                    <a href="/admin/manage_event/event/{{ event.id }}">
+                    <a href="/admin/manage_event/event/{{ event.id_event }}">
                         <button type="button">Voir</button>
                     </a>
+                    <form action="/admin/manage_event/{{ event.id_event }}/delete" method="post" style="display:inline;">
+                        <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet Evennement ?');">Supprimer</button>
+                    </form>
                 </td>
             </tr>
             {% endfor %}

@@ -1,14 +1,13 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 import sqlite3
+from lib import database
 from lib.database import get_db_connection
 
 manage_candidate_bp = Blueprint('manage_candidate', __name__)
 
 @manage_candidate_bp.route("/admin/manage_candidate")
 def manage_candidate():
-    conn = get_db_connection()
-    candidates = conn.execute('SELECT * FROM Candidate').fetchall()
-    conn.close()
+    candidates, error = database.get_allcandidates()
     return render_template('manage_candidate.html', candidates=candidates)
 
 @manage_candidate_bp.route("/admin/manage_candidate/candidate/<int:id_candidate>/delete", methods=['POST'])
