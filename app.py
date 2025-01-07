@@ -22,6 +22,7 @@ def inject_routes():
 
 app.add_url_rule("/", "index", index)
 app.add_url_rule("/liste", "liste", liste)
+app.add_url_rule("/liste/live", "liste", liste)
 app.add_url_rule("/admin", "admin", admin)
 app.add_url_rule("/admin/create_candidate", "create_candidate", create_candidate)
 app.add_url_rule("/admin/manage_candidate", "manage_candidate", manage_candidate)

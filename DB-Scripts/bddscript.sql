@@ -46,29 +46,3 @@ CREATE TABLE Attends(
    FOREIGN KEY(id_participant) REFERENCES Participant(id_participant),
    FOREIGN KEY(id_event) REFERENCES Event(id_event)
 );
-
-INSERT INTO Candidate (id_candidate, lastname_candidate, name_candidate, email_candidate) VALUES
-(1, 'Doe', 'John', 'john.doe@example.com'),
-(2, 'Smith', 'Jane', 'jane.smith@example.com'),
-(3, 'Brown', 'Charlie', 'charlie.brown@example.com');
-
-INSERT INTO Participant (id_participant, name_participant, email_participant) VALUES
-(1, 'Williams', 'williams@example.com'),
-(2, 'Johnson', 'johnson@example.com');
-
-INSERT INTO Event (id_event, name_event, date_event) VALUES
-(1, 'Tech Conference', '2023-11-01'),
-(2, 'Job Fair', '2023-12-15');
-
-INSERT INTO Interview (id_interview, id_participant, id_event, id_candidate) VALUES
-(1, 1, 1, 1),
-(2, 2, 2, 2);
-
-INSERT INTO Participates (id_candidate, id_event) VALUES
-(1, 1),
-(2, 2),
-(3, 1);
-
-INSERT INTO Attends (id_participant, id_event) VALUES
-(1, 1),
-(2, 2);
