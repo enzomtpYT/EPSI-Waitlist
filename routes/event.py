@@ -25,10 +25,10 @@ def edit_event(id_event):
         if error is None:
             error = database.edit_event(name, date, id_event)
             if error is None:
-                flash("Évennement mis à jour avec succès!", "success")
+                flash("Événement mis à jour avec succès!", "success")
                 return redirect(url_for('event.edit_event', id_event=id_event))
             else:
-                flash(f"Erreur lors de la mise à jour de l'Évennement: {error}", "danger")
+                flash(f"Erreur lors de la mise à jour de l'Événement: {error}", "danger")
     return render_template('event.html', event=event)
 
 @event_bp.route("/admin/manage_event/event/<int:id_event>/delete", methods=['POST'])
