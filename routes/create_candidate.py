@@ -22,10 +22,7 @@ def create_candidate():
 
         if error is None:
             try:
-                conn.execute(
-                    "INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate) VALUES (?, ?, ?)",
-                    (lastname, name, email)
-                )
+                conn.execute("INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate) VALUES (?, ?, ?)", (lastname, name, email))
                 conn.commit()
                 flash("Candidat créé avec succès!", "success")
             except sqlite3.Error as e:

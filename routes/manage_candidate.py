@@ -12,13 +12,28 @@ def manage_candidate():
 
 @manage_candidate_bp.route("/admin/manage_candidate/candidate/<int:id_candidate>/delete", methods=['POST'])
 def delete_candidate(id_candidate):
-    conn = get_db_connection()
+    delete_statement = 'DELETE FROM Candidate WHERE id_candidate = ?'
+
     try:
-        conn.execute('DELETE FROM Candidate WHERE id_candidate = ?', (id_candidate))
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(delete_statement, (id_candidate,))
         conn.commit()
-        flash("Candidat supprimé avec succès!", "success")
-    except sqlite3.Error as e:
-        flash(f"Erreur lors de la suppression du candidat: {e}", "danger")
+    except sqlite3.OperationalError as e:
+        print(e)
     finally:
         conn.close()
+
     return redirect(url_for('manage_candidate.manage_candidate'))
+
+    # conn = get_db_connection()
+    # try:
+    #     conn.execute('DELETE FROM Candidate WHERE id_candidate = ?', (id_candidate))
+    #     conn.commit()
+    #     flash("Candidat supprimé avec succès!", "success")
+    #     return redirect(url_for('manage_candidate.manage_candidate'))
+    # except sqlite3.Error as e:
+    #     flash(f"Erreur lors de la suppression du candidat: {e}", "danger")
+    #     return f'AIE ETTEUR {e}'
+    # finally:
+    #     conn.close()
