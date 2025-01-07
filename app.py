@@ -3,10 +3,12 @@ import os
 from routes.index import index
 from routes.admin import admin
 from routes.liste import liste
+from routes.liste import live
+from routes.manage_event import manage_event
+from routes.event import event
 from routes.create_candidate import create_candidate_bp
 from routes.manage_candidate import manage_candidate_bp
 from routes.candidate import candidate_bp
-from routes.liste import live
 from routes.manage_event import manage_event
 from routes.create_event import create_event_bp
 
@@ -37,6 +39,7 @@ app.add_url_rule("/liste", "liste", liste)
 app.add_url_rule("/liste/data-live", "live", live)
 app.add_url_rule("/admin", "admin", admin)
 app.add_url_rule("/admin/manage_event", "manage_event", manage_event)
+app.add_url_rule("/admin/manage_event/event", "event", event)
 
 if __name__ == "__main__":
     debug_mode = os.getenv('FLASK_ENV') == 'development'
