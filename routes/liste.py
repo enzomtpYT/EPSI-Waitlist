@@ -1,10 +1,11 @@
-from flask import Blueprint, render_template, g
+from flask import Blueprint, Response, render_template, g
 from lib import database
+import time, json
+from flask import jsonify
 
 liste_bp = Blueprint('liste', __name__)
 
-@liste_bp.route("/liste")
-def liste():
+def get_data():
     todayevent, error = database.get_event()
     if error:
         message = error
@@ -26,15 +27,35 @@ def liste():
     for interv in inter:
         all, error = database.get_even_interview_candidate(todayevent, interv['id_participant'])
         if all.__len__() > 0:
-            print(f'-------{interv['name_participant']}-------')
             if interv['name_participant'] not in list:
                 list[interv['name_participant']] = []
             for candid in all:
-                list[interv['name_participant']].append(candid)
-                print(candid['name_candidate'])
+                list[interv['name_participant']].append(dict(candid))  # Convert Row to dict
     
     data = {
         "list": [list],
         "message": None,
     }
-    return render_template('liste.html', datas=data)
+    return data
+
+def refresh():
+    previous_data = None
+    while True:
+        data = get_data()
+        if data != previous_data:
+            yield json.dumps(data)
+            previous_data = data
+        time.sleep(1)
+
+@liste_bp.route("/liste")
+def liste():
+    return render_template('liste.html', datas=get_data())
+
+@liste_bp.route("/liste/data")
+def liste_data():
+    data = get_data()
+    return jsonify(data)
+        
+@liste_bp.route("/liste/data-live")
+def live():
+    return Response(refresh(), mimetype='text/event-stream')
