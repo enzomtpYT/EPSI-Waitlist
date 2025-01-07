@@ -16,7 +16,7 @@ def create_candidate():
         if not lastname:
             error = 'Le nom de famille est obligatoire.'
         elif not name:
-            error = 'Le prénom de famille est obligatoire.'
+            error = 'Le prénom est obligatoire.'
         elif not email:
             error = 'L\'adresse email est obligatoire.'
 
@@ -24,7 +24,7 @@ def create_candidate():
             try:
                 conn.execute(
                     "INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate) VALUES (?, ?, ?)",
-                    (lastname, name, email),
+                    (lastname, name, email)
                 )
                 conn.commit()
                 flash("Candidat créé avec succès!", "success")
