@@ -6,21 +6,25 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='styles/liste.css') }}">
 <h1>LISTE!</h1>
 <div class="divider"></div>
-<table>
-  <thead>
-    <tr>
-      {% for intervenant in intervenants %}
-        <th>{{ intervenant.nom_intervenant }}</th>
-      {% endfor %}
-      <th>Abwaawawa</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for candidat in candidats %}
+{% if not data.message %}
+  <table>
+    <thead>
       <tr>
-        <td>{{ candidat.prenom_candidat }} - {{ candidat.nom_candidat }}</td>
+        {% for intervenant in datas.intervenants %}
+          <th>{{ intervenant.nom_intervenant }}</th>
+        {% endfor %}
+        <th>Abwaawawa</th>
       </tr>
-    {% endfor %}
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      {% for candidat in datas.candidats %}
+        <tr>
+          <td>{{ candidat.prenom_candidat }} - {{ candidat.nom_candidat }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <h1>{{ datas.message }}</h1>
+{% endif %}
 {% endblock %}
