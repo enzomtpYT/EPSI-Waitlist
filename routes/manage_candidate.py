@@ -22,6 +22,11 @@ def delete_candidate(id_candidate):
         conn.commit()
     except sqlite3.OperationalError as e:
         print(e)
+    finally:
+        conn.close()
+
+    return redirect(url_for('manage_candidate.manage_candidate'))
+
     # conn = get_db_connection()
     # try:
     #     conn.execute('DELETE FROM Candidate WHERE id_candidate = ?', (id_candidate))
