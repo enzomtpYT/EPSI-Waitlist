@@ -7,10 +7,7 @@ liste_bp = Blueprint('liste', __name__)
 def liste():
     todayevent, error = db.get_event()
     if error:
-        message = "Erreur lors de la récupération de l'événement"
-        print(error)
-    if not todayevent:
-        message = "Pas d'événement aujourd'hui"
+        message = error
         candid = None
         inter = None
     else:

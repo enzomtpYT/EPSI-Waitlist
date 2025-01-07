@@ -4,9 +4,13 @@
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='styles/liste.css') }}">
+{% if not datas.message %}
 <h1>LISTE!</h1>
+{% else %}
+  <h1>{{ datas.message }}</h1>
+{% endif %}
 <div class="divider"></div>
-{% if not data.message %}
+{% if not datas.message %}
   <table>
     <thead>
       <tr>
@@ -24,7 +28,5 @@
       {% endfor %}
     </tbody>
   </table>
-{% else %}
-  <h1>{{ datas.message }}</h1>
 {% endif %}
 {% endblock %}
