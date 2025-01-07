@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template
+import sqlite3
 
 manage_candidate_bp = Blueprint('manage_candidate', __name__)
 
