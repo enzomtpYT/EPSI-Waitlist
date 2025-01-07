@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Modifier Evennement{% endblock %}
+
+{% block content %}
+<h1>Modifier Evennement</h1>
+
+<div class="admin-section">
+    <h2>Modifier les informations du Evennement</h2>
+    <form action="/event/{{ event.id }}/edit" method="post">
+        <label for="date_event">Nom:</label>
+        <input type="text" id="date_event" name="date_event" value="{{ event.name }}">
+
+        <label for="date_event">Date:</label>
+        <input type="text" id="date_event" name="date_event" value="{{ event.date }}">
+
+        <button type="submit">Enregistrer</button>
+    </form>
+</div>
+
+<div class="admin-section">
+    <h2>Entretiens passés par le/la Evennement.e</h2>
+    <a href="/admin/manage_event/event/{{ event.id }}/interview">
+        <button type="button">Voir les entretiens</button>
+    </a>
+</div>
+
+<div class="admin-section">
+    <h2>Supprimer le Evennement</h2>
+    <form action="/event/{{ event.id }}/delete" method="post">
+        <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet Évennement ?');">Supprimer</button>
+    </form>
+</div>
+
+{% endblock %}

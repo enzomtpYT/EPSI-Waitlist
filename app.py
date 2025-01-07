@@ -7,6 +7,7 @@ from routes.liste import live
 from routes.manage_candidate import manage_candidate
 from routes.manage_event import manage_event
 from routes.candidate import candidate
+from routes.event import event
 from routes.create_candidate import create_candidate_bp
 from routes.create_event import create_event_bp
 from flask import render_template
@@ -37,6 +38,7 @@ app.add_url_rule("/admin", "admin", admin)
 app.add_url_rule("/admin/manage_candidate", "manage_candidate", manage_candidate)
 app.add_url_rule("/admin/manage_candidate/candidate", "candidate", candidate)
 app.add_url_rule("/admin/manage_event", "manage_event", manage_event)
+app.add_url_rule("/admin/manage_event/event", "event", event)
 
 if __name__ == "__main__":
     debug_mode = os.getenv('FLASK_ENV') == 'development'
