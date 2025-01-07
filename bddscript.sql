@@ -2,14 +2,14 @@ CREATE TABLE Candidate(
    id_candidate INTEGER,
    lastname_candidate TEXT NOT NULL,
    name_candidate TEXT NOT NULL,
-   email_address_candidate TEXT NOT NULL,
+   email_candidate TEXT NOT NULL,
    PRIMARY KEY(id_candidate)
 );
 
 CREATE TABLE Participant(
    id_participant INTEGER,
    name_participant TEXT NOT NULL,
-   email_address_participant TEXT,
+   email_participant TEXT,
    PRIMARY KEY(id_participant)
 );
 
@@ -47,12 +47,12 @@ CREATE TABLE Attends(
    FOREIGN KEY(id_event) REFERENCES Event(id_event)
 );
 
-INSERT INTO Candidate (id_candidate, lastname_candidate, name_candidate, email_address_candidate) VALUES
+INSERT INTO Candidate (id_candidate, lastname_candidate, name_candidate, email_candidate) VALUES
 (1, 'Doe', 'John', 'john.doe@example.com'),
 (2, 'Smith', 'Jane', 'jane.smith@example.com'),
 (3, 'Brown', 'Charlie', 'charlie.brown@example.com');
 
-INSERT INTO Participant (id_participant, name_participant, email_address_participant) VALUES
+INSERT INTO Participant (id_participant, name_participant, email_participant) VALUES
 (1, 'Williams', 'williams@example.com'),
 (2, 'Johnson', 'johnson@example.com');
 
