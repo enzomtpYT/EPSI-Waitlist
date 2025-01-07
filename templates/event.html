@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}Admin - Modifier Evennement{% endblock %}
+{% block title %}Admin - Modifier Événement{% endblock %}
 
 {% block content %}
-<h1>Modifier Evennement</h1>
+<h1>Modifier Événement</h1>
 
 <div class="admin-section">
-    <h2>Modifier les informations du Evennement</h2>
+    <h2>Modifier les informations de l'événement</h2>
     <form action="/event/{{ event.id_event }}/edit" method="post">
         <label for="date_event">Nom:</label>
         <input type="text" id="date_event" name="date_event" value="{{ event.name_event }}">
@@ -19,16 +19,16 @@
 </div>
 
 <div class="admin-section">
-    <h2>Entretiens de l'Evennement</h2>
+    <h2>Entretiens de l'événement</h2>
     <a href="/admin/manage_event/event/{{ event.id_event }}/interview">
         <button type="button">Voir les entretiens</button>
     </a>
 </div>
 
 <div class="admin-section">
-    <h2>Supprimer le Evennement</h2>
+    <h2>Supprimer l'événement</h2>
     <form action="/event/{{ event.id_event }}/delete" method="post">
-        <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet Évennement ?');">Supprimer</button>
+        <button type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');">Supprimer</button>
     </form>
 </div>
 

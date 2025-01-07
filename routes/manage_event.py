@@ -16,7 +16,7 @@ def delete_event(id_event):
         conn.execute("DELETE FROM Event WHERE id_event = ?", (id_event,))
         conn.commit()
     except sqlite3.Error as e:
-        print(f"Erreur lors de la suppression de l'évenement: {e}")
+        print(f"Erreur lors de la suppression de l'événement: {e}")
     finally:
         conn.close()
     return redirect(url_for('manage_event.manage_event'))

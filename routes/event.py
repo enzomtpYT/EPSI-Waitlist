@@ -17,9 +17,9 @@ def edit_event(id_event):
         name = request.form['name_event']
         date = request.form['date_event']
         error = None
-        
+
         if not name:
-            error = 'Le Nom est obligatoire.'
+            error = 'Le nom est obligatoire.'
         elif not date:
             error = 'La date est obligatoire.'
 
@@ -30,9 +30,9 @@ def edit_event(id_event):
                     (name, date, id_event)
                 )
                 conn.commit()
-                flash("Évennement mis à jour avec succès!", "success")
+                flash("Événement mis à jour avec succès!", "success")
             except sqlite3.Error as e:
-                flash(f"Erreur lors de la mise à jour de l'Évennement: {e}", "danger")
+                flash(f"Erreur lors de la mise à jour de l'événement: {e}", "danger")
             finally:
                 conn.close()
             return redirect(url_for('event.edit_event', id_event=id_event))
@@ -46,9 +46,9 @@ def delete_event(id_event):
     try:
         conn.execute('DELETE FROM Event WHERE id_event = ?', (id_event))
         conn.commit()
-        flash("Évennement supprimé avec succès!", "success")
+        flash("Événement supprimé avec succès!", "success")
     except sqlite3.Error as e:
-        flash(f"Erreur lors de la suppression de l'Évennement: {e}", "danger")
+        flash(f"Erreur lors de la suppression de l'événement: {e}", "danger")
     finally:
         conn.close()
     return redirect(url_for('manage_event.manage_event'))
