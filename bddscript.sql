@@ -7,7 +7,7 @@ CREATE TABLE Candidate(
 );
 
 CREATE TABLE Participant(
-   id_Participant INTEGER,
+   id_participant INTEGER,
    name_participant TEXT NOT NULL,
    email_address_participant TEXT,
    PRIMARY KEY(id_participant)
@@ -26,7 +26,7 @@ CREATE TABLE Interview(
    id_event INTEGER NOT NULL,
    id_candidate INTEGER NOT NULL,
    PRIMARY KEY(id_interview),
-   FOREIGN KEY(id_participant) REFERENCES participant(id_participant),
+   FOREIGN KEY(id_participant) REFERENCES Participant(id_participant),
    FOREIGN KEY(id_event) REFERENCES Event(id_event),
    FOREIGN KEY(id_candidate) REFERENCES Candidate(id_candidate)
 );
