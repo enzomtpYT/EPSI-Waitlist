@@ -16,6 +16,7 @@ def edit_event(id_event):
     if request.method == 'POST':
         name = request.form['name_event']
         date = request.form['date_event']
+        year = request.form['year_event']
         error = None
 
         if not name:
@@ -24,7 +25,7 @@ def edit_event(id_event):
             error = 'La date est obligatoire.'
 
         if error is None:
-            error = database.edit_event(name, date, id_event)
+            error = database.edit_event(name, date, year, id_event)
             if error is None:
                 flash("Événement mis à jour avec succès!", "success")
                 return redirect(url_for('event.edit_event', id_event=id_event))
@@ -37,7 +38,7 @@ def view_interviews(id_event):
     conn = get_db_connection()
     event = conn.execute('SELECT name_event FROM Event WHERE id_event = ?', (id_event,)).fetchone()
     interviews = conn.execute('''
-    SELECT Interview.id_interview, Participant.name_participant, Candidate.lastname_candidate, Candidate.name_candidate
+    SELECT Interview.id_interview, Participant.name_participant, Candidate.lastname_candidate, Candidate.name_candidate, Candidate.year_candidate, Candidate.class_candidate
     FROM Interview
     JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
     JOIN Participant ON Interview.id_participant = Participant.id_participant

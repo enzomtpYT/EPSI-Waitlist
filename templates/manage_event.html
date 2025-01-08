@@ -12,6 +12,7 @@
             <tr>
                 <th>Nom</th>
                 <th>Date</th>
+                <th>Année</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -20,6 +21,7 @@
             <tr>
                 <td>{{ event.name_event }}</td>
                 <td>{{ event.date_event }}</td>
+                <td>{{ event.year_event }}</td>
                 <td>
                     <a href="/admin/manage_event/event/{{ event.id_event }}">
                         <button type="button">Voir</button>

@@ -9,6 +9,7 @@ def create_event():
     if request.method == 'POST':
         name = request.form['name_event']
         date = request.form['date_event']
+        year = request.form['year_event']
         conn = get_db_connection()
         error = None
 
@@ -20,7 +21,7 @@ def create_event():
         if error is None:
             try:
                 conn.execute(
-                    "INSERT INTO Event (name_event, date_event) VALUES (?, ?)", (name, date),
+                    "INSERT INTO Event (name_event, date_event, year_event) VALUES (?, ?, ?)", (name, date, year),
                 )
                 conn.commit()
                 flash("L'événement a été créer avec succès!", "success")
