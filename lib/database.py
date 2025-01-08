@@ -356,3 +356,31 @@ def create_event(name, date, year):
     finally:
         conn.close()
     return None
+
+def create_candidate(lastname, name, email, year, candidate_class):
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        conn.execute('INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate, year_candidate, class_candidate) VALUES (?, ?, ?, ?, ?)', (lastname, name, email, year, candidate_class))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la création du candidat: {e}")
+        return "Erreur lors de la création du candidat"
+    finally:
+        conn.close()
+    return None
+
+def create_participant(name, email):
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        conn.execute('INSERT INTO Participant (name_participant, email_participant) VALUES (?, ?)', (name, email))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la création de l'intervenant: {e}")
+        return "Erreur lors de la création de l'intervenant"
+    finally:
+        conn.close()
+    return None

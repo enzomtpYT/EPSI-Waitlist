@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-import sqlite3
-from lib.database import get_db_connection
+from lib import database
 
 create_candidate_bp = Blueprint('create_candidate', __name__)
 
@@ -12,7 +11,6 @@ def create_candidate():
         email = request.form['candidate_email']
         year = request.form['candidate_year']
         candidate_class = request.form['candidate_class']
-        conn = get_db_connection()
         error = None
 
         if not lastname:
@@ -23,15 +21,12 @@ def create_candidate():
             error = 'L\'adresse email est obligatoire.'
 
         if error is None:
-            try:
-                conn.execute("INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate, year_candidate, class_candidate) VALUES (?, ?, ?, ?, ?)", (lastname, name, email, year, candidate_class))
-                conn.commit()
+            error = database.create_candidate(lastname, name, email, year, candidate_class)
+            if error is None:
                 flash("Candidat créé avec succès!", "success")
                 return redirect(url_for('create_candidate.create_candidate'))
-            except sqlite3.Error as e:
-                flash(f"Erreur lors de la création du candidat: {e}", "danger")
-            finally:
-                conn.close()
-        return redirect(url_for('create_candidate.create_candidate'))
+            else:
+                flash(f"Erreur lors de la création du Candidat: {error}", "danger")
+                return redirect(url_for('create_candidate.create_candidate'))
 
     return render_template('create_candidate.html')
