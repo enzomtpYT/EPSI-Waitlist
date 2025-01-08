@@ -15,6 +15,7 @@ def edit_event(id_event):
     if request.method == 'POST':
         name = request.form['name_event']
         date = request.form['date_event']
+        year = request.form['year_event']
         error = None
 
         if not name:
@@ -23,7 +24,7 @@ def edit_event(id_event):
             error = 'La date est obligatoire.'
 
         if error is None:
-            error = database.edit_event(name, date, id_event)
+            error = database.edit_event(name, date, year, id_event)
             if error is None:
                 flash("Événement mis à jour avec succès!", "success")
                 return redirect(url_for('event.edit_event', id_event=id_event))

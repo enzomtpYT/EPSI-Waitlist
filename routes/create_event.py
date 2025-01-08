@@ -8,6 +8,7 @@ def create_event():
     if request.method == 'POST':
         name = request.form['name_event']
         date = request.form['date_event']
+        year = request.form['year_event']
         error = None
 
         if not name:
@@ -16,7 +17,7 @@ def create_event():
             error = 'L\'adresse email est obligatoire.'
 
         if error is None:
-            error = database.create_event(name, date)
+            error = database.create_event(name, date, year)
             if error is None:
                 flash("Événement créé avec succès!", "success")
                 return redirect(url_for('create_event.create_event'))
