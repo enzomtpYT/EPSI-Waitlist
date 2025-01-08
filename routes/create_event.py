@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-import sqlite3
-from lib.database import get_db_connection
+from lib import database
 
 create_event_bp = Blueprint('create_event', __name__)
 
@@ -9,7 +8,6 @@ def create_event():
     if request.method == 'POST':
         name = request.form['name_event']
         date = request.form['date_event']
-        conn = get_db_connection()
         error = None
 
         if not name:
@@ -18,16 +16,12 @@ def create_event():
             error = 'L\'adresse email est obligatoire.'
 
         if error is None:
-            try:
-                conn.execute(
-                    "INSERT INTO Event (name_event, date_event) VALUES (?, ?)", (name, date),
-                )
-                conn.commit()
-                flash("L'événement a été créer avec succès!", "success")
-            except sqlite3.Error as e:
-                flash(f"Erreur lors de la création de l'événement: {e}", "danger")
-            finally:
-                conn.close()
-        return redirect(url_for('create_event.create_event'))
+            error = database.create_event(name, date)
+            if error is None:
+                flash("Événement créé avec succès!", "success")
+                return redirect(url_for('create_event.create_event'))
+            else:
+                flash(f"Erreur lors de la création de l'Événement: {error}", "danger")
+                return redirect(url_for('create_event.create_event'))
 
     return render_template('create_event.html')

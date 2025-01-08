@@ -1,15 +1,13 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-import sqlite3
-from lib.database import get_db_connection
+from lib import database
 
 manage_waitlist_bp = Blueprint('manage_waitlist', __name__)
 
 @manage_waitlist_bp.route("/admin/manage_waitlist/<int:id_event>", methods=['GET', 'POST'])
 def manage_waitlist(id_event):
-    conn = get_db_connection()
-    event = conn.execute('SELECT * FROM Event WHERE id_event = ?', (id_event,)).fetchone()
-    participants = conn.execute('SELECT * FROM Participant').fetchall()
-    candidates = conn.execute('SELECT * FROM Candidate').fetchall()
+    event, error = database.get_event(id_event)
+    participants, error = database.get_all_participants()
+    candidates, error = database.get_all_candidates()
 
     if request.method == 'POST':
         id_participant = request.form['participant']
@@ -22,18 +20,12 @@ def manage_waitlist(id_event):
             error = 'Le candidat est obligatoire.'
 
         if error is None:
-            try:
-                conn.execute(
-                    'INSERT INTO Participates (id_candidate, id_event) VALUES (?, ?)',
-                    (id_candidate, id_event)
-                )
-                conn.commit()
-                flash("Candidat ajouté à la liste d'attente avec succès!", "success")
-            except sqlite3.Error as e:
-                flash(f"Erreur lors de l'ajout du candidat à la liste d'attente: {e}", "danger")
-            finally:
-                conn.close()
-            return redirect(url_for('manage_waitlist.manage_waitlist', id_event=id_event))
+            error = database.create_interview(id_event, id_participant, id_candidate)
+            if error is None:
+                flash('Entretien créé avec succès.', 'success')
+                return redirect(url_for('manage_waitlist.manage_waitlist', id_event=id_event))
+            else:
+                flash(error, 'danger')
+                return redirect(url_for('manage_waitlist.manage_waitlist', id_event=id_event))
 
-    conn.close()
     return render_template('manage_waitlist.html', event=event, participants=participants, candidates=candidates)
