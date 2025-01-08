@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from lib import database
+from lib.database import get_db_connection
 
 candidate_bp = Blueprint('candidate', __name__)
 
@@ -9,6 +10,7 @@ def candidate():
 
 @candidate_bp.route("/admin/manage_candidate/candidate/<int:id_candidate>", methods=['GET', 'POST'])
 def edit_candidate(id_candidate):
+    conn = get_db_connection()
     candidate, error = database.get_candidate(id_candidate)
 
     if request.method == 'POST':
@@ -31,7 +33,28 @@ def edit_candidate(id_candidate):
                 return redirect(url_for('candidate.edit_candidate', id_candidate=id_candidate))
             else:
                 flash(f"Erreur lors de la mise à jour du Candidat: {error}", "danger")
-    return render_template('candidate.html', candidate=candidate)
+
+    interviews = conn.execute('''
+        SELECT Interview.id_interview, Event.name_event, Event.date_event, Participant.name_participant
+        FROM Interview
+        JOIN Participant ON Interview.id_participant = Participant.id_participant
+        JOIN Event ON Interview.id_event = Event.id_event
+        WHERE Interview.id_candidate = ?
+    ''', (id_candidate,)).fetchall()
+    conn.close()
+    return render_template('candidate.html', interviews=interviews, candidate_id=id_candidate, candidate=candidate)
+# @candidate_bp.route("/admin/manage_candidate/candidate/<int:id_candidate>/interviews", methods=['GET'])
+# def view_interviews(id_candidate):
+#     conn = get_db_connection()
+#     interviews = conn.execute('''
+#         SELECT Interview.id_interview, Event.date_event, Participant.name_participant
+#         FROM Interview
+#         JOIN Participant ON Interview.id_participant = Participant.id_participant
+#         JOIN Event ON Interview.id_event = Event.id_event
+#         WHERE Interview.id_candidate = ?
+#     ''', (id_candidate,)).fetchall()
+#     conn.close()
+#     return render_template('interviews.html', interviews=interviews, candidate_id=id_candidate)
 
 @candidate_bp.route("/admin/manage_candidate/candidate/<int:id_candidate>/delete", methods=['POST'])
 def delete_candidate(id_candidate):

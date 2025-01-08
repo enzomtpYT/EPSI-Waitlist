@@ -21,11 +21,37 @@
     </form>
 </div>
 
-<div class="admin-section">
+{# <div class="admin-section">
     <h2>Entretiens passés par le/la candidat.e</h2>
-    <a href="/admin/manage_candidate/candidate/{{ candidate.id_candidate }}/interview">
+    <a href="{{ url_for('candidate.view_interviews', id_candidate=candidate.id_candidate) }}">
         <button type="button">Voir les entretiens</button>
     </a>
+</div> #}
+
+<div class="admin-section">
+    <h2>Liste des Entretiens</h2>
+    {% if interviews %}
+    <table>
+        <thead>
+            <tr>
+                <th>Événement</th>
+                <th>Date</th>
+                <th>Intervenant</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for interview in interviews %}
+            <tr>
+                <td>{{ interview.name_event }}</td>
+                <td>{{ interview.date_event }}</td>
+                <td>{{ interview.name_participant }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Aucun entretien trouvé pour ce candidat.</p>
+    {% endif %}
 </div>
 
 <div class="admin-section">
