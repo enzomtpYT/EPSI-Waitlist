@@ -20,10 +20,29 @@
 </div>
 
 <div class="admin-section">
-    <h2>Entretiens passés par l'intervenant.e</h2>
-    <a href="/admin/manage_participant/participant/{{ participant.id_participant }}/interview">
-        <button type="button">Voir les entretiens</button>
-    </a>
+    <h2>Liste des Entretiens</h2>
+    {% if interviews %}
+    <table>
+        <thead>
+            <tr>
+                <th>Événement</th>
+                <th>Date</th>
+                <th>Candidat</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for interview in interviews %}
+            <tr>
+                <td>{{ interview.name_event }}</td>
+                <td>{{ interview.date_event }}</td>
+                <td>{{interview.name_candidate}} {{ interview.lastname_candidate }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Aucun entretien trouvé pour cet intervenant.</p>
+    {% endif %}
 </div>
 
 <div class="admin-section">

@@ -11,6 +11,7 @@ def participant():
 
 @participant_bp.route("/admin/manage_participant/participant/<int:id_participant>", methods=['GET', 'POST'])
 def edit_participant(id_participant):
+    conn = get_db_connection()
     participant, error = database.get_participant(id_participant)
 
     if request.method == 'POST':
@@ -30,7 +31,16 @@ def edit_participant(id_participant):
                 return redirect(url_for('participant.edit_participant', id_participant=id_participant))
             else:
                 flash(f"Erreur lors de la mise à jour du participant: {error}", "danger")
-    return render_template('participant.html', participant=participant)
+
+    interviews = conn.execute('''
+    SELECT Interview.id_interview, Event.name_event, Event.date_event, Candidate.lastname_candidate, Candidate.name_candidate
+    FROM Interview
+    JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
+    JOIN Event ON Interview.id_event = Event.id_event
+    WHERE Interview.id_participant = ?
+    ''', (id_participant,)).fetchall()
+    conn.close()
+    return render_template('participant.html', interviews=interviews, participant_id=id_participant, participant=participant)
 
 @participant_bp.route("/admin/manage_participant/participant/<int:id_participant>/delete", methods=['POST'])
 def delete_participant(id_participant):
