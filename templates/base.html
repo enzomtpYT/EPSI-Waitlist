@@ -7,6 +7,24 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/base.css') }}">
 </head>
 <body>
+    {% with messages = get_flashed_messages(True) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <script>
+            console.log("{{ category }}: {{ message }}");
+        </script>
+            {% if category == 'success' %}
+            <div class="popup fsuccess">
+            {% elif category == 'danger' %}
+            <div class="popup ferror">
+            {% else %}
+            <div class="popup">
+            {% endif %}
+                    <span class="popuptext">{{ message }}</span>
+                </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
     {% include 'navbar.html' %}
     <div class="content">
         {% block content %}{% endblock %}

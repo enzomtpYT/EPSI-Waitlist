@@ -35,6 +35,7 @@ def edit_candidate(id_candidate):
                 return redirect(url_for('candidate.edit_candidate', id_candidate=id_candidate))
             else:
                 flash(f"Erreur lors de la mise à jour du Candidat: {error}", "danger")
+                return redirect(url_for('candidate.edit_candidate', id_candidate=id_candidate))
 
     interviews = conn.execute('''
         SELECT Interview.id_interview, Event.name_event, Event.date_event, Participant.name_participant
