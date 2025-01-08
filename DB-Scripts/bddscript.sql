@@ -3,6 +3,9 @@ CREATE TABLE Candidate(
    lastname_candidate TEXT NOT NULL,
    name_candidate TEXT NOT NULL,
    email_candidate TEXT NOT NULL,
+   year_candidate TEXT,
+   class_candidate TEXT,
+
    PRIMARY KEY(id_candidate)
 );
 
