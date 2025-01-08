@@ -10,6 +10,7 @@ def candidate():
 @candidate_bp.route("/admin/manage_candidate/candidate/<int:id_candidate>", methods=['GET', 'POST'])
 def edit_candidate(id_candidate):
     candidate, error = database.get_candidate(id_candidate)
+    interviews, error = database.get_candidate_interviews(id_candidate)
 
     if request.method == 'POST':
         lastname = request.form['candidate_lastname']
@@ -35,7 +36,6 @@ def edit_candidate(id_candidate):
                 flash(f"Erreur lors de la mise à jour du Candidat: {error}", "danger")
                 return redirect(url_for('candidate.edit_candidate', id_candidate=id_candidate))
 
-    error, interviews = database.get_candidate_interviews(id_candidate)
     return render_template('candidate.html', interviews=interviews, candidate_id=id_candidate, candidate=candidate)
 
 @candidate_bp.route("/admin/manage_candidate/candidate/<int:id_candidate>/delete", methods=['POST'])
