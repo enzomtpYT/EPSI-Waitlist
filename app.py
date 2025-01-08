@@ -4,11 +4,14 @@ from routes.index import index_bp
 from routes.admin import admin_bp
 from routes.liste import liste_bp
 from routes.event import event_bp
-from routes.candidate import candidate_bp
-from routes.create_event import create_event_bp
-from routes.manage_event import manage_event_bp
 from routes.create_candidate import create_candidate_bp
 from routes.manage_candidate import manage_candidate_bp
+from routes.candidate import candidate_bp
+from routes.create_participant import create_participant_bp
+from routes.manage_participant import manage_participant_bp
+from routes.participant import participant_bp
+from routes.create_event import create_event_bp
+from routes.manage_event import manage_event_bp
 
 app = Flask(__name__)
 
@@ -16,15 +19,18 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
 # Register the blueprints
-app.register_blueprint(create_candidate_bp)
-app.register_blueprint(manage_candidate_bp)
-app.register_blueprint(candidate_bp)
-app.register_blueprint(event_bp)
-app.register_blueprint(create_event_bp)
-app.register_blueprint(manage_event_bp)
 app.register_blueprint(index_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(liste_bp)
+app.register_blueprint(create_candidate_bp)
+app.register_blueprint(manage_candidate_bp)
+app.register_blueprint(candidate_bp)
+app.register_blueprint(create_participant_bp)
+app.register_blueprint(manage_participant_bp)
+app.register_blueprint(participant_bp)
+app.register_blueprint(create_event_bp)
+app.register_blueprint(manage_event_bp)
+app.register_blueprint(event_bp)
 
 custom_route_names = {
 
