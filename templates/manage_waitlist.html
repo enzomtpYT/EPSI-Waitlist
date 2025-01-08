@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Gérer la Liste d'Attente{% endblock %}
+
+{% block content %}
+<h1>Gérer la Liste d'Attente pour l'Événement: {{ event.name_event }}</h1>
+
+<div class="admin-section">
+    <h2>Ajouter un Candidat à la Liste d'Attente</h2>
+    <form action="{{ url_for('manage_waitlist.manage_waitlist', id_event=event.id_event) }}" method="post">
+        <label for="participant">Intervenant:</label>
+        <select id="participant" name="participant">
+            {% for participant in participants %}
+            <option value="{{ participant.id_participant }}">{{ participant.name_participant }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="candidate">Candidat:</label>
+        <select id="candidate" name="candidate">
+            {% for candidate in candidates %}
+            <option value="{{ candidate.id_candidate }}">{{ candidate.lastname_candidate }} {{ candidate.name_candidate }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Ajouter à la liste d'attente</button>
+    </form>
+</div>
+
+{% endblock %}

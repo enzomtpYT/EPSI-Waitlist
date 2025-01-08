@@ -1,5 +1,6 @@
 from flask import Flask, render_template, session
 import os
+# from lib import models
 from routes.index import index_bp
 from routes.admin import admin_bp
 from routes.liste import liste_bp
@@ -12,6 +13,8 @@ from routes.manage_participant import manage_participant_bp
 from routes.participant import participant_bp
 from routes.create_event import create_event_bp
 from routes.manage_event import manage_event_bp
+from routes.event import event_bp
+from routes.manage_waitlist import manage_waitlist_bp
 
 app = Flask(__name__)
 
@@ -31,6 +34,7 @@ app.register_blueprint(participant_bp)
 app.register_blueprint(create_event_bp)
 app.register_blueprint(manage_event_bp)
 app.register_blueprint(event_bp)
+app.register_blueprint(manage_waitlist_bp)
 
 custom_route_names = {
 

@@ -19,6 +19,13 @@
 </div>
 
 <div class="admin-section">
+    <h2>Liste d'Attente</h2>
+    <a href="{{ url_for('manage_waitlist.manage_waitlist', id_event=event.id_event) }}">
+        <button type="button">Gérer la liste d'attente</button>
+    </a>
+</div>
+
+<div class="admin-section">
     <h2>Entretiens de l'événement</h2>
     <a href="{{ url_for('event.view_interviews', id_event=event.id_event) }}">
         <button type="button">Voir les entretiens</button>
