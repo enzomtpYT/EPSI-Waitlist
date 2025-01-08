@@ -5,7 +5,6 @@ CREATE TABLE Candidate(
    email_candidate TEXT NOT NULL,
    year_candidate TEXT,
    class_candidate TEXT,
-
    PRIMARY KEY(id_candidate)
 );
 
@@ -20,6 +19,7 @@ CREATE TABLE Event(
    id_event INTEGER,
    name_event TEXT NOT NULL,
    date_event NUMERIC NOT NULL,
+   year_event TEXT,
    PRIMARY KEY(id_event)
 );
 

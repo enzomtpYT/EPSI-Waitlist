@@ -8,10 +8,10 @@
 <div class="admin-section">
     <h2>Modifier les informations de l'événement</h2>
     <form action="/admin/manage_event/event/{{ event.id_event }}" method="post">
-        <label for="date_event">Nom:</label>
+        <label for="date_event">Nom :</label>
         <input type="text" id="name_event" name="name_event" value="{{ event.name_event }}">
 
-        <label for="date_event">Date:</label>
+        <label for="date_event">Date :</label>
         <input type="date" id="date_event" name="date_event" value="{{ event.date_event }}">
 
         <button type="submit">Enregistrer</button>
@@ -19,7 +19,7 @@
 </div>
 
 <div class="admin-section">
-    <h2>Liste d'Attente</h2>
+    <h2>Liste d'attente</h2>
     <a href="{{ url_for('manage_waitlist.manage_waitlist', id_event=event.id_event) }}">
         <button type="button">Gérer la liste d'attente</button>
     </a>
