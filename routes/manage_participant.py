@@ -8,7 +8,7 @@ manage_participant_bp = Blueprint('manage_participant', __name__)
 @manage_participant_bp.route('/admin/manage_participant', methods=('GET', 'POST'))
 def manage_participant():
     participants, error = database.get_all_participants()
-    return render_template('manage_candidate.html', participants=participants)
+    return render_template('manage_participant.html', participants=participants)
 
 @manage_participant_bp.route("/admin/manage_participant/<int:id_participant>/delete", methods=['POST'])
 def delete_participant(id_participant):
