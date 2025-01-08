@@ -154,7 +154,7 @@ def get_event_interview_candidate(todayevent, id_participant):
     if conn is None:
         return None, "Erreur base de données"
     try:
-        list = conn.execute(f'SELECT id_candidate FROM Interview WHERE id_event = \'{todayevent}\' AND id_participant = \'{id_participant}\'').fetchall()
+        list = conn.execute(f'SELECT id_candidate FROM Interview WHERE id_event = \'{todayevent}\' AND id_participant = \'{id_participant}\' AND happened = \'0\'').fetchall()
         candid = []
         for candidat in list:
             cad = conn.execute(f'SELECT * FROM Candidate WHERE id_candidate = \'{candidat["id_candidate"]}\'').fetchall()

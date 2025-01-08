@@ -26,11 +26,10 @@ def get_data():
 
     for interv in inter:
         all, error = database.get_event_interview_candidate(todayevent, interv['id_participant'])
-        if all.__len__() > 0:
-            if interv['name_participant'] not in list:
-                list[interv['name_participant']] = []
-            for candid in all:
-                list[interv['name_participant']].append(dict(candid))  # Convert Row to dict
+        if interv['name_participant'] not in list:
+            list[interv['name_participant']] = []
+        for candid in all:
+            list[interv['name_participant']].append(dict(candid))  # Convert Row to dict
 
     data = {
         "list": [list],
