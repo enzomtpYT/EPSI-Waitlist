@@ -11,7 +11,7 @@ def get_db_connection():
 
 today = datetime.date.today()
 
-def get_events():
+def get_today_events():
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"

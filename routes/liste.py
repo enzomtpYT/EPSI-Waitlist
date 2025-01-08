@@ -6,7 +6,7 @@ from flask import jsonify
 liste_bp = Blueprint('liste', __name__)
 
 def get_data():
-    todayevent, error = database.get_events()
+    todayevent, error = database.get_today_events()
     if error:
         message = error
         candid = None
