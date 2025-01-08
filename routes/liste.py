@@ -1,4 +1,4 @@
-from flask import Blueprint, Response, render_template, g
+from flask import Blueprint, Response, render_template, flash
 from lib import database
 import time, json
 from flask import jsonify
@@ -32,10 +32,9 @@ def get_data():
             list[interv['name_participant']].append(dict(candid))  # Convert Row to dict
 
     data = {
-        "list": [list],
-        "message": None,
+        "list": [list]
     }
-    return data
+    return data, message
 
 def refresh():
     previous_data = None
@@ -48,11 +47,13 @@ def refresh():
 
 @liste_bp.route("/liste")
 def liste():
-    return render_template('liste.html', datas=get_data())
+    d, mess = get_data()
+    flash(mess)
+    return render_template('liste.html', datas=d)
 
 @liste_bp.route("/liste/data")
 def liste_data():
-    data = get_data()
+    data , mess = get_data()
     return jsonify(data)
 
 @liste_bp.route("/liste/data-live")
