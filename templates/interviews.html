@@ -19,9 +19,14 @@
             {% for interview in interviews %}
             <tr>
                 <td>{{ interview.name_participant }}</td>
-                <td>{{ interview.name_candidate }} {{ interview.lastname_candidate }}</td>
-                <td>{% if  interview.year_candidate %}{{ interview.year_candidate }}{%endif %}</td>
-                <td>{% if  interview.class_candidate %}{{ interview.class_candidate }}{% endif %}</td>
+                <td>{{ interview.name_candidate }} {{ interview.lastname_candidate }}
+                {% if  interview.year_candidate %}
+                    {{ interview.year_candidate }}
+                {%endif %}
+                {% if  interview.class_candidate %}
+                    {{ interview.class_candidate }}
+                {% endif %}
+                </td>
             </tr>
             {% endfor %}
         </tbody>
