@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from lib import database
-from lib.database import get_db_connection
 
 event_bp = Blueprint('event', __name__)
 
@@ -30,6 +29,7 @@ def edit_event(id_event):
                 return redirect(url_for('event.edit_event', id_event=id_event))
             else:
                 flash(f"Erreur lors de la mise à jour de l'Événement: {error}", "danger")
+                return redirect(url_for('event.edit_event', id_event=id_event))
     return render_template('event.html', event=event)
 
 @event_bp.route("/admin/manage_event/event/<int:id_event>/interviews", methods=['GET'])
