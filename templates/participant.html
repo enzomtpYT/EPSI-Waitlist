@@ -6,7 +6,7 @@
 <h1>Intervenant : {{ participant.name_participant }}</h1>
 
 <div class="admin-section">
-    <h2>Modifier les informations de l'intervenant</h2>
+    <h2>Modifier les informations de l'intervenant.e</h2>
     <form action="{{ url_for('participant.edit_participant', id_participant=participant.id_participant) }}" method="post">
 
         <label for="participant_name">Prénom:</label>
@@ -20,7 +20,7 @@
 </div>
 
 <div class="admin-section">
-    <h2>Liste des Entretiens</h2>
+    <h2>Liste des entretiens</h2>
     {% if interviews %}
     <table>
         <thead>
