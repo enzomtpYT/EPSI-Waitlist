@@ -20,7 +20,7 @@
 
 <div class="admin-section">
     <h2>Entretiens de l'événement</h2>
-    <a href="/admin/manage_event/event/{{ event.id_event }}/interview">
+    <a href="{{ url_for('event.view_interviews', id_event=event.id_event) }}">
         <button type="button">Voir les entretiens</button>
     </a>
 </div>
