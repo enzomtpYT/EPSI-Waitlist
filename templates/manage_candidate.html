@@ -14,6 +14,8 @@
                 <th>Nom</th>
                 <th>Prénom</th>
                 <th>E-mail</th>
+                <th>Année</th>
+                <th>Classe</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -23,6 +25,8 @@
                 <td>{{ candidate.lastname_candidate }}</td>
                 <td>{{ candidate.name_candidate }}</td>
                 <td>{{ candidate.email_candidate }}</td>
+                <td>{{ candidate.year_candidate }}</td>
+                <td>{{ candidate.class_candidate }}</td>
                 <td>
                     <a href="/admin/manage_candidate/candidate/{{ candidate.id_candidate }}">
                         <button type="button">Voir</button>

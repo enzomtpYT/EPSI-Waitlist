@@ -207,12 +207,12 @@ def get_participant(participant_id):
         conn.close()
 
 
-def edit_candidate(lastname, name, email, id_candidate):
+def edit_candidate(lastname, name, email, year, candidate_class, id_candidate):
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute('UPDATE Candidate SET lastname_candidate = ?, name_candidate = ?, email_candidate = ? WHERE id_candidate = ?', (lastname, name, email, id_candidate))
+        conn.execute('UPDATE Candidate SET lastname_candidate = ?, name_candidate = ?, email_candidate = ?, year_candidate = ?, class_candidate = ? WHERE id_candidate = ?', (lastname, name, email, year, candidate_class, id_candidate))
         conn.commit()
     except sqlite3.Error as e:
         print(f"Erreur lors de la mise à jour du candidat: {e}")

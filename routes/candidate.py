@@ -17,6 +17,8 @@ def edit_candidate(id_candidate):
         lastname = request.form['candidate_lastname']
         name = request.form['candidate_name']
         email = request.form['candidate_email']
+        year = request.form['candidate_year']
+        candidate_class = request.form['candidate_class']
         error = None
 
         if not lastname:
@@ -27,7 +29,7 @@ def edit_candidate(id_candidate):
             error = 'L\'adresse email est obligatoire.'
 
         if error is None:
-            error = database.edit_candidate(lastname, name, email, id_candidate)
+            error = database.edit_candidate(lastname, name, email, year, candidate_class, id_candidate)
             if error is None:
                 flash("Candidat mis à jour avec succès!", "success")
                 return redirect(url_for('candidate.edit_candidate', id_candidate=id_candidate))
@@ -43,19 +45,6 @@ def edit_candidate(id_candidate):
     ''', (id_candidate,)).fetchall()
     conn.close()
     return render_template('candidate.html', interviews=interviews, candidate_id=id_candidate, candidate=candidate)
-
-# @candidate_bp.route("/admin/manage_candidate/candidate/<int:id_candidate>/interviews", methods=['GET'])
-# def view_interviews(id_candidate):
-#     conn = get_db_connection()
-#     interviews = conn.execute('''
-#         SELECT Interview.id_interview, Event.name_event, Event.date_event, Participant.name_participant
-#         FROM Interview
-#         JOIN Participant ON Interview.id_participant = Participant.id_participant
-#         JOIN Event ON Interview.id_event = Event.id_event
-#         WHERE Interview.id_candidate = ?
-#     ''', (id_candidate,)).fetchall()
-#     conn.close()
-#     return render_template('interviews.html', interviews=interviews, candidate_id=id_candidate)
 
 @candidate_bp.route("/admin/manage_candidate/candidate/<int:id_candidate>/delete", methods=['POST'])
 def delete_candidate(id_candidate):

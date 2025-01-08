@@ -10,6 +10,8 @@ def create_candidate():
         lastname = request.form['candidate_lastname']
         name = request.form['candidate_name']
         email = request.form['candidate_email']
+        year = request.form['candidate_year']
+        candidate_class = request.form['candidate_class']
         conn = get_db_connection()
         error = None
 
@@ -22,9 +24,10 @@ def create_candidate():
 
         if error is None:
             try:
-                conn.execute("INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate) VALUES (?, ?, ?)", (lastname, name, email))
+                conn.execute("INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate, year_candidate, class_candidate) VALUES (?, ?, ?, ?, ?)", (lastname, name, email, year, candidate_class))
                 conn.commit()
                 flash("Candidat créé avec succès!", "success")
+                return redirect(url_for('create_candidate.create_candidate'))
             except sqlite3.Error as e:
                 flash(f"Erreur lors de la création du candidat: {e}", "danger")
             finally:

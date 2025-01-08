@@ -3,30 +3,29 @@
 {% block title %}Admin - Modifier Candidat{% endblock %}
 
 {% block content %}
-<h1>Candidat : {{ candidate.name_candidate }} {{ candidate.lastname_candidate }}</h1>
+<h1>Candidat : {{ candidate.name_candidate }} {{ candidate.lastname_candidate }} {{ candidate.year_candidate }} {{ candidate.class_candidate }}</h1>
 
 <div class="admin-section">
     <h2>Modifier les informations du candidat</h2>
     <form action="{{ url_for('candidate.edit_candidate', id_candidate=candidate.id_candidate) }}" method="post">
-        <label for="candidate_lastname">Nom:</label>
+        <label for="candidate_lastname">Nom :</label>
         <input type="text" id="candidate_lastname" name="candidate_lastname" value="{{ candidate.lastname_candidate }}">
 
-        <label for="candidate_name">Prénom:</label>
+        <label for="candidate_name">Prénom :</label>
         <input type="text" id="candidate_name" name="candidate_name" value="{{ candidate.name_candidate }}">
 
-        <label for="candidate_email">E-mail:</label>
+        <label for="candidate_email">E-mail :</label>
         <input type="email" id="candidate_email" name="candidate_email" value="{{ candidate.email_candidate }}">
+
+        <label for="candidate_year">Année :</label>
+        <input type="text" id="candidate_year" name="candidate_year" value="{{ candidate.year_candidate }}">
+
+        <label for="candidate_class">Classe :</label>
+        <input type="text" id="candidate_class" name="candidate_class" value="{{ candidate.class_candidate }}">
 
         <button type="submit">Enregistrer</button>
     </form>
 </div>
-
-{# <div class="admin-section">
-    <h2>Entretiens passés par le/la candidat.e</h2>
-    <a href="{{ url_for('candidate.view_interviews', id_candidate=candidate.id_candidate) }}">
-        <button type="button">Voir les entretiens</button>
-    </a>
-</div> #}
 
 <div class="admin-section">
     <h2>Liste des entretiens</h2>
