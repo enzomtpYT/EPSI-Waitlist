@@ -6,13 +6,13 @@
 <h1>Intervenant : {{ participant.name_participant }}</h1>
 
 <div class="admin-section">
-    <h2>Modifier les informations de l'intervenant.e</h2>
+    <h2>Modifier les informations de l'intervenant</h2>
     <form action="{{ url_for('participant.edit_participant', id_participant=participant.id_participant) }}" method="post">
 
-        <label for="participant_name">Prénom:</label>
+        <label for="participant_name">Prénom :</label>
         <input type="text" id="participant_name" name="participant_name" value="{{ participant.name_participant }}">
 
-        <label for="participant_email">E-mail:</label>
+        <label for="participant_email">E-mail :</label>
         <input type="email" id="participant_email" name="participant_email" value="{{ participant.email_participant }}">
 
         <button type="submit">Enregistrer</button>
@@ -41,12 +41,12 @@
         </tbody>
     </table>
     {% else %}
-    <p>Aucun entretien trouvé pour cet.te intervenant.e</p>
+    <p>Aucun entretien trouvé pour cet intervenant.</p>
     {% endif %}
 </div>
 
 <div class="admin-section">
-    <h2>Supprimer l'intervenant.e</h2>
+    <h2>Supprimer l'intervenant</h2>
     <form action="/admin/manage_participant/{{ participant.id_participant }}/delete" method="post">
         <button class="delete" type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet intervenant ?');">Supprimer</button>
     </form>

@@ -6,7 +6,7 @@
 <h1>Candidat : {{ candidate.name_candidate }} {{ candidate.lastname_candidate }} {{ candidate.year_candidate }} {{ candidate.class_candidate }}</h1>
 
 <div class="admin-section">
-    <h2>Modifier les informations du candidat</h2>
+    <h2>Modifier les informations du/de la candidat.e</h2>
     <form action="{{ url_for('candidate.edit_candidate', id_candidate=candidate.id_candidate) }}" method="post">
         <label for="candidate_lastname">Nom :</label>
         <input type="text" id="candidate_lastname" name="candidate_lastname" value="{{ candidate.lastname_candidate }}">
