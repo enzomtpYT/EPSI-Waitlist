@@ -43,11 +43,12 @@ def edit_candidate(id_candidate):
     ''', (id_candidate,)).fetchall()
     conn.close()
     return render_template('candidate.html', interviews=interviews, candidate_id=id_candidate, candidate=candidate)
+
 # @candidate_bp.route("/admin/manage_candidate/candidate/<int:id_candidate>/interviews", methods=['GET'])
 # def view_interviews(id_candidate):
 #     conn = get_db_connection()
 #     interviews = conn.execute('''
-#         SELECT Interview.id_interview, Event.date_event, Participant.name_participant
+#         SELECT Interview.id_interview, Event.name_event, Event.date_event, Participant.name_participant
 #         FROM Interview
 #         JOIN Participant ON Interview.id_participant = Participant.id_participant
 #         JOIN Event ON Interview.id_event = Event.id_event
