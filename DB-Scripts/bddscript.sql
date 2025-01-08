@@ -5,7 +5,6 @@ CREATE TABLE Candidate(
    email_candidate TEXT NOT NULL,
    year_candidate TEXT,
    class_candidate TEXT,
-
    PRIMARY KEY(id_candidate)
 );
 
