@@ -27,7 +27,7 @@ def get_event():
     finally:
         conn.close()
 
-def get_allevents():
+def get_all_events():
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
@@ -43,7 +43,7 @@ def get_allevents():
     finally:
         conn.close()
 
-def get_allcandidates():
+def get_all_candidates():
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
@@ -59,7 +59,23 @@ def get_allcandidates():
     finally:
         conn.close()
 
-def get_event_candidats(todayevent):
+def get_all_participants():
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+    try:
+        participants = conn.execute(f'SELECT * FROM Participant').fetchall()
+        if participants:
+            return participants, None
+        else:
+            return None, "Pas d'intervenant"
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def get_event_candidates(todayevent):
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
@@ -103,7 +119,21 @@ def delete_candidate(id_candidate):
         conn.close()
     return None
 
-def get_event_intervenant(todayevent):
+def delete_participant(id_participant):
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        conn.execute("DELETE FROM Participant WHERE id_participant = ?", (id_participant,))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la suppression de l'intervenant: {e}")
+        return "Erreur lors de la suppression de l'intervenant"
+    finally:
+        conn.close()
+    return None
+
+def get_event_participant(todayevent):
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
@@ -119,7 +149,7 @@ def get_event_intervenant(todayevent):
         conn.close()
     return inter, None
 
-def get_even_interview_candidate(todayevent, id_participant):
+def get_event_interview_candidate(todayevent, id_participant):
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
@@ -201,6 +231,20 @@ def edit_event(name, date, id_event):
     except sqlite3.Error as e:
         print(f"Erreur lors de la mise à jour de l'événnement: {e}")
         return "Erreur lors de la mise à jour de l'événnement"
+    finally:
+        conn.close()
+    return None
+
+def edit_participant(name, email, id_participant):
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        conn.execute('UPDATE Participant SET name_participant = ?, email_participant = ? WHERE id_participant = ?', (name, email, id_participant))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la mise à jour de l'intervenant: {e}")
+        return "Erreur lors de la mise à jour de l'intervenant"
     finally:
         conn.close()
     return None

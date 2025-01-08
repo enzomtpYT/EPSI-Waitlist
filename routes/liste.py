@@ -12,26 +12,26 @@ def get_data():
         candid = None
         inter = None
     else:
-        candid, error = database.get_event_candidats(todayevent)
+        candid, error = database.get_event_candidates(todayevent)
         if not candid:
             message = "Aucun candidats trouvés"
         else:
             message = None
 
-        inter, error = database.get_event_intervenant(todayevent)
+        inter, error = database.get_event_participant(todayevent)
         if not inter:
             message = "Aucun intervenants trouvés"
-    
+
     list = {}
-    
+
     for interv in inter:
-        all, error = database.get_even_interview_candidate(todayevent, interv['id_participant'])
+        all, error = database.get_event_interview_candidate(todayevent, interv['id_participant'])
         if all.__len__() > 0:
             if interv['name_participant'] not in list:
                 list[interv['name_participant']] = []
             for candid in all:
                 list[interv['name_participant']].append(dict(candid))  # Convert Row to dict
-    
+
     data = {
         "list": [list],
         "message": None,
@@ -55,7 +55,7 @@ def liste():
 def liste_data():
     data = get_data()
     return jsonify(data)
-        
+
 @liste_bp.route("/liste/data-live")
 def live():
     return Response(refresh(), mimetype='text/event-stream')

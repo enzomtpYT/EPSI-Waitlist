@@ -5,7 +5,7 @@ manage_event_bp = Blueprint('manage_event', __name__)
 
 @manage_event_bp.route("/admin/manage_event")
 def manage_event():
-    events, error = database.get_allevents()
+    events, error = database.get_all_events()
     return render_template('manage_event.html', events=events, error=error)
 
 @manage_event_bp.route("/admin/manage_event/<int:id_event>/delete", methods=['POST'])
