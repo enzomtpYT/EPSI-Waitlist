@@ -420,7 +420,7 @@ def create_tag(name):
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute('INSERT INTO Tag (name_tag) VALUES (?)', (name))
+        conn.execute('INSERT INTO Tag (name_tag) VALUES (?)', (name,))
         conn.commit()
         return None
     except sqlite3.Error as e:

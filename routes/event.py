@@ -15,7 +15,6 @@ def edit_event(id_event):
     if request.method == 'POST':
         name = request.form['name_event']
         date = request.form['date_event']
-        # year = request.form['year_event']
         error = None
 
         if not name:
