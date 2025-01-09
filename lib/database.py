@@ -281,7 +281,7 @@ def get_participant_interviews(id_participant):
     if conn is None:
         return None, "Erreur base de données"
     try:
-        interviews = conn.execute('SELECT Interview.id_interview, Event.name_event, Candidate.lastname_candidate, Candidate.name_candidate FROM Interview JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate JOIN Participant ON Interview.id_participant = Participant.id_participant JOIN Event ON Interview.id_event = Event.id_event WHERE Interview.id_participant = ?', (id_participant,)).fetchall()
+        interviews = conn.execute('SELECT Interview.id_interview, Event.name_event, Event.date_event, Candidate.lastname_candidate, Candidate.name_candidate FROM Interview JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate JOIN Participant ON Interview.id_participant = Participant.id_participant JOIN Event ON Interview.id_event = Event.id_event WHERE Interview.id_participant = ?', (id_participant,)).fetchall()
         return interviews, None
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
@@ -294,7 +294,7 @@ def get_candidate_interviews(id_candidate):
     if conn is None:
         return None, "Erreur base de données"
     try:
-        interviews = conn.execute('SELECT Interview.id_interview, Event.name_event, Participant.name_participant FROM Interview JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate JOIN Participant ON Interview.id_participant = Participant.id_participant JOIN Event ON Interview.id_event = Event.id_event WHERE Interview.id_candidate = ?', (id_candidate,)).fetchall()
+        interviews = conn.execute('SELECT Interview.id_interview, Event.name_event, Event.date_event, Participant.name_participant FROM Interview JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate JOIN Participant ON Interview.id_participant = Participant.id_participant JOIN Event ON Interview.id_event = Event.id_event WHERE Interview.id_candidate = ?', (id_candidate,)).fetchall()
         return interviews, None
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
