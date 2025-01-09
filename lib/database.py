@@ -385,7 +385,7 @@ def get_interview(id_interview):
         return None, "Erreur requête base de données"
     finally:
         conn.close()
-        
+
 def get_candidate_from_event_participants_inverviews(id_event, id_participant):
     conn = get_db_connection()
     if conn is None:
@@ -402,7 +402,7 @@ def get_candidate_from_event_participants_inverviews(id_event, id_participant):
         print(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
-        conn.close()    
+        conn.close()
 
 def edit_interview(id_interview, happened):
     conn = get_db_connection()

@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from lib import database
-from lib.database import get_db_connection, get_all_tags, get_candidate_tags, add_tag_to_candidate, remove_tag_from_candidate, get_candidate_interviews
 
 candidate_bp = Blueprint('candidate', __name__)
 
@@ -10,7 +9,6 @@ def candidate():
 
 @candidate_bp.route("/admin/manage_candidate/candidate/<int:id_candidate>", methods=['GET', 'POST'])
 def edit_candidate(id_candidate):
-    conn = get_db_connection()
     candidate, error = database.get_candidate(id_candidate)
     interviews, error = database.get_candidate_interviews(id_candidate)
 
