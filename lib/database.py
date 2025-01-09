@@ -56,12 +56,12 @@ def get_event(event_id):
     finally:
         conn.close()
 
-def edit_event(name, date, id_event):
+def edit_event(name, date, year, id_event):
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute('UPDATE Event SET name_event = ?, date_event = ? WHERE id_event = ?', (name, date, id_event))
+        conn.execute('UPDATE Event SET name_event = ?, date_event = ?, year_event = ? WHERE id_event = ?', (name, date, year, id_event))
         conn.commit()
     except sqlite3.Error as e:
         print(f"Erreur lors de la mise à jour de l'événnement: {e}")
