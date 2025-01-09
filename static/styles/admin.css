@@ -1,0 +1,32 @@
+.admin-section > table > thead > tr > th {
+    text-align: left;
+    border-bottom: 1px solid #4f4f4f;
+    align-items: center;
+    text-align: center;
+}
+
+.admin-section > table > tbody > tr > td {
+    text-align: left;
+    align-items: center;
+    text-align: center;
+}
+
+.admin-section > table > tbody > tr:nth-child(even) {
+    background-color: #ebebeb;
+}
+
+.admin-section > table > tbody > tr:nth-child(odd) {
+    background-color: #fff;
+}
+
+.admin-section > table > tbody > tr > td > * > button {
+    max-width: 49%;
+}
+
+.admin-section {
+    display: flex;
+    flex-direction: column;
+    padding: 0.2rem 1rem;
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
