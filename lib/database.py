@@ -97,7 +97,7 @@ def get_event_interviews(id_event):
         JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
         JOIN Participant ON Interview.id_participant = Participant.id_participant
         JOIN Event ON Interview.id_event = Event.id_event
-        WHERE Interview.id_event = ?
+        WHERE Interview.id_event = ? AND Interview.happened = 1
         ''', (id_event,)).fetchall()
         return event, interviews, None
     except sqlite3.Error as e:
@@ -256,7 +256,7 @@ def get_candidate_interviews(id_candidate):
         JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
         JOIN Participant ON Interview.id_participant = Participant.id_participant
         JOIN Event ON Interview.id_event = Event.id_event
-        WHERE Interview.id_candidate = ?
+        WHERE Interview.id_candidate = ? AND Interview.happened = 1
         ''', (id_candidate,)).fetchall()
         return interviews, None
     except sqlite3.Error as e:
@@ -349,7 +349,7 @@ def get_participant_interviews(id_participant):
         JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
         JOIN Participant ON Interview.id_participant = Participant.id_participant
         JOIN Event ON Interview.id_event = Event.id_event
-        WHERE Interview.id_participant = ?
+        WHERE Interview.id_participant = ? AND Interview.happened = 1
         ''', (id_participant,)).fetchall()
         return interviews, None
     except sqlite3.Error as e:
