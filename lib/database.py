@@ -1,5 +1,4 @@
 import sqlite3, datetime
-from flask import render_template
 
 def get_db_connection():
     try:
@@ -486,3 +485,63 @@ def delete_tag(id_tag):
     finally:
         conn.close()
     return None
+
+def get_candidate_tags(id_candidate):
+    conn = get_db_connection()
+    try:
+        tags = conn.execute('''
+        SELECT Tag.id_tag, Tag.name_tag
+        FROM Tag
+        JOIN Member_of ON Tag.id_tag = Member_of.id_tag
+        WHERE Member_of.id_candidate = ?
+        ''', (id_candidate,)).fetchall()
+        conn.close()
+        return tags, None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def add_tag_to_candidate(id_candidate, id_tag):
+    conn = get_db_connection()
+    try:
+        conn.execute('INSERT INTO Member_of (id_candidate, id_tag) VALUES (?, ?)', (id_candidate, id_tag))
+        conn.commit()
+        conn.close()
+        return None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def get_event_tags(id_event):
+    conn = get_db_connection()
+    try:
+        tags = conn.execute('''
+        SELECT Tag.id_tag, Tag.name_tag
+        FROM Tag
+        JOIN Dedicated_to ON Tag.id_tag = Dedicated_to.id_tag
+        WHERE Dedicated_to.id_event = ?
+        ''', (id_event,)).fetchall()
+        conn.close()
+        return tags, None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def add_tag_to_event(id_event, id_tag):
+    conn = get_db_connection()
+    try:
+        conn.execute('INSERT INTO Dedicated_to (id_event, id_tag) VALUES (?, ?)', (id_event, id_tag))
+        conn.commit()
+        conn.close()
+        return None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return "Erreur requête base de données"
+    finally:
+        conn.close()
