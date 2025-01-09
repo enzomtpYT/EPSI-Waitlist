@@ -3,8 +3,6 @@ CREATE TABLE Candidate(
    lastname_candidate TEXT NOT NULL,
    name_candidate TEXT NOT NULL,
    email_candidate TEXT NOT NULL,
-   year_candidate TEXT,
-   class_candidate TEXT,
    PRIMARY KEY(id_candidate)
 );
 
@@ -19,7 +17,6 @@ CREATE TABLE Event(
    id_event INTEGER,
    name_event TEXT NOT NULL,
    date_event NUMERIC NOT NULL,
-   year_event TEXT,
    PRIMARY KEY(id_event)
 );
 
@@ -33,6 +30,13 @@ CREATE TABLE Interview(
    FOREIGN KEY(id_participant) REFERENCES Participant(id_participant),
    FOREIGN KEY(id_event) REFERENCES Event(id_event),
    FOREIGN KEY(id_candidate) REFERENCES Candidate(id_candidate)
+);
+
+CREATE TABLE Tag(
+   id_tag INTEGER,
+   name_tag TEXT NOT NULL,
+   PRIMARY KEY(id_tag),
+   UNIQUE(name_tag)
 );
 
 CREATE TABLE Participates(
@@ -49,4 +53,20 @@ CREATE TABLE Attends(
    PRIMARY KEY(id_participant, id_event),
    FOREIGN KEY(id_participant) REFERENCES Participant(id_participant),
    FOREIGN KEY(id_event) REFERENCES Event(id_event)
+);
+
+CREATE TABLE Member_of(
+   id_candidate INTEGER,
+   id_tag INTEGER,
+   PRIMARY KEY(id_candidate, id_tag),
+   FOREIGN KEY(id_candidate) REFERENCES Candidate(id_candidate),
+   FOREIGN KEY(id_tag) REFERENCES Tag(id_tag)
+);
+
+CREATE TABLE Dedicated_to(
+   id_event INTEGER,
+   id_tag INTEGER,
+   PRIMARY KEY(id_event, id_tag),
+   FOREIGN KEY(id_event) REFERENCES Event(id_event),
+   FOREIGN KEY(id_tag) REFERENCES Tag(id_tag)
 );
