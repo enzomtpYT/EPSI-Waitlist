@@ -14,12 +14,12 @@ today = datetime.date.today()
 
 # Event functions
 
-def create_event(name, date, year):
+def create_event(name, date):
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute('INSERT INTO Event (name_event, date_event, year_event) VALUES (?, ?, ?)', (name, date, year))
+        conn.execute('INSERT INTO Event (name_event, date_event) VALUES (?, ?)', (name, date))
         conn.commit()
     except sqlite3.Error as e:
         print(f"Erreur lors de la création de l'événement: {e}")
@@ -57,12 +57,12 @@ def get_event(event_id):
     finally:
         conn.close()
 
-def edit_event(name, date, year, id_event):
+def edit_event(name, date, id_event):
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute('UPDATE Event SET name_event = ?, date_event = ?, year_event = ? WHERE id_event = ?', (name, date, year, id_event))
+        conn.execute('UPDATE Event SET name_event = ?, date_event = ? WHERE id_event = ?', (name, date, id_event))
         conn.commit()
     except sqlite3.Error as e:
         print(f"Erreur lors de la mise à jour de l'événnement: {e}")
@@ -92,7 +92,7 @@ def get_event_interviews(id_event):
     try:
         event = conn.execute('SELECT * FROM Event WHERE id_event = ?', (id_event,)).fetchone()
         interviews = conn.execute('''
-        SELECT Interview.id_interview, Participant.name_participant, Candidate.lastname_candidate, Candidate.name_candidate, Candidate.year_candidate, Candidate.class_candidate
+        SELECT Interview.id_interview, Participant.name_participant, Candidate.lastname_candidate, Candidate.name_candidate
         FROM Interview
         JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
         JOIN Participant ON Interview.id_participant = Participant.id_participant
@@ -174,12 +174,12 @@ def get_event_interview_candidate(todayevent, id_participant):
 
 # Candidate functions
 
-def create_candidate(lastname, name, email, year, candidate_class):
+def create_candidate(lastname, name, email):
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute('INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate, year_candidate, class_candidate) VALUES (?, ?, ?, ?, ?)', (lastname, name, email, year, candidate_class))
+        conn.execute('INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate) VALUES (?, ?, ?)', (lastname, name, email))
         conn.commit()
     except sqlite3.Error as e:
         print(f"Erreur lors de la création du candidat: {e}")
@@ -217,12 +217,12 @@ def get_candidate(candidate_id):
     finally:
         conn.close()
 
-def edit_candidate(lastname, name, email, year, candidate_class, id_candidate):
+def edit_candidate(lastname, name, email, id_candidate):
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute('UPDATE Candidate SET lastname_candidate = ?, name_candidate = ?, email_candidate = ?, year_candidate = ?, class_candidate = ? WHERE id_candidate = ?', (lastname, name, email, year, candidate_class, id_candidate))
+        conn.execute('UPDATE Candidate SET lastname_candidate = ?, name_candidate = ?, email_candidate = ? WHERE id_candidate = ?', (lastname, name, email, id_candidate))
         conn.commit()
     except sqlite3.Error as e:
         print(f"Erreur lors de la mise à jour du candidat: {e}")

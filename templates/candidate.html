@@ -4,12 +4,13 @@
 
 {% block content %}
 <h1>Candidat : {{ candidate.name_candidate }} {{ candidate.lastname_candidate }}
-{% if  candidate.year_candidate %}
+{# {% if  candidate.year_candidate %}
     {{ candidate.year_candidate }}
 {%endif %}
 {% if  candidate.class_candidate %}
     {{ candidate.class_candidate }}
-{% endif %}</h1>
+{% endif %} #}
+</h1>
 
 <div class="admin-section">
     <h2>Modifier les informations du/de la candidat.e</h2>
@@ -23,11 +24,11 @@
         <label for="candidate_email">E-mail :</label>
         <input type="email" id="candidate_email" name="candidate_email" value="{{ candidate.email_candidate }}">
 
-        <label for="candidate_year">Année :</label>
+        {# <label for="candidate_year">Année :</label>
         <input type="text" id="candidate_year" name="candidate_year" value="{{ candidate.year_candidate if candidate.year_candidate else '' }}">
 
         <label for="candidate_class">Classe :</label>
-        <input type="text" id="candidate_class" name="candidate_class" value="{{ candidate.class_candidate if candidate.class_candidate else '' }}">
+        <input type="text" id="candidate_class" name="candidate_class" value="{{ candidate.class_candidate if candidate.class_candidate else '' }}"> #}
 
         <button type="submit">Enregistrer</button>
     </form>

@@ -9,8 +9,8 @@ def create_candidate():
         lastname = request.form['candidate_lastname']
         name = request.form['candidate_name']
         email = request.form['candidate_email']
-        year = request.form['candidate_year']
-        candidate_class = request.form['candidate_class']
+        # year = request.form['candidate_year']
+        # candidate_class = request.form['candidate_class']
         error = None
 
         if not lastname:
@@ -21,7 +21,7 @@ def create_candidate():
             error = 'L\'adresse email est obligatoire.'
 
         if error is None:
-            error = database.create_candidate(lastname, name, email, year, candidate_class)
+            error = database.create_candidate(lastname, name, email)
             if error is None:
                 flash("Candidat créé avec succès!", "success")
                 return redirect(url_for('create_candidate.create_candidate'))

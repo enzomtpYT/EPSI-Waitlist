@@ -20,12 +20,12 @@
             <tr>
                 <td>{{ interview.name_participant }}</td>
                 <td>{{ interview.name_candidate }} {{ interview.lastname_candidate }}
-                {% if  interview.year_candidate %}
+                {# {% if  interview.year_candidate %}
                     {{ interview.year_candidate }}
                 {%endif %}
                 {% if  interview.class_candidate %}
                     {{ interview.class_candidate }}
-                {% endif %}
+                {% endif %} #}
                 </td>
             </tr>
             {% endfor %}
