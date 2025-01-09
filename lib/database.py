@@ -1,4 +1,5 @@
 import sqlite3, datetime
+from flask import render_template
 
 def get_db_connection():
     try:
@@ -89,8 +90,16 @@ def get_event_interviews(id_event):
     if conn is None:
         return None, "Erreur base de données"
     try:
-        interviews = conn.execute('SELECT Interview.id_interview, Participant.name_participant, Candidate.lastname_candidate, Candidate.name_candidate, Candidate.year_candidate, Candidate.class_candidate FROM Interview JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate JOIN Participant ON Interview.id_participant = Participant.id_participant JOIN Event ON Interview.id_event = Event.id_event WHERE Interview.id_event = ?', (id_event,)).fetchall()
-        return interviews, None
+        event = conn.execute('SELECT * FROM Event WHERE id_event = ?', (id_event,)).fetchone()
+        interviews = conn.execute('''
+        SELECT Interview.id_interview, Participant.name_participant, Candidate.lastname_candidate, Candidate.name_candidate, Candidate.year_candidate, Candidate.class_candidate
+        FROM Interview
+        JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
+        JOIN Participant ON Interview.id_participant = Participant.id_participant
+        JOIN Event ON Interview.id_event = Event.id_event
+        WHERE Interview.id_event = ?
+        ''', (id_event,)).fetchall()
+        return event, interviews, None
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
@@ -241,7 +250,14 @@ def get_candidate_interviews(id_candidate):
     if conn is None:
         return None, "Erreur base de données"
     try:
-        interviews = conn.execute('SELECT Interview.id_interview, Event.name_event, Event.date_event, Participant.name_participant FROM Interview JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate JOIN Participant ON Interview.id_participant = Participant.id_participant JOIN Event ON Interview.id_event = Event.id_event WHERE Interview.id_candidate = ?', (id_candidate,)).fetchall()
+        interviews = conn.execute('''
+        SELECT Interview.id_interview, Event.name_event, Event.date_event, Participant.name_participant
+        FROM Interview
+        JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
+        JOIN Participant ON Interview.id_participant = Participant.id_participant
+        JOIN Event ON Interview.id_event = Event.id_event
+        WHERE Interview.id_candidate = ?
+        ''', (id_candidate,)).fetchall()
         return interviews, None
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
@@ -327,7 +343,14 @@ def get_participant_interviews(id_participant):
     if conn is None:
         return None, "Erreur base de données"
     try:
-        interviews = conn.execute('SELECT Interview.id_interview, Event.name_event, Event.date_event, Candidate.lastname_candidate, Candidate.name_candidate FROM Interview JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate JOIN Participant ON Interview.id_participant = Participant.id_participant JOIN Event ON Interview.id_event = Event.id_event WHERE Interview.id_participant = ?', (id_participant,)).fetchall()
+        interviews = conn.execute('''
+        SELECT Interview.id_interview, Event.name_event, Event.date_event, Candidate.lastname_candidate, Candidate.name_candidate
+        FROM Interview
+        JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
+        JOIN Participant ON Interview.id_participant = Participant.id_participant
+        JOIN Event ON Interview.id_event = Event.id_event
+        WHERE Interview.id_participant = ?
+        ''', (id_participant,)).fetchall()
         return interviews, None
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
