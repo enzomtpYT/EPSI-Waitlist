@@ -59,6 +59,15 @@ button {
     width: 100%;
     max-width: 25%;
     border-radius: 10px;
+    transition: 0.1s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+button:active {
+    transform: scale(0.95);
 }
 
 .admin-section > table > thead > tr > th {
@@ -88,6 +97,10 @@ button {
 
 .delete {
     background-color: #dc3545;
+}
+
+.delete:hover {
+    background-color: #c82333;
 }
 
 .popup {
