@@ -435,8 +435,10 @@ def get_all_tags():
         return None, "Erreur base de données"
     try:
         tags = conn.execute('SELECT * FROM Tag').fetchall()
-        conn.close()
-        return tags, None
+        if tags:
+            return tags, None
+        else:
+            return [], "Pas de tag"
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
         return [], "Erreur requête base de données"
