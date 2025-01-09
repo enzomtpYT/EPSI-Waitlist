@@ -9,7 +9,9 @@
 <div class="admin-section">
     <h2>Ajouter un candidat à la liste d'attente</h2>
     <form action="{{ url_for('manage_waitlist.manage_waitlist', id_event=event.id_event) }}" method="post">
-        <div class="list">
+
+        <label for="participant">Intervenant :</label>
+        <select id="participant" name="participant">
             {% for participant in participants %}
             <div class="column">
                 <label class="interv" for="part{{ participant.id_participant }}">{{ participant.name_participant }}</label>
@@ -24,9 +26,27 @@
                 </select>
             </div>
             {% endfor %}
-        </div>
+        </select>
+
+        <label for="tag">Tag :</label>
+        <select id="tag" name="tag">
+            <option value="">Sélectionner un tag</option>
+            {% for tag in tags %}
+            <option value="{{ tag.id_tag }}">{{ tag.name_tag }}</option>
+            {% endfor %}
+        </select>
+
         <button type="submit">Ajouter à la liste d'attente</button>
     </form>
+</div>
+
+<div class="admin-section">
+    <h2>Tags de l'Événement</h2>
+    <ul>
+        {% for tag in event_tags %}
+        <li>{{ tag.name_tag }}</li>
+        {% endfor %}
+    </ul>
 </div>
 
 <script>

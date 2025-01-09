@@ -1,5 +1,4 @@
 import sqlite3, datetime
-from flask import render_template
 
 def get_db_connection():
     try:
@@ -14,12 +13,12 @@ today = datetime.date.today()
 
 # Event functions
 
-def create_event(name, date, year):
+def create_event(name, date):
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute('INSERT INTO Event (name_event, date_event, year_event) VALUES (?, ?, ?)', (name, date, year))
+        conn.execute('INSERT INTO Event (name_event, date_event) VALUES (?, ?)', (name, date))
         conn.commit()
     except sqlite3.Error as e:
         print(f"Erreur lors de la création de l'événement: {e}")
@@ -57,12 +56,12 @@ def get_event(event_id):
     finally:
         conn.close()
 
-def edit_event(name, date, year, id_event):
+def edit_event(name, date, id_event):
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute('UPDATE Event SET name_event = ?, date_event = ?, year_event = ? WHERE id_event = ?', (name, date, year, id_event))
+        conn.execute('UPDATE Event SET name_event = ?, date_event = ? WHERE id_event = ?', (name, date, id_event))
         conn.commit()
     except sqlite3.Error as e:
         print(f"Erreur lors de la mise à jour de l'événnement: {e}")
@@ -92,7 +91,7 @@ def get_event_interviews(id_event):
     try:
         event = conn.execute('SELECT * FROM Event WHERE id_event = ?', (id_event,)).fetchone()
         interviews = conn.execute('''
-        SELECT Interview.id_interview, Participant.name_participant, Candidate.lastname_candidate, Candidate.name_candidate, Candidate.year_candidate, Candidate.class_candidate
+        SELECT Interview.id_interview, Participant.name_participant, Candidate.lastname_candidate, Candidate.name_candidate
         FROM Interview
         JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
         JOIN Participant ON Interview.id_participant = Participant.id_participant
@@ -174,12 +173,12 @@ def get_event_interview_candidate(todayevent, id_participant):
 
 # Candidate functions
 
-def create_candidate(lastname, name, email, year, candidate_class):
+def create_candidate(lastname, name, email):
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute('INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate, year_candidate, class_candidate) VALUES (?, ?, ?, ?, ?)', (lastname, name, email, year, candidate_class))
+        conn.execute('INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate) VALUES (?, ?, ?)', (lastname, name, email))
         conn.commit()
     except sqlite3.Error as e:
         print(f"Erreur lors de la création du candidat: {e}")
@@ -217,12 +216,12 @@ def get_candidate(candidate_id):
     finally:
         conn.close()
 
-def edit_candidate(lastname, name, email, year, candidate_class, id_candidate):
+def edit_candidate(lastname, name, email, id_candidate):
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute('UPDATE Candidate SET lastname_candidate = ?, name_candidate = ?, email_candidate = ?, year_candidate = ?, class_candidate = ? WHERE id_candidate = ?', (lastname, name, email, year, candidate_class, id_candidate))
+        conn.execute('UPDATE Candidate SET lastname_candidate = ?, name_candidate = ?, email_candidate = ? WHERE id_candidate = ?', (lastname, name, email, id_candidate))
         conn.commit()
     except sqlite3.Error as e:
         print(f"Erreur lors de la mise à jour du candidat: {e}")
@@ -432,3 +431,161 @@ def delete_interview(id_interview):
     finally:
         conn.close()
     return None
+
+#Tag functions
+def create_tag(name):
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        conn.execute('INSERT INTO Tag (name_tag) VALUES (?)', (name,))
+        conn.commit()
+        return None
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la création du tag: {e}")
+        return "Erreur lors de la création du tag"
+    finally:
+        conn.close()
+
+def get_all_tags():
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+    try:
+        tags = conn.execute('SELECT * FROM Tag').fetchall()
+        if tags:
+            return tags, None
+        else:
+            return [], "Pas de tag"
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return [], "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def get_tag(tag_id):
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+    try:
+        tag = conn.execute('SELECT * FROM Tag WHERE id_tag = ?', (tag_id,)).fetchone()
+        return tag, None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def edit_tag(name, id_tag):
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        conn.execute('UPDATE Tag SET name_tag = ? WHERE id_tag = ?', (name, id_tag))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la mise à jour du tag: {e}")
+        return "Erreur lors de la mise à jour du tag"
+    finally:
+        conn.close()
+    return None
+
+def delete_tag(id_tag):
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        conn.execute("DELETE FROM Tag WHERE id_tag = ?", (id_tag,))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la suppression du candidat: {e}")
+        return "Erreur lors de la suppression du candidat"
+    finally:
+        conn.close()
+    return None
+
+def get_candidate_tags(id_candidate):
+    conn = get_db_connection()
+    try:
+        tags = conn.execute('''
+        SELECT Tag.id_tag, Tag.name_tag
+        FROM Tag
+        JOIN Member_of ON Tag.id_tag = Member_of.id_tag
+        WHERE Member_of.id_candidate = ?
+        ''', (id_candidate,)).fetchall()
+        conn.close()
+        return tags, None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def add_tag_to_candidate(id_candidate, id_tag):
+    conn = get_db_connection()
+    try:
+        conn.execute('INSERT INTO Member_of (id_candidate, id_tag) VALUES (?, ?)', (id_candidate, id_tag))
+        conn.commit()
+        conn.close()
+        return None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def remove_tag_from_candidate(id_candidate, id_tag):
+    conn = get_db_connection()
+    try:
+        conn.execute('DELETE FROM Member_of WHERE id_candidate = ? AND id_tag = ?', (id_candidate, id_tag))
+        conn.commit()
+        conn.close()
+        return None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def get_event_tags(id_event):
+    conn = get_db_connection()
+    try:
+        tags = conn.execute('''
+        SELECT Tag.id_tag, Tag.name_tag
+        FROM Tag
+        JOIN Dedicated_to ON Tag.id_tag = Dedicated_to.id_tag
+        WHERE Dedicated_to.id_event = ?
+        ''', (id_event,)).fetchall()
+        conn.close()
+        return tags, None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def add_tag_to_event(id_event, id_tag):
+    conn = get_db_connection()
+    try:
+        conn.execute('INSERT INTO Dedicated_to (id_event, id_tag) VALUES (?, ?)', (id_event, id_tag))
+        conn.commit()
+        conn.close()
+        return None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def remove_tag_from_event(id_event, id_tag):
+    conn = get_db_connection()
+    try:
+        conn.execute('DELETE FROM Dedicated_to WHERE id_event = ? AND id_tag = ?', (id_event, id_tag))
+        conn.commit()
+        conn.close()
+        return None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return "Erreur requête base de données"
+    finally:
+        conn.close()

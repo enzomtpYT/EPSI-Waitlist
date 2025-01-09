@@ -15,6 +15,8 @@ from routes.create_event import create_event_bp
 from routes.manage_event import manage_event_bp
 from routes.event import event_bp
 from routes.manage_waitlist import manage_waitlist_bp
+from routes.create_tag import create_tag_bp
+from routes.manage_tag import manage_tag_bp
 
 app = Flask(__name__)
 
@@ -35,6 +37,8 @@ app.register_blueprint(create_event_bp)
 app.register_blueprint(manage_event_bp)
 app.register_blueprint(event_bp)
 app.register_blueprint(manage_waitlist_bp)
+app.register_blueprint(create_tag_bp)
+app.register_blueprint(manage_tag_bp)
 
 custom_route_names = {
 

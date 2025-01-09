@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Gérer Tags{% endblock %}
+
+{% block content %}
+<h1>Gérer les tags</h1>
+
+<div class="admin-section">
+    <h2>Liste des tags</h2>
+    {% if tags %}
+    <table>
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tag in tags %}
+            <tr>
+                <form action="{{ url_for('manage_tag.manage_tag') }}" method="post">
+
+                    <input type="hidden" name="id_tag" value="{{ tag.id_tag }}">
+                    <label for="tag_name">Nom :</label>
+                    <input type="text" id="tag_name" name="tag_name" value="{{ tag.name_tag }}">
+
+                    <button type="submit">Enregistrer</button>
+                    
+                </form>
+
+                <form action="{{ url_for('manage_tag.delete_tag', id_tag=tag.id_tag) }}" method="post">
+                    <button class="delete" type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce tag ?');">Supprimer</button>
+                </form>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Aucun tag n'existe.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

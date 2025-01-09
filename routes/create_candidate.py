@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from lib import database
+import sqlite3
+from lib.database import get_db_connection, get_all_tags, add_tag_to_candidate
 
 create_candidate_bp = Blueprint('create_candidate', __name__)
 
@@ -9,8 +11,8 @@ def create_candidate():
         lastname = request.form['candidate_lastname']
         name = request.form['candidate_name']
         email = request.form['candidate_email']
-        year = request.form['candidate_year']
-        candidate_class = request.form['candidate_class']
+        tags = request.form.getlist('tags')
+        conn = get_db_connection()
         error = None
 
         if not lastname:
@@ -21,12 +23,31 @@ def create_candidate():
             error = 'L\'adresse email est obligatoire.'
 
         if error is None:
-            error = database.create_candidate(lastname, name, email, year, candidate_class)
-            if error is None:
-                flash("Candidat créé avec succès!", "success")
-                return redirect(url_for('create_candidate.create_candidate'))
-            else:
-                flash(f"Erreur lors de la création du Candidat: {error}", "danger")
-                return redirect(url_for('create_candidate.create_candidate'))
+            try:
+                error = database.create_candidate(lastname, name, email)
+                candidate_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+                for tag_id in tags:
+                    add_tag_to_candidate(candidate_id, tag_id)
+                if error is None:
+                    flash("Candidat créé avec succès!", "success")
+                    return redirect(url_for('create_candidate.create_candidate'))
+                else:
+                    flash(f"Erreur lors de la création du participant: {error}", "danger")
+                    return redirect(url_for('create_participant.create_participant'))
+            except sqlite3.Error as e:
+                flash(f"Erreur lors de la création du candidat: {e}", "danger")
+            finally:
+                conn.close()
+        else:
+            flash(error, "danger")
+
+        # if error is None:
+        #     error = database.create_candidate(lastname, name, email)
+        #     if error is None:
+        #         flash("Candidat créé avec succès!", "success")
+        #         return redirect(url_for('create_candidate.create_candidate'))
+        #     else:
+        #         flash(f"Erreur lors de la création du candidat: {error}", "danger")
+        #         return redirect(url_for('create_candidate.create_candidate'))
 
     return render_template('create_candidate.html')

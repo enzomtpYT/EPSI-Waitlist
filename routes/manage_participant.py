@@ -14,5 +14,5 @@ def manage_participant():
 def delete_participant(id_participant):
     error = database.delete_participant(id_participant)
     if error:
-        flash(f"Erreur lors de la suppression du Participant: {error}", "danger")
+        flash(f"Erreur lors de la suppression du participant: {error}", "danger")
     return redirect(url_for('manage_participant.manage_participant'))
