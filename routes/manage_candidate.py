@@ -14,5 +14,5 @@ def manage_candidate():
 def delete_candidate(id_candidate):
     error = database.delete_candidate(id_candidate)
     if error:
-        flash(f"Erreur lors de la suppression du Candidat: {error}", "danger")
+        flash(f"Erreur lors de la suppression du candidat: {error}", "danger")
     return redirect(url_for('manage_candidate.manage_candidate'))

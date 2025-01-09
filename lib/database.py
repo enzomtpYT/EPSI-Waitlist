@@ -414,3 +414,75 @@ def delete_interview(id_interview):
     finally:
         conn.close()
     return None
+
+#Tag functions
+def create_tag(name):
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        conn.execute('INSERT INTO Tag (name_tag) VALUES (?)', (name))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la création du tag: {e}")
+        return "Erreur lors de la création du tag"
+    finally:
+        conn.close()
+    return None
+
+def get_all_tags():
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+    try:
+        tags = conn.execute(f'SELECT * FROM Tag').fetchall()
+        if tags:
+            return tags, None
+        else:
+            return None, "Pas de tag"
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def get_tag(tag_id):
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+    try:
+        tag = conn.execute('SELECT * FROM Tag WHERE id_tag = ?', (tag_id,)).fetchone()
+        return tag, None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def edit_tag(name, id_tag):
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        conn.execute('UPDATE Tag SET name_tag = ? WHERE id_tag = ?', (name, id_tag))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la mise à jour du tag: {e}")
+        return "Erreur lors de la mise à jour du tag"
+    finally:
+        conn.close()
+    return None
+
+def delete_tag(id_tag):
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        conn.execute("DELETE FROM Tag WHERE id_tag = ?", (id_tag,))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la suppression du candidat: {e}")
+        return "Erreur lors de la suppression du candidat"
+    finally:
+        conn.close()
+    return None

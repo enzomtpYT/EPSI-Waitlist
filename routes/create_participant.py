@@ -21,7 +21,7 @@ def create_participant():
                 flash("Participant créé avec succès!", "success")
                 return redirect(url_for('create_participant.create_participant'))
             else:
-                flash(f"Erreur lors de la création du Participant: {error}", "danger")
+                flash(f"Erreur lors de la création du participant: {error}", "danger")
                 return redirect(url_for('create_participant.create_participant'))
 
    return render_template('create_participant.html')

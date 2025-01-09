@@ -22,7 +22,7 @@ def create_event():
                 flash("Événement créé avec succès!", "success")
                 return redirect(url_for('create_event.create_event'))
             else:
-                flash(f"Erreur lors de la création de l'Événement: {error}", "danger")
+                flash(f"Erreur lors de la création de l'événement: {error}", "danger")
                 return redirect(url_for('create_event.create_event'))
 
     return render_template('create_event.html')

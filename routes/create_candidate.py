@@ -26,7 +26,7 @@ def create_candidate():
                 flash("Candidat créé avec succès!", "success")
                 return redirect(url_for('create_candidate.create_candidate'))
             else:
-                flash(f"Erreur lors de la création du Candidat: {error}", "danger")
+                flash(f"Erreur lors de la création du candidat: {error}", "danger")
                 return redirect(url_for('create_candidate.create_candidate'))
 
     return render_template('create_candidate.html')

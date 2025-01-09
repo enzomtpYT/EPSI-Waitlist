@@ -14,5 +14,5 @@ def manage_event():
 def delete_event(id_event):
     error = database.delete_event(id_event)
     if error:
-        flash(f"Erreur lors de la suppression de l'Événement: {error}", "danger")
+        flash(f"Erreur lors de la suppression de l'événement: {error}", "danger")
     return redirect(url_for('manage_event.manage_event'))

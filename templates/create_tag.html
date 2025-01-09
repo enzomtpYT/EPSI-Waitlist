@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Créer Tag{% endblock %}
+
+{% block content %}
+<h1>Créer un tag</h1>
+
+<div class="admin-section">
+    <h2>Informations du tag</h2>
+    <form action="{{ url_for('create_tag.create_tag') }}" method="post">
+
+        <label for="tag_name">Nom :</label>
+        <input type="text" id="tag_name" name="tag_name">
+
+        <button type="submit">Créer</button>
+    </form>
+</div>
+
+{% endblock %}
