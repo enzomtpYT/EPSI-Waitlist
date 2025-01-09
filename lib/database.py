@@ -422,12 +422,12 @@ def create_tag(name):
     try:
         conn.execute('INSERT INTO Tag (name_tag) VALUES (?)', (name))
         conn.commit()
+        return None
     except sqlite3.Error as e:
         print(f"Erreur lors de la création du tag: {e}")
         return "Erreur lors de la création du tag"
     finally:
         conn.close()
-    return None
 
 def get_all_tags():
     conn = get_db_connection()
@@ -548,6 +548,19 @@ def add_tag_to_event(id_event, id_tag):
     conn = get_db_connection()
     try:
         conn.execute('INSERT INTO Dedicated_to (id_event, id_tag) VALUES (?, ?)', (id_event, id_tag))
+        conn.commit()
+        conn.close()
+        return None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def remove_tag_from_event(id_event, id_tag):
+    conn = get_db_connection()
+    try:
+        conn.execute('DELETE FROM Dedicated_to WHERE id_event = ? AND id_tag = ?', (id_event, id_tag))
         conn.commit()
         conn.close()
         return None

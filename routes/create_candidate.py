@@ -24,13 +24,16 @@ def create_candidate():
 
         if error is None:
             try:
-                conn.execute("INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate) VALUES (?, ?, ?)", (lastname, name, email))
-                conn.commit()
+                error = database.create_candidate(lastname, name, email)
                 candidate_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
                 for tag_id in tags:
                     add_tag_to_candidate(candidate_id, tag_id)
-                flash("Candidat créé avec succès!", "success")
-                return redirect(url_for('create_candidate.create_candidate'))
+                if error is None:
+                    flash("Candidat créé avec succès!", "success")
+                    return redirect(url_for('create_candidate.create_candidate'))
+                else:
+                    flash(f"Erreur lors de la création du participant: {error}", "danger")
+                    return redirect(url_for('create_participant.create_participant'))
             except sqlite3.Error as e:
                 flash(f"Erreur lors de la création du candidat: {e}", "danger")
             finally:
