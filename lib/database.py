@@ -434,14 +434,12 @@ def get_all_tags():
     if conn is None:
         return None, "Erreur base de données"
     try:
-        tags = conn.execute(f'SELECT * FROM Tag').fetchall()
-        if tags:
-            return tags, None
-        else:
-            return None, "Pas de tag"
+        tags = conn.execute('SELECT * FROM Tag').fetchall()
+        conn.close()
+        return tags, None
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
-        return None, "Erreur requête base de données"
+        return [], "Erreur requête base de données"
     finally:
         conn.close()
 
@@ -507,6 +505,19 @@ def add_tag_to_candidate(id_candidate, id_tag):
     conn = get_db_connection()
     try:
         conn.execute('INSERT INTO Member_of (id_candidate, id_tag) VALUES (?, ?)', (id_candidate, id_tag))
+        conn.commit()
+        conn.close()
+        return None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def remove_tag_from_candidate(id_candidate, id_tag):
+    conn = get_db_connection()
+    try:
+        conn.execute('DELETE FROM Member_of WHERE id_candidate = ? AND id_tag = ?', (id_candidate, id_tag))
         conn.commit()
         conn.close()
         return None
