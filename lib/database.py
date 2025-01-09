@@ -386,6 +386,24 @@ def get_interview(id_interview):
         return None, "Erreur requête base de données"
     finally:
         conn.close()
+        
+def get_candidate_from_event_participants_inverviews(id_event, id_participant):
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+    try:
+        interviews = conn.execute('''
+        SELECT Interview.id_interview, Candidate.lastname_candidate, Candidate.name_candidate, Candidate.id_candidate
+        FROM Interview
+        JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
+        WHERE Interview.id_event = ? AND Interview.id_participant = ?
+        ''', (id_event, id_participant)).fetchall()
+        return interviews, None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()    
 
 def edit_interview(id_interview, happened):
     conn = get_db_connection()
