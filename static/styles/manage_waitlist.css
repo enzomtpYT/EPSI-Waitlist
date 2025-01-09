@@ -53,3 +53,28 @@ option:checked {
     font-size: 1.5rem;
     font-weight: bold;
 }
+
+.taglabel {
+    display: flex;
+    justify-content: space-between;
+    color: #007bff;
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding: 0.2rem;
+}
+
+.tagselect {
+    display: flex;
+    justify-content: space-between;
+    color: #007bff;
+    font-size: 1.5rem;
+    font-weight: bold;
+    width: 25%;
+    padding: 0.2rem;
+}
+
+.tagoption {
+    display: flex;
+    justify-content: space-between;
+    color: #007bff;
+}

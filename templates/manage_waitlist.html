@@ -9,30 +9,28 @@
 <div class="admin-section">
     <h2>Ajouter un candidat à la liste d'attente</h2>
     <form action="{{ url_for('manage_waitlist.manage_waitlist', id_event=event.id_event) }}" method="post">
-
-        <label for="participant">Intervenant :</label>
-        <select id="participant" name="participant">
+        <div class="list">
             {% for participant in participants %}
             <div class="column">
                 <label class="interv" for="part{{ participant.id_participant }}">{{ participant.name_participant }}</label>
                 <select name="{{ participant.id_participant }}" id="{{ participant.id_participant }}" multiple size="{{ candidates|length+1 }}">
                     {% for candidate in candidates %}
                         {% if candidate.id_candidate in existing_interviews[participant.id_participant] %}
-                            <option value="{{ candidate.id_candidate }}" selected>{{ candidate.lastname_candidate }} {{ candidate.name_candidate }}</option>
+                            <option class="listopt" value="{{ candidate.id_candidate }}" selected>{{ candidate.lastname_candidate }} {{ candidate.name_candidate }}</option>
                         {% else %}
-                            <option value="{{ candidate.id_candidate }}">{{ candidate.lastname_candidate }} {{ candidate.name_candidate }}</option>
+                            <option class="listopt" value="{{ candidate.id_candidate }}">{{ candidate.lastname_candidate }} {{ candidate.name_candidate }}</option>
                         {% endif %}
                     {% endfor %}
                 </select>
             </div>
             {% endfor %}
-        </select>
+        </div>
 
-        <label for="tag">Tag :</label>
-        <select id="tag" name="tag">
-            <option value="">Sélectionner un tag</option>
+        <label class="taglabel" for="tag">Tag :</label>
+        <select class="tagselect" id="tag" name="tag">
+            <option class="tagoption" value="">Sélectionner un tag</option>
             {% for tag in tags %}
-            <option value="{{ tag.id_tag }}">{{ tag.name_tag }}</option>
+            <option class="tagoption" value="{{ tag.id_tag }}">{{ tag.name_tag }}</option>
             {% endfor %}
         </select>
 
