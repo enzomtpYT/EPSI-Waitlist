@@ -113,3 +113,10 @@ button:active {
     background-color: rgba(121, 0, 0, 0.75);
     border: 3px solid rgb(93, 0, 0);
 }
+
+h1 {
+    text-align: center;
+    margin: 1rem 0;
+    color: #007bff;
+    font-size: 2.5rem;
+}

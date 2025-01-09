@@ -28,5 +28,43 @@
     flex-direction: column;
     padding: 0.2rem 1rem;
     background-color: #f8f9fa;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.admin-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 10px;
+    padding: 0.2rem 1rem;
+}
+
+.admin-container > .admin-section {
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    width: 100%;
+    border: 2px solid #007bff;
+    border-radius: 5px;
+}
+
+.admin-container > .admin-section > h2 {
+    text-align: center;
+    padding: 0.5rem;
+    color: #007bff;
+}
+
+.admin-buttons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 10px;
+    padding: 0.2rem 1rem;
+}
+
+.admin-buttons > a > button {
+    max-width: 100%;
 }
