@@ -177,7 +177,6 @@ h1 {
     width: auto;
 }
 
-<<<<<<< Updated upstream
 .display-tag {
     display: inline-flex;
     cursor: pointer;
@@ -201,8 +200,7 @@ h1 {
 .actionbtn {
     max-width: 5vw;
 }
-=======
+
 .plussvg {
     transform: rotate(45deg);
->>>>>>> Stashed changes
 }
