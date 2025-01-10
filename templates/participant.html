@@ -9,7 +9,7 @@
     <h2>Modifier les informations de l'intervenant</h2>
     <form action="{{ url_for('participant.edit_participant', id_participant=participant.id_participant) }}" method="post">
 
-        <label for="participant_name">Prénom :</label>
+        <label for="participant_name">Nom :</label>
         <input type="text" id="participant_name" name="participant_name" value="{{ participant.name_participant }}">
 
         <label for="participant_email">E-mail :</label>
