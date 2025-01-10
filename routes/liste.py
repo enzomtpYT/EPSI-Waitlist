@@ -1,7 +1,6 @@
-from flask import Blueprint, Response, render_template, flash
+from flask import Blueprint, Response, render_template, flash, jsonify
 from lib import database
 import time, json
-from flask import jsonify
 
 liste_bp = Blueprint('liste', __name__)
 
@@ -48,7 +47,8 @@ def refresh():
 @liste_bp.route("/liste")
 def liste():
     d, mess = get_data()
-    flash(mess)
+    if mess:
+        flash(mess)
     return render_template('liste.html', datas=d)
 
 @liste_bp.route("/liste/data")
