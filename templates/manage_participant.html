@@ -13,6 +13,7 @@
             <tr>
                 <th>Nom</th>
                 <th>E-mail</th>
+                <th>Tags</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -21,6 +22,11 @@
             <tr>
                 <td>{{ participant.name_participant }}</td>
                 <td>{{ participant.email_participant }}</td>
+                <td><ul>{% for tag in participant.tags %}
+                    {% if tag.name_tag %}
+                    <li>{{ tag.name_tag }}</li>
+                    {% endif %}
+                {% endfor %}</ul></td>
                 <td>
                     <a href="/admin/manage_participant/participant/{{ participant.id_participant }}">
                         <button type="button">Voir</button>

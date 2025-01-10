@@ -14,8 +14,7 @@
                 <th>Nom</th>
                 <th>Prénom</th>
                 <th>E-mail</th>
-                {# <th>Année</th>
-                <th>Classe</th> #}
+                <th>Tags</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -25,8 +24,11 @@
                 <td>{{ candidate.lastname_candidate }}</td>
                 <td>{{ candidate.name_candidate }}</td>
                 <td>{{ candidate.email_candidate }}</td>
-                {# <td>{% if candidate.year_candidate %}{{ candidate.year_candidate }}{% else %}&nbsp;{% endif %}</td>
-                <td>{% if candidate.class_candidate %}{{ candidate.class_candidate }}{% else %}&nbsp;{% endif %}</td> #}
+                <td><ul>{% for tag in candidate.tags %}
+                    {% if tag.name_tag %}
+                    <li>{{ tag.name_tag }}</li>
+                    {% endif %}
+                {% endfor %}</ul></td>
                 <td>
                     <a href="/admin/manage_candidate/candidate/{{ candidate.id_candidate }}">
                         <button type="button">Voir</button>

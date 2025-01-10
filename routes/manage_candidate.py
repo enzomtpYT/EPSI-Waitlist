@@ -8,7 +8,19 @@ def manage_candidate():
     candidates, error = database.get_all_candidates()
     if error:
         flash("Erreur lors de la récupération des candidats", "danger")
-    return render_template('manage_candidate.html', candidates=candidates)
+
+    candidates_with_tags = []
+    for candidate in candidates:
+        candidate_dict = dict(candidate)
+        candidate_tags, error = database.get_candidate_tags(candidate['id_candidate'])
+        if error:
+            flash(f"Erreur lors de la récupération des tags pour l'événement {candidate['name_candidate']}: {error}", "danger")
+            candidate['tags'] = []
+        else:
+            candidate_dict['tags'] = candidate_tags
+        candidates_with_tags.append(candidate_dict)
+
+    return render_template('manage_candidate.html', candidates=candidates_with_tags)
 
 @manage_candidate_bp.route("/admin/manage_candidate/<int:id_candidate>/delete", methods=['POST'])
 def delete_candidate(id_candidate):
