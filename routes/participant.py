@@ -28,11 +28,6 @@ def edit_participant(id_participant):
         if error is None:
             error = database.edit_participant(name, id_participant)
             if error is None:
-                # Update tags
-                if tags:
-                    current_tags, error = database.get_participant_tags(id_participant)
-                    current_tag_ids = [tag['id_tag'] for tag in current_tags]
-
                 flash("Participant mis à jour avec succès!", "success")
                 return redirect(url_for('participant.edit_participant', id_participant=id_participant))
             else:
