@@ -31,23 +31,6 @@ def edit_candidate(id_candidate):
         if error is None:
             error = database.edit_candidate(lastname, name, email, id_candidate)
             if error is None:
-                # Update tags
-                if tags:
-                    current_tags, error = database.get_candidate_tags(id_candidate)
-                    current_tag_ids = [tag['id_tag'] for tag in current_tags]
-
-                # # Add new tags
-                # if tags:
-                #     for tag_id in tags:
-                #         if int(tag_id) not in current_tag_ids:
-                #             database.add_tag_to_candidate(id_candidate, tag_id)
-
-                # # Remove old tags
-                # if current_tag_ids:
-                #     for tag_id in current_tag_ids:
-                #         if str(tag_id) not in tags:
-                #             database.remove_tag_from_candidate(id_candidate, tag_id)
-
                 flash("Candidat mis à jour avec succès!", "success")
                 return redirect(url_for('candidate.edit_candidate_route', id_candidate=id_candidate))
             else:
