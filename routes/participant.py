@@ -15,6 +15,7 @@ def edit_participant(id_participant):
     if request.method == 'POST':
         name = request.form['participant_name']
         email = request.form['participant_email']
+        tags = request.form.getlist('tags')
         error = None
 
         if not name:
@@ -23,13 +24,46 @@ def edit_participant(id_participant):
             error = 'L\'adresse email est obligatoire.'
 
         if error is None:
-            error = database.edit_participant(name, email, id_participant)
+            error = database.edit_participant(name, id_participant)
             if error is None:
+                # Update tags
+                if tags:
+                    current_tags, error = database.get_participant_tags(id_participant)
+                    current_tag_ids = [tag['id_tag'] for tag in current_tags]
+
                 flash("Participant mis à jour avec succès!", "success")
                 return redirect(url_for('participant.edit_participant', id_participant=id_participant))
             else:
                 flash(f"Erreur lors de la mise à jour du participant: {error}", "danger")
-    return render_template('participant.html', interviews=interviews, participant_id=id_participant, participant=participant)
+
+    tags, error = database.get_all_tags()
+    participant_tags, error = database.get_participant_tags(id_participant)
+    participant_tag_ids = [tag['id_tag'] for tag in participant_tags]
+    interviews, error = database.get_participant_interviews(id_participant)
+    return render_template('participant.html', interviews=interviews, participant_id=id_participant, participant=participant, tags=tags, participant_tag_ids=participant_tag_ids)
+
+@participant_bp.route("/admin/manage_participant/participant/<int:id_participant>/add_tag_participant", methods=['POST'])
+def add_tag_participant(id_participant):
+    if 'add_tag' in request.form:
+        id_tag = request.form['tag']
+        error = database.add_tag_to_participant(id_participant, id_tag)
+        if error:
+            flash(f"Erreur lors de l'ajout du tag: {error}", "danger")
+        else:
+            flash("Tag ajouté avec succès!", "success")
+    return redirect(url_for('participant.edit_participant', id_participant=id_participant))
+
+@participant_bp.route("/admin/manage_participant/participant/<int:id_participant>/remove_tag_participant", methods=['POST'])
+def remove_tag_participant(id_participant):
+    if 'remove_tag' in request.form:
+        id_tag = request.form['tag']
+        error = database.remove_tag_from_participant(id_participant, id_tag)
+        if error:
+            flash(f"Erreur lors de la suppression du tag: {error}", "danger")
+        else:
+            flash("Tag supprimé avec succès!", "success")
+
+    return redirect(url_for('participant.edit_participant', id_participant=id_participant))
 
 @participant_bp.route("/admin/manage_participant/participant/<int:id_participant>/delete", methods=['POST'])
 def delete_participant(id_participant):

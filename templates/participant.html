@@ -20,6 +20,33 @@
 </div>
 
 <div class="admin-section">
+    <h2>Tags de l'intervenant</h2>
+    <ul>
+        {% for tag in participant_tags %}
+        <li>
+            {{ tag.name_tag }}
+            <form action="{{ url_for('participant.remove_tag_participant', id_participant=participant.id_participant, id_tag=tag.id_tag) }}" method="post" style="display:inline;">
+                <button type="submit">-</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="admin-section">
+    <h2>Ajouter un tag</h2>
+    <form action="{{ url_for('participant.add_tag_participant', id_participant=participant.id_participant) }}" method="post">
+        <label for="tag">Tag :</label>
+        <select id="tag" name="tag">
+            {% for tag in tags %}
+            <option value="{{ tag.id_tag }}">{{ tag.name_tag }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" name="add_tag">Ajouter</button>
+    </form>
+</div>
+
+<div class="admin-section">
     <h2>Liste des entretiens</h2>
     {% if interviews %}
     <table>
