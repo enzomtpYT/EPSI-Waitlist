@@ -146,12 +146,38 @@ h1 {
     flex-shrink: 0;
 }
 
+.add-tag {
+    display: inline-flex;
+    cursor: pointer;
+    align-items: center;
+    gap: .25rem;
+    border-radius: 99999px;
+    padding: .25rem .5rem;
+    font-size: .875rem;
+    font-weight: 600;
+    line-height: 1;
+    overflow: visible;
+    width: auto;
+}
+
+.add-tag:hover {
+    text-decoration: underline;
+}
+
+.add-tag > svg {
+    box-sizing: border-box;
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+}
+
 .tagform {
     display: flex;
     flex-direction: column;
     width: auto;
 }
 
+<<<<<<< Updated upstream
 .display-tag {
     display: inline-flex;
     cursor: pointer;
@@ -174,4 +200,8 @@ h1 {
 
 .actionbtn {
     max-width: 5vw;
+=======
+.plussvg {
+    transform: rotate(45deg);
+>>>>>>> Stashed changes
 }
