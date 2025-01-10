@@ -287,16 +287,18 @@ def create_candidate(lastname, name, email):
         return "Erreur base de données"
     try:
         # Insere le candidat dans la base de données
-        conn.execute('INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate) VALUES (?, ?, ?)', (lastname, name, email))
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate) VALUES (?, ?, ?)', (lastname, name, email))
+        candidate_id = cursor.lastrowid
         # Sauvegarde les modifications
         conn.commit()
+        return candidate_id, None
     except sqlite3.Error as e:
         print(f"Erreur lors de la création du candidat: {e}")
-        return "Erreur lors de la création du candidat"
+        return None, "Erreur lors de la création du candidat"
     finally:
         # Fermes la connexion à la base de données
         conn.close()
-    return None
 
 def get_all_candidates():
     """

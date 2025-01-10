@@ -5,12 +5,11 @@ create_candidate_bp = Blueprint('create_candidate', __name__)
 
 @create_candidate_bp.route('/admin/create_candidate', methods=('GET', 'POST'))
 def create_candidate():
-    possible_tags, error = database.get_all_tags()
     if request.method == 'POST':
         lastname = request.form['candidate_lastname']
         name = request.form['candidate_name']
         email = request.form['candidate_email']
-        tags = request.form.getlist('tags')
+        selected_tags = request.form['selected_tags'].split(',')
         error = None
 
         if not lastname:
@@ -21,24 +20,43 @@ def create_candidate():
             error = 'L\'adresse email est obligatoire.'
 
         if error is None:
-            error = database.create_candidate(lastname, name, email)
-            if error:
+            candidate_id, error = database.create_candidate(name, email)
+            if error is None:
+                for tag_id in selected_tags:
+                    database.add_tag_to_candidate(candidate_id, tag_id)
+                flash("Candidat créé avec succès!", "success")
+                return redirect(url_for('create_candidate.create_candidate'))
+            else:
                 flash(f"Erreur lors de la création du candidat: {error}", "danger")
-                return redirect(url_for('create_candidate.create_candidate'))
-            added_candidate, error = database.get_last_added_candidate()
-            if error:
-                flash(f"Erreur lors de la récupération du candidat: {error}", "danger")
-                return redirect(url_for('create_candidate.create_candidate'))
-            candidate_id = added_candidate['id_candidate']
-            for tag_id in tags:
-                error = database.add_tag_to_candidate(candidate_id, tag_id)
-                if error:
-                    flash(f"Erreur lors de l'ajout du tag: {error}", "danger")
-                    return redirect(url_for('create_candidate.create_candidate'))
-            flash("Candidat créé avec succès!", "success")
-            return redirect(url_for('create_candidate.create_candidate'))
         else:
-            flash(f"Erreur lors de la création du candidat: {error}", "danger")
-            return redirect(url_for('create_candidate.create_candidate'))
+            flash(error, "danger")
 
-    return render_template('create_candidate.html', tags=possible_tags)
+    tags, error = database.get_all_tags()
+    if error:
+        flash(f"Erreur lors de la récupération des tags: {error}", "danger")
+        tags = []
+
+    return render_template('create_candidate.html', tags=tags)
+
+    #     if error is None:
+    #         error = database.create_candidate(lastname, name, email)
+    #         if error:
+    #             flash(f"Erreur lors de la création du candidat: {error}", "danger")
+    #             return redirect(url_for('create_candidate.create_candidate'))
+    #         added_candidate, error = database.get_last_added_candidate()
+    #         if error:
+    #             flash(f"Erreur lors de la récupération du candidat: {error}", "danger")
+    #             return redirect(url_for('create_candidate.create_candidate'))
+    #         candidate_id = added_candidate['id_candidate']
+    #         for tag_id in tags:
+    #             error = database.add_tag_to_candidate(candidate_id, tag_id)
+    #             if error:
+    #                 flash(f"Erreur lors de l'ajout du tag: {error}", "danger")
+    #                 return redirect(url_for('create_candidate.create_candidate'))
+    #         flash("Candidat créé avec succès!", "success")
+    #         return redirect(url_for('create_candidate.create_candidate'))
+    #     else:
+    #         flash(f"Erreur lors de la création du candidat: {error}", "danger")
+    #         return redirect(url_for('create_candidate.create_candidate'))
+
+    # return render_template('create_candidate.html', tags=possible_tags)

@@ -17,29 +17,21 @@
 
         <label for="participant_tag">Tags de l'intervenant :</label>
         <div class="taglist" id="participant_tags">
-            {# {% for tag in participant_tags %}
-                <form class="tagform" action="{{ url_for('participant.remove_tag_participant', id_participant=participant.id_participant) }}" method="post" style="display:inline;">
-                    <input type="hidden" name="tag" value="{{ tag.id_tag }}">
-                    <button class="delete remove-tag" type="button" name="remove_tag">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10 4.293 5.707a1 1 0 0 1 0-1.414" clip-rule="evenodd"></path></svg>
-                    {{ tag.name_tag }}
-                    </button>
-                </form>
-            {% endfor %} #}
+        <!-- Tags will be dynamically added here -->
         </div>
 
         <label for="tags">Tags possibles :</label>
         <div class="taglist" id="available_tags">
             {% for tag in tags %}
                 {% if tag.id_tag not in participant_tags|map(attribute='id_tag') %}
-                    {# <input type="hidden" name="tag" value="{{ tag.id_tag }}"> #}
-                        <button class="add-tag" type="button" name="add_tag" data-tag-id="{{ tag.id_tag }}" data-tag-name="{{ tag.name_tag }}">
+                    <button class="add-tag" type="button" name="add_tag" data-tag-id="{{ tag.id_tag }}" data-tag-name="{{ tag.name_tag }}">
                         <svg class="plussvg" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10 4.293 5.707a1 1 0 0 1 0-1.414" clip-rule="evenodd"></path></svg>
                         {{ tag.name_tag }}
-                        </button>
-                    {% endif %}
+                    </button>
+                {% endif %}
             {% endfor %}
+        </div>
 
         <input type="hidden" id="selected_tags" name="selected_tags">
 

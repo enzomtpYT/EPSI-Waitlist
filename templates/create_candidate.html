@@ -17,15 +17,89 @@
         <label for="candidate_email">E-mail :</label>
         <input type="email" id="candidate_email" name="candidate_email">
 
-        <label for="tags">Tags:</label>
-        <select id="tags" name="tags" multiple>
-            {% for tag in tags %}
-            <option value="{{ tag.id_tag }}">{{ tag.name_tag }}</option>
-            {% endfor %}
-        </select>
+        <label for="candidate_tags">Tags du candidat :</label>
+        <div id="candidate_tags" class="taglist">
+            <!-- Tags will be dynamically added here -->
+        </div>
 
-        <button type="submit">Créer</button>
+        <label for="tags">Tags possibles :</label>
+        <div id="available_tags" class="taglist">
+            {% for tag in tags %}
+            <button type="button" class="add-tag" data-tag-id="{{ tag.id_tag }}" data-tag-name="{{ tag.name_tag }}">
+                <svg class="plussvg" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10 4.293 5.707a1 1 0 0 1 0-1.414" clip-rule="evenodd"></path></svg>
+                {{ tag.name_tag }}
+            </button>
+            {% endfor %}
+        </div>
+
+        <input type="hidden" id="selected_tags" name="selected_tags">
+
+        <div>
+            <button type="submit">Créer</button>
+        </div>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const candidateTagsContainer = document.getElementById('candidate_tags');
+    const availableTagsContainer = document.getElementById('available_tags');
+    const selectedTagsInput = document.getElementById('selected_tags');
+
+    availableTagsContainer.addEventListener('click', function(event) {
+        if (event.target.closest('.add-tag')) {
+            const button = event.target.closest('.add-tag');
+            const tagId = button.getAttribute('data-tag-id');
+            const tagName = button.getAttribute('data-tag-name');
+
+            // Add tag to candidate tags
+            const tagElement = document.createElement('div');
+            tagElement.classList.add('tagitem');
+            tagElement.innerHTML = `
+                <input type="hidden" name="candidate_tags[]" value="${tagId}">
+                <span>${tagName}</span>
+                <button type="button" class="remove-tag" data-tag-id="${tagId}">x</button>
+            `;
+            candidateTagsContainer.appendChild(tagElement);
+
+            // Remove tag from available tags
+            button.remove();
+        }
+    });
+
+    candidateTagsContainer.addEventListener('click', function(event) {
+        if (event.target.closest('.remove-tag')) {
+            const button = event.target.closest('.remove-tag');
+            const tagId = button.getAttribute('data-tag-id');
+            const tagName = button.previousElementSibling.textContent;
+
+            // Remove tag from candidate tags
+            button.parentElement.remove();
+
+            // Add tag back to available tags
+            const tagButton = document.createElement('button');
+            tagButton.type = 'button';
+            tagButton.classList.add('add-tag');
+            tagButton.setAttribute('data-tag-id', tagId);
+            tagButton.setAttribute('data-tag-name', tagName);
+            tagButton.innerHTML = `
+                <svg class="plussvg" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10 4.293 5.707a1 1 0 0 1 0-1.414" clip-rule="evenodd"></path>
+                </svg>
+                ${tagName}
+            `;
+            availableTagsContainer.appendChild(tagButton);
+        }
+    });
+
+    // Update hidden input with selected tags before form submission
+    document.querySelector('form').addEventListener('submit', function() {
+        const selectedTags = Array.from(candidateTagsContainer.querySelectorAll('input[name="candidate_tags[]"]'))
+            .map(input => input.value);
+        selectedTagsInput.value = selectedTags.join(',');
+    });
+});
+</script>
 
 {% endblock %}
