@@ -4,7 +4,6 @@ import os
 from routes.index import index_bp
 from routes.admin import admin_bp
 from routes.liste import liste_bp
-from routes.event import event_bp
 from routes.create_candidate import create_candidate_bp
 from routes.manage_candidate import manage_candidate_bp
 from routes.candidate import candidate_bp
