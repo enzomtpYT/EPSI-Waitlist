@@ -1,5 +1,6 @@
-from flask import Flask, render_template, session
-import os
+from flask import Flask
+from flask_socketio import SocketIO, send
+import os, time
 # from lib import models
 from routes.index import index_bp
 from routes.admin import admin_bp
@@ -18,6 +19,7 @@ from routes.create_tag import create_tag_bp
 from routes.manage_tag import manage_tag_bp
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 
 # Set the secret key to a random value
 app.secret_key = os.urandom(24)
@@ -40,11 +42,17 @@ app.register_blueprint(create_tag_bp)
 app.register_blueprint(manage_tag_bp)
 
 custom_route_names = {
-
     "/": "Accueil",
     "/admin": "Admin",
     "/liste": "Liste"
 }
+
+@socketio.on('message')
+def handleMessage(msg):
+
+    print('Message: ' + msg)
+    time.sleep(5)
+    send(msg, broadcast=True)
 
 @app.context_processor
 def inject_routes():
@@ -52,4 +60,4 @@ def inject_routes():
 
 if __name__ == "__main__":
     debug_mode = os.getenv('FLASK_ENV') == 'development'
-    app.run(host="127.0.0.1", port=8080, debug=debug_mode)
+    socketio.run(app, host="127.0.0.1", port=8080, debug=debug_mode)
