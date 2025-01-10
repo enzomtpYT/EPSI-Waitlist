@@ -40,7 +40,9 @@
         <label for="tag">Tag :</label>
         <select id="tag" name="tag">
             {% for tag in tags %}
-            <option value="{{ tag.id_tag }}">{{ tag.name_tag }}</option>
+                {% if tag.id_tag not in event_tags|map(attribute='id_tag') %}
+                    <option value="{{ tag.id_tag }}">{{ tag.name_tag }}</option>
+                {% endif %}
             {% endfor %}
         </select>
         <button type="submit" name="add_tag">Ajouter</button>
