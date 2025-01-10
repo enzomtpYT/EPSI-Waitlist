@@ -547,6 +547,49 @@ def remove_tag_from_candidate(id_candidate, id_tag):
     finally:
         conn.close()
 
+def get_participant_tags(id_participant):
+    conn = get_db_connection()
+    try:
+        tags = conn.execute('''
+        SELECT Tag.id_tag, Tag.name_tag
+        FROM Tag
+        JOIN Participant_tag ON Tag.id_tag = Participant_tag.id_tag
+        WHERE Participant_tag.id_participant = ?
+        ''', (id_participant,)).fetchall()
+        conn.close()
+        return tags, None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def add_tag_to_participant(id_participant, id_tag):
+    conn = get_db_connection()
+    try:
+        conn.execute('INSERT INTO Participant_tag (id_participant, id_tag) VALUES (?, ?)', (id_participant, id_tag))
+        conn.commit()
+        conn.close()
+        return None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def remove_tag_from_participant(id_participant, id_tag):
+    conn = get_db_connection()
+    try:
+        conn.execute('DELETE FROM Participant_tag WHERE id_participant = ? AND id_tag = ?', (id_participant, id_tag))
+        conn.commit()
+        conn.close()
+        return None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return "Erreur requête base de données"
+    finally:
+        conn.close()
+
 def get_event_tags(id_event):
     conn = get_db_connection()
     try:
