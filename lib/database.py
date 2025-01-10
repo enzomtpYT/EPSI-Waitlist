@@ -35,14 +35,16 @@ def create_event(name, date):
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute('INSERT INTO Event (name_event, date_event) VALUES (?, ?)', (name, date))
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO Event (name_event, date_event) VALUES (?, ?)', (name, date))
+        event_id = cursor.lastrowid
         conn.commit()
+        return event_id, None
     except sqlite3.Error as e:
         print(f"Erreur lors de la création de l'événement: {e}")
-        return "Erreur lors de la création de l'événement"
+        return None, "Erreur lors de la création de l'événement"
     finally:
         conn.close()
-    return None
 
 def get_all_events():
     """
