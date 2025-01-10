@@ -446,6 +446,7 @@ def delete_interview(id_interview):
     return None
 
 #Tag functions
+
 def create_tag(name):
     conn = get_db_connection()
     if conn is None:
