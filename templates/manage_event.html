@@ -21,12 +21,14 @@
             <tr>
                 <td>{{ event.name_event }}</td>
                 <td>{{ event.date_event }}</td>
-                <td><ul>{% for tag in event.tags %}
-                    {% if tag.name_tag %}
-                    <li>{{ tag.name_tag }}</li>
-                    {% endif %}
-                {% endfor %}</ul></td>
-                <td>
+                <td class="taggrid">
+                    {% for tag in event.tags %}
+                        {% if tag.name_tag %}
+                            <p class="display-tag">{{ tag.name_tag }}</p>
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td class="actionbtn">
                     <a href="/admin/manage_event/event/{{ event.id_event }}">
                         <button type="button">Voir</button>
                     </a>

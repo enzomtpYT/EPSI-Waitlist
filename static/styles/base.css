@@ -151,3 +151,27 @@ h1 {
     flex-direction: column;
     width: auto;
 }
+
+.display-tag {
+    display: inline-flex;
+    cursor: pointer;
+    align-items: center;
+    gap: .25rem;
+    border-radius: 99999px;
+    padding: .25rem .5rem;
+    font-size: .875rem;
+    font-weight: 600;
+    line-height: 1;
+    overflow: visible;
+    width: auto;
+    background-color: #4f4f4f;
+    color: #fff;
+}
+
+.taggrid {
+    min-width: 5vw;
+}
+
+.actionbtn {
+    max-width: 5vw;
+}
