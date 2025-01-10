@@ -489,7 +489,6 @@ def create_participant(name, email):
     try:
         cursor = conn.cursor()
         cursor.execute('INSERT INTO Participant (name_participant, email_participant) VALUES (?, ?)', (name, email))
-        # conn.execute('INSERT INTO Participant (name_participant, email_participant) VALUES (?, ?)', (name, email))
         participant_id = cursor.lastrowid
         conn.commit()
         return participant_id, None
