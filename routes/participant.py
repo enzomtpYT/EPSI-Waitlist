@@ -11,6 +11,8 @@ def participant():
 def edit_participant(id_participant):
     participant, error = database.get_participant(id_participant)
     interviews, error = database.get_participant_interviews(id_participant)
+    participant_tags, error = database.get_participant_tags(id_participant)
+    tags, error = database.get_all_tags()
 
     if request.method == 'POST':
         name = request.form['participant_name']
@@ -36,11 +38,7 @@ def edit_participant(id_participant):
             else:
                 flash(f"Erreur lors de la mise à jour du participant: {error}", "danger")
 
-    tags, error = database.get_all_tags()
-    participant_tags, error = database.get_participant_tags(id_participant)
-    participant_tag_ids = [tag['id_tag'] for tag in participant_tags]
-    interviews, error = database.get_participant_interviews(id_participant)
-    return render_template('participant.html', interviews=interviews, participant_id=id_participant, participant=participant, tags=tags, participant_tag_ids=participant_tag_ids)
+    return render_template('participant.html', interviews=interviews, participant_id=id_participant, participant=participant, tags=tags, participant_tags=participant_tags)
 
 @participant_bp.route("/admin/manage_participant/participant/<int:id_participant>/add_tag_participant", methods=['POST'])
 def add_tag_participant(id_participant):

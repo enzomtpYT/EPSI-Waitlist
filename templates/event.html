@@ -21,7 +21,7 @@
 
 <div class="admin-section">
     <h2>Tags de l'événement</h2>
-        <div class="taglist">
+    <div class="taglist">
         {% for tag in event_tags %}
             <form class="tagform" action="{{ url_for('event.remove_tag_event', id_event=event.id_event) }}" method="post" style="display:inline;">
                 <input type="hidden" name="tag" value="{{ tag.id_tag }}">
@@ -31,7 +31,7 @@
                 </button>
             </form>
         {% endfor %}
-        </div>
+    </div>
 </div>
 
 <div class="admin-section">

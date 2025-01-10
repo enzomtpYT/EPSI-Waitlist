@@ -11,6 +11,8 @@ def candidate():
 def edit_candidate(id_candidate):
     candidate, error = database.get_candidate(id_candidate)
     interviews, error = database.get_candidate_interviews(id_candidate)
+    candidate_tags, error = database.get_candidate_tags(id_candidate)
+    tags, error = database.get_all_tags()
 
     if request.method == 'POST':
         lastname = request.form['candidate_lastname']
@@ -52,11 +54,7 @@ def edit_candidate(id_candidate):
                 flash(f"Erreur lors de la mise à jour du candidat: {error}", "danger")
                 return redirect(url_for('candidate.edit_candidate_route', id_candidate=id_candidate))
 
-    tags, error = database.get_all_tags()
-    candidate_tags, error = database.get_candidate_tags(id_candidate)
-    candidate_tag_ids = [tag['id_tag'] for tag in candidate_tags]
-    interviews, error = database.get_candidate_interviews(id_candidate)
-    return render_template('candidate.html', candidate=candidate, tags=tags, candidate_tag_ids=candidate_tag_ids, interviews=interviews)
+    return render_template('candidate.html', candidate=candidate, tags=tags, interviews=interviews, candidate_tags=candidate_tags)
 
 @candidate_bp.route("/admin/manage_candidate/candidate/<int:id_candidate>/add_tag_candidate", methods=['POST'])
 def add_tag_candidate(id_candidate):
