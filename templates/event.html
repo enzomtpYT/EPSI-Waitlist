@@ -21,17 +21,17 @@
 
 <div class="admin-section">
     <h2>Tags de l'événement</h2>
-    <ul>
+        <div class="taglist">
         {% for tag in event_tags %}
-        <li>
-            {{ tag.name_tag }}
-            <form action="{{ url_for('event.remove_tag_event', id_event=event.id_event) }}" method="post" style="display:inline;">
+            <form class="tagform" action="{{ url_for('event.remove_tag_event', id_event=event.id_event) }}" method="post" style="display:inline;">
                 <input type="hidden" name="tag" value="{{ tag.id_tag }}">
-                <button type="submit" name="remove_tag">-</button>
+                <button class="delete remove-tag" type="submit" name="remove_tag">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10 4.293 5.707a1 1 0 0 1 0-1.414" clip-rule="evenodd"></path></svg>
+                {{ tag.name_tag }}
+                </button>
             </form>
-        </li>
         {% endfor %}
-    </ul>
+        </div>
 </div>
 
 <div class="admin-section">

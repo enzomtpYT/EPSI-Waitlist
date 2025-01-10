@@ -551,7 +551,7 @@ def get_event_tags(id_event):
     conn = get_db_connection()
     try:
         tags = conn.execute('''
-        SELECT Tag.id_tag, Tag.name_tag
+        SELECT Tag.*
         FROM Tag
         JOIN Event_tag ON Tag.id_tag = Event_tag.id_tag
         WHERE Event_tag.id_event = ?
