@@ -370,6 +370,19 @@ def get_participant_interviews(id_participant):
     finally:
         conn.close()
 
+def get_last_added_participant():
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+    try:
+        participant = conn.execute('SELECT * FROM Participant ORDER BY id_participant DESC LIMIT 1').fetchone()
+        return participant, None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
 # Interview functions
 
 def create_interview(id_event, id_participant, id_candidate):

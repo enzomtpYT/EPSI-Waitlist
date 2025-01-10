@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from lib import database
-import sqlite3
 
 create_candidate_bp = Blueprint('create_candidate', __name__)
 
