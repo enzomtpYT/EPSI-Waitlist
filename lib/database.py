@@ -284,14 +284,17 @@ def create_participant(name, email):
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute('INSERT INTO Participant (name_participant, email_participant) VALUES (?, ?)', (name, email))
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO Participant (name_participant, email_participant) VALUES (?, ?)', (name, email))
+        # conn.execute('INSERT INTO Participant (name_participant, email_participant) VALUES (?, ?)', (name, email))
+        participant_id = cursor.lastrowid
         conn.commit()
+        return participant_id, None
     except sqlite3.Error as e:
         print(f"Erreur lors de la création de l'intervenant: {e}")
-        return "Erreur lors de la création de l'intervenant"
+        return None, "Erreur lors de la création de l'intervenant"
     finally:
         conn.close()
-    return None
 
 def get_all_participants():
     conn = get_db_connection()
