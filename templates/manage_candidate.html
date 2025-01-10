@@ -24,12 +24,14 @@
                 <td>{{ candidate.lastname_candidate }}</td>
                 <td>{{ candidate.name_candidate }}</td>
                 <td>{{ candidate.email_candidate }}</td>
-                <td><ul>{% for tag in candidate.tags %}
-                    {% if tag.name_tag %}
-                    <li>{{ tag.name_tag }}</li>
-                    {% endif %}
-                {% endfor %}</ul></td>
-                <td>
+                <td class="taggrid">
+                    {% for tag in candidate.tags %}
+                        {% if tag.name_tag %}
+                            <p class="display-tag">{{ tag.name_tag }}</p>
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td class="actionbtn">
                     <a href="/admin/manage_candidate/candidate/{{ candidate.id_candidate }}">
                         <button type="button">Voir</button>
                     </a>

@@ -22,12 +22,14 @@
             <tr>
                 <td>{{ participant.name_participant }}</td>
                 <td>{{ participant.email_participant }}</td>
-                <td><ul>{% for tag in participant.tags %}
-                    {% if tag.name_tag %}
-                    <li>{{ tag.name_tag }}</li>
-                    {% endif %}
-                {% endfor %}</ul></td>
-                <td>
+                <td class="taggrid">
+                    {% for tag in participant.tags %}
+                        {% if tag.name_tag %}
+                            <p class="display-tag">{{ tag.name_tag }}</p>
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td class="actionbtn">
                     <a href="/admin/manage_participant/participant/{{ participant.id_participant }}">
                         <button type="button">Voir</button>
                     </a>
