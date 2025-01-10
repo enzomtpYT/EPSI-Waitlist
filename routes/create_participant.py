@@ -19,8 +19,8 @@ def create_participant():
 
         if error is None:
             error = database.create_participant(name, email)
-            if error is None:
-                flash("Participant créé avec succès!", "success")
+            if error:
+                flash(f"Erreur lors de la création du participant: {error}", "danger")
                 return redirect(url_for('create_participant.create_participant'))
             added_participant, error = database.get_last_added_participant()
             if error:
