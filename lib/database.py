@@ -510,8 +510,8 @@ def get_candidate_tags(id_candidate):
         tags = conn.execute('''
         SELECT Tag.id_tag, Tag.name_tag
         FROM Tag
-        JOIN Member_of ON Tag.id_tag = Member_of.id_tag
-        WHERE Member_of.id_candidate = ?
+        JOIN Candidate_tag ON Tag.id_tag = Candidate_tag.id_tag
+        WHERE Candidate_tag.id_candidate = ?
         ''', (id_candidate,)).fetchall()
         conn.close()
         return tags, None
@@ -524,7 +524,7 @@ def get_candidate_tags(id_candidate):
 def add_tag_to_candidate(id_candidate, id_tag):
     conn = get_db_connection()
     try:
-        conn.execute('INSERT INTO Member_of (id_candidate, id_tag) VALUES (?, ?)', (id_candidate, id_tag))
+        conn.execute('INSERT INTO Candidate_tag (id_candidate, id_tag) VALUES (?, ?)', (id_candidate, id_tag))
         conn.commit()
         conn.close()
         return None
@@ -537,7 +537,7 @@ def add_tag_to_candidate(id_candidate, id_tag):
 def remove_tag_from_candidate(id_candidate, id_tag):
     conn = get_db_connection()
     try:
-        conn.execute('DELETE FROM Member_of WHERE id_candidate = ? AND id_tag = ?', (id_candidate, id_tag))
+        conn.execute('DELETE FROM Candidate_tag WHERE id_candidate = ? AND id_tag = ?', (id_candidate, id_tag))
         conn.commit()
         conn.close()
         return None
@@ -553,8 +553,8 @@ def get_event_tags(id_event):
         tags = conn.execute('''
         SELECT Tag.id_tag, Tag.name_tag
         FROM Tag
-        JOIN Dedicated_to ON Tag.id_tag = Dedicated_to.id_tag
-        WHERE Dedicated_to.id_event = ?
+        JOIN Event_tag ON Tag.id_tag = Event_tag.id_tag
+        WHERE Event_tag.id_event = ?
         ''', (id_event,)).fetchall()
         conn.close()
         return tags, None
@@ -567,7 +567,7 @@ def get_event_tags(id_event):
 def add_tag_to_event(id_event, id_tag):
     conn = get_db_connection()
     try:
-        conn.execute('INSERT INTO Dedicated_to (id_event, id_tag) VALUES (?, ?)', (id_event, id_tag))
+        conn.execute('INSERT INTO Event_tag (id_event, id_tag) VALUES (?, ?)', (id_event, id_tag))
         conn.commit()
         conn.close()
         return None
@@ -580,7 +580,7 @@ def add_tag_to_event(id_event, id_tag):
 def remove_tag_from_event(id_event, id_tag):
     conn = get_db_connection()
     try:
-        conn.execute('DELETE FROM Dedicated_to WHERE id_event = ? AND id_tag = ?', (id_event, id_tag))
+        conn.execute('DELETE FROM Event_tag WHERE id_event = ? AND id_tag = ?', (id_event, id_tag))
         conn.commit()
         conn.close()
         return None

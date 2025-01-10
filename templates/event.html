@@ -8,16 +8,42 @@
 <div class="admin-section">
     <h2>Modifier les informations de l'événement</h2>
     <form action="/admin/manage_event/event/{{ event.id_event }}" method="post">
-        <label for="date_event">Nom :</label>
+        <label for="name_event">Nom :</label>
         <input type="text" id="name_event" name="name_event" value="{{ event.name_event }}">
 
         <label for="date_event">Date :</label>
         <input type="date" id="date_event" name="date_event" value="{{ event.date_event }}">
 
-        {# <label for="year_event">Année :</label>
-        <input type="text" id="year_event" name="year_event" value="{{ event.year_event if event.year_event else '' }}"> #}
-
         <button type="submit">Enregistrer</button>
+
+    </form>
+</div>
+
+<div class="admin-section">
+    <h2>Tags de l'événement</h2>
+    <ul>
+        {% for tag in event_tags %}
+        <li>
+            {{ tag.name_tag }}
+            <form action="{{ url_for('event.remove_tag_event', id_event=event.id_event) }}" method="post" style="display:inline;">
+                <input type="hidden" name="tag" value="{{ tag.id_tag }}">
+                <button type="submit" name="remove_tag">-</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="admin-section">
+    <h2>Ajouter un tag</h2>
+    <form action="{{ url_for('event.add_tag_event', id_event=event.id_event) }}" method="post">
+        <label for="tag">Tag :</label>
+        <select id="tag" name="tag">
+            {% for tag in tags %}
+            <option value="{{ tag.id_tag }}">{{ tag.name_tag }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" name="add_tag">Ajouter</button>
     </form>
 </div>
 

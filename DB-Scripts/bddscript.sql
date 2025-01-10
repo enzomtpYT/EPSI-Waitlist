@@ -55,7 +55,7 @@ CREATE TABLE Attends(
    FOREIGN KEY(id_event) REFERENCES Event(id_event)
 );
 
-CREATE TABLE Member_of(
+CREATE TABLE Candidate_tag(
    id_candidate INTEGER,
    id_tag INTEGER,
    PRIMARY KEY(id_candidate, id_tag),
@@ -63,10 +63,18 @@ CREATE TABLE Member_of(
    FOREIGN KEY(id_tag) REFERENCES Tag(id_tag)
 );
 
-CREATE TABLE Dedicated_to(
+CREATE TABLE Event_tag(
    id_event INTEGER,
    id_tag INTEGER,
    PRIMARY KEY(id_event, id_tag),
    FOREIGN KEY(id_event) REFERENCES Event(id_event),
+   FOREIGN KEY(id_tag) REFERENCES Tag(id_tag)
+);
+
+CREATE TABLE Participant_tag(
+   id_participant INTEGER,
+   id_tag INTEGER,
+   PRIMARY KEY(id_participant, id_tag),
+   FOREIGN KEY(id_participant) REFERENCES Participant(id_participant),
    FOREIGN KEY(id_tag) REFERENCES Tag(id_tag)
 );
