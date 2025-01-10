@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from lib import database
 import sqlite3
-from lib.database import get_db_connection
 
 create_tag_bp = Blueprint('create_tag', __name__)
 
@@ -9,7 +8,7 @@ create_tag_bp = Blueprint('create_tag', __name__)
 def create_tag():
     if request.method == 'POST':
         name = request.form['tag_name']
-        conn = get_db_connection()
+        conn = database.get_db_connection()
         error = None
 
         if not name:

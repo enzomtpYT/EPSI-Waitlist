@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from lib import database
-from lib.database import get_event_interviews
 
 event_bp = Blueprint('event', __name__)
 
@@ -70,7 +69,7 @@ def remove_tag_event(id_event):
 
 @event_bp.route("/admin/manage_event/event/<int:id_event>/interviews", methods=['GET'])
 def view_interviews(id_event):
-    event, interviews, error = get_event_interviews(id_event)
+    event, interviews, error = database.get_event_interviews(id_event)
     if error:
         flash(error, "danger")
         return redirect(url_for('event.edit_event', id_event=id_event))
