@@ -34,17 +34,17 @@ def edit_candidate(id_candidate):
                     current_tags, error = database.get_candidate_tags(id_candidate)
                     current_tag_ids = [tag['id_tag'] for tag in current_tags]
 
-                # Add new tags
-                if tags:
-                    for tag_id in tags:
-                        if int(tag_id) not in current_tag_ids:
-                            database.add_tag_to_candidate(id_candidate, tag_id)
+                # # Add new tags
+                # if tags:
+                #     for tag_id in tags:
+                #         if int(tag_id) not in current_tag_ids:
+                #             database.add_tag_to_candidate(id_candidate, tag_id)
 
-                # Remove old tags
-                if current_tag_ids:
-                    for tag_id in current_tag_ids:
-                        if str(tag_id) not in tags:
-                            database.remove_tag_from_candidate(id_candidate, tag_id)
+                # # Remove old tags
+                # if current_tag_ids:
+                #     for tag_id in current_tag_ids:
+                #         if str(tag_id) not in tags:
+                #             database.remove_tag_from_candidate(id_candidate, tag_id)
 
                 flash("Candidat mis à jour avec succès!", "success")
                 return redirect(url_for('candidate.edit_candidate_route', id_candidate=id_candidate))
@@ -57,6 +57,29 @@ def edit_candidate(id_candidate):
     candidate_tag_ids = [tag['id_tag'] for tag in candidate_tags]
     interviews, error = database.get_candidate_interviews(id_candidate)
     return render_template('candidate.html', candidate=candidate, tags=tags, candidate_tag_ids=candidate_tag_ids, interviews=interviews)
+
+@candidate_bp.route("/admin/manage_candidate/candidate/<int:id_candidate>/add_tag_candidate", methods=['POST'])
+def add_tag_candidate(id_candidate):
+    if 'add_tag' in request.form:
+        id_tag = request.form['tag']
+        error = database.add_tag_to_candidate(id_candidate, id_tag)
+        if error:
+            flash(f"Erreur lors de l'ajout du tag: {error}", "danger")
+        else:
+            flash("Tag ajouté avec succès!", "success")
+    return redirect(url_for('candidate.edit_candidate', id_candidate=id_candidate))
+
+@candidate_bp.route("/admin/manage_candidate/candidate/<int:id_candidate>/remove_tag_candidate", methods=['POST'])
+def remove_tag_candidate(id_candidate):
+    if 'remove_tag' in request.form:
+        id_tag = request.form['tag']
+        error = database.remove_tag_from_candidate(id_candidate, id_tag)
+        if error:
+            flash(f"Erreur lors de la suppression du tag: {error}", "danger")
+        else:
+            flash("Tag supprimé avec succès!", "success")
+
+    return redirect(url_for('candidate.edit_candidate', id_candidate=id_candidate))
 
 @candidate_bp.route("/admin/manage_candidate/candidate/<int:id_candidate>/delete", methods=['POST'])
 def delete_candidate(id_candidate):
