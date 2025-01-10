@@ -14,8 +14,12 @@
         <label for="date_event">Date :</label>
         <input type="date" id="date_event" name="date_event">
 
-        {# <label for="year_event">Année :</label>
-        <input type="text" id="year_event" name="year_event"> #}
+        <label for="tags">Tags:</label>
+        <select id="tags" name="tags" multiple>
+            {% for tag in tags %}
+            <option value="{{ tag.id_tag }}">{{ tag.name_tag }}</option>
+            {% endfor %}
+        </select>
 
         <button type="submit">Créer</button>
     </form>

@@ -645,3 +645,16 @@ def remove_tag_from_event(id_event, id_tag):
         return "Erreur requête base de données"
     finally:
         conn.close()
+
+def get_last_added_event():
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+    try:
+        event = conn.execute('SELECT * FROM Event ORDER BY id_event DESC LIMIT 1').fetchone()
+        return event, None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
