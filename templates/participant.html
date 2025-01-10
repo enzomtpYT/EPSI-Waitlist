@@ -36,17 +36,20 @@
 
 <div class="admin-section">
     <h2>Ajouter un tag</h2>
-    <form action="{{ url_for('participant.add_tag_participant', id_participant=participant.id_participant) }}" method="post">
-        <label for="tag">Tag :</label>
-        <select id="tag" name="tag">
-            {% for tag in tags %}
+    <div class="taglist">
+        {% for tag in tags %}
+            <form class="tagform" action="{{ url_for('participant.add_tag_participant', id_participant=participant.id_participant) }}" method="post" style="display: inline;">
                 {% if tag.id_tag not in participant_tags|map(attribute='id_tag') %}
-                    <option value="{{ tag.id_tag }}">{{ tag.name_tag }}</option>
+                <input type="hidden" name="tag" value="{{ tag.id_tag }}">
+                    <button class="add-tag" type="submit" name="add_tag">
+                    <svg class="plussvg" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10 4.293 5.707a1 1 0 0 1 0-1.414" clip-rule="evenodd"></path></svg>
+                    {{ tag.name_tag }}
+                    </button>
                 {% endif %}
-            {% endfor %}
-        </select>
-        <button type="submit" name="add_tag">Ajouter</button>
-    </form>
+            </form>
+        {% endfor %}
+    </div>
 </div>
 
 <div class="admin-section">
