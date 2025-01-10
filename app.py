@@ -1,7 +1,6 @@
 from flask import Flask
 from flask_socketio import SocketIO, send
 import os, time
-# from lib import models
 from routes.index import index_bp
 from routes.admin import admin_bp
 from routes.liste import liste_bp
