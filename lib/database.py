@@ -1,6 +1,13 @@
 import sqlite3, datetime
 
 def get_db_connection():
+    """
+    Établit une connexion à la base de données SQLite.
+
+    Returns:
+        sqlite3.Connection: L'objet de connexion à la base de données.
+        None: Si une erreur survient lors de la connexion.
+    """
     try:
         conn = sqlite3.connect('BDDStage')
         conn.row_factory = sqlite3.Row
@@ -14,6 +21,16 @@ today = datetime.date.today()
 # Event functions
 
 def create_event(name, date):
+    """
+    Crée un nouvel événement dans la base de données.
+
+    Args:
+        name (str): Le nom de l'événement.
+        date (str): La date de l'événement.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
@@ -28,6 +45,13 @@ def create_event(name, date):
     return None
 
 def get_all_events():
+    """
+    Récupère tous les événements de la base de données.
+
+    Returns:
+        list: Une liste de dictionnaires représentant les événements.
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
@@ -44,6 +68,16 @@ def get_all_events():
         conn.close()
 
 def get_event(event_id):
+    """
+    Récupère un événement de la base de données en utilisant son identifiant.
+
+    Args:
+        event_id (int): L'identifiant de l'événement.
+
+    Returns:
+        dict: Un dictionnaire représentant l'événement.
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
@@ -57,6 +91,17 @@ def get_event(event_id):
         conn.close()
 
 def edit_event(name, date, id_event):
+    """
+    Met à jour un événement dans la base de données.
+
+    Args:
+        name (str): Le nom de l'événement.
+        date (str): La date de l'événement.
+        id_event (int): L'identifiant de l'événement.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
@@ -71,6 +116,15 @@ def edit_event(name, date, id_event):
     return None
 
 def delete_event(id_event):
+    """
+    Supprime un événement de la base de données en utilisant son identifiant.
+
+    Args:
+        id_event (int): L'identifiant de l'événement.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
@@ -85,6 +139,15 @@ def delete_event(id_event):
     return None
 
 def get_event_interviews(id_event):
+    """
+    Récupère les interviews associées à un événement.
+
+    Args:
+        id_event (int): L'identifiant de l'événement.
+
+    Returns:
+        tuple: Un tuple contenant l'événement, les interviews et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
@@ -106,6 +169,12 @@ def get_event_interviews(id_event):
         conn.close()
 
 def get_today_events():
+    """
+    Récupère les événements prévus pour aujourd'hui.
+
+    Returns:
+        tuple: Un tuple contenant l'identifiant de l'événement et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
@@ -122,6 +191,15 @@ def get_today_events():
         conn.close()
 
 def get_event_candidates(todayevent):
+    """
+    Récupère les candidats associés à un événement.
+
+    Args:
+        todayevent (int): L'identifiant de l'événement.
+
+    Returns:
+        tuple: Un tuple contenant une liste de candidats et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
@@ -138,6 +216,15 @@ def get_event_candidates(todayevent):
     return candid, None
 
 def get_event_participant(todayevent):
+    """
+    Récupère les participants associés à un événement.
+
+    Args:
+        todayevent (int): L'identifiant de l'événement.
+
+    Returns:
+        tuple: Un tuple contenant une liste de participants et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
@@ -154,6 +241,16 @@ def get_event_participant(todayevent):
     return inter, None
 
 def get_event_interview_candidate(todayevent, id_participant):
+    """
+    Récupère les candidats associés aux interviews d'un participant pour un événement.
+
+    Args:
+        todayevent (int): L'identifiant de l'événement.
+        id_participant (int): L'identifiant du participant.
+
+    Returns:
+        tuple: Un tuple contenant une liste de candidats et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
@@ -174,81 +271,161 @@ def get_event_interview_candidate(todayevent, id_participant):
 # Candidate functions
 
 def create_candidate(lastname, name, email):
+    """
+    Crée un nouveau candidat dans la base de données.
+
+    Args:
+        lastname (str): Le nom de famille du candidat.
+        name (str): Le prénom du candidat.
+        email (str): L'adresse email du candidat.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
+        # Insere le candidat dans la base de données
         conn.execute('INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate) VALUES (?, ?, ?)', (lastname, name, email))
+        # Sauvegarde les modifications
         conn.commit()
     except sqlite3.Error as e:
         print(f"Erreur lors de la création du candidat: {e}")
         return "Erreur lors de la création du candidat"
     finally:
+        # Fermes la connexion à la base de données
         conn.close()
     return None
 
 def get_all_candidates():
+    """
+    Récupère tous les candidats de la base de données.
+
+    Returns:
+        tuple: Un tuple contenant une liste de candidats et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
+
     try:
-        candidates = conn.execute(f'SELECT * FROM Candidate').fetchall()
+        # Renvoie tous les candidats de la base de données
+        candidates = conn.execute('SELECT * FROM Candidate').fetchall()
+
         if candidates:
             return candidates, None
         else:
             return None, "Pas de candidat"
+
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
+
     finally:
+        # Fermes la connexion à la base de données
         conn.close()
 
 def get_candidate(candidate_id):
+    """
+    Récupère un candidat de la base de données en utilisant son identifiant.
+
+    Args:
+        candidate_id (int): L'identifiant du candidat.
+
+    Returns:
+        tuple: Un tuple contenant le candidat et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
     if conn is None:
+        # Si la connexion échoue, renvoie une erreur
         return None, "Erreur base de données"
     try:
+        # Exécute la requête pour récupérer le candidat
         candidate = conn.execute('SELECT * FROM Candidate WHERE id_candidate = ?', (candidate_id,)).fetchone()
         return candidate, None
     except sqlite3.Error as e:
+        # Gère les erreurs de requête SQL
         print(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
+        # Ferme la connexion à la base de données
         conn.close()
 
 def edit_candidate(lastname, name, email, id_candidate):
+    """
+    Met à jour un candidat dans la base de données.
+
+    Args:
+        lastname (str): Le nom de famille du candidat.
+        name (str): Le prénom du candidat.
+        email (str): L'adresse email du candidat.
+        id_candidate (int): L'identifiant du candidat.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
+
     try:
+        # Met à jour le candidat dans la base de données
         conn.execute('UPDATE Candidate SET lastname_candidate = ?, name_candidate = ?, email_candidate = ? WHERE id_candidate = ?', (lastname, name, email, id_candidate))
+        # Sauvegarde les modifications
         conn.commit()
     except sqlite3.Error as e:
         print(f"Erreur lors de la mise à jour du candidat: {e}")
         return "Erreur lors de la mise à jour du candidat"
     finally:
+        # Fermes la connexion à la base de données
         conn.close()
     return None
 
 def delete_candidate(id_candidate):
+    """
+    Supprime un candidat de la base de données en utilisant son identifiant.
+
+    Args:
+        id_candidate (int): L'identifiant du candidat.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     if conn is None:
+        # Si la connexion échoue, renvoie une erreur
         return "Erreur base de données"
     try:
+        # Exécute la requête pour supprimer le candidat
         conn.execute("DELETE FROM Candidate WHERE id_candidate = ?", (id_candidate,))
+        # Sauvegarde les modifications
         conn.commit()
     except sqlite3.Error as e:
+        # Gère les erreurs de requête SQL
         print(f"Erreur lors de la suppression du candidat: {e}")
         return "Erreur lors de la suppression du candidat"
     finally:
+        # Ferme la connexion à la base de données
         conn.close()
     return None
 
 def get_candidate_interviews(id_candidate):
+    """
+    Récupère les interviews associées à un candidat.
+
+    Args:
+        id_candidate (int): L'identifiant du candidat.
+
+    Returns:
+        tuple: Un tuple contenant une liste d'interviews et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
+
     try:
+        # Renvoie les entretiens du candidat
         interviews = conn.execute('''
         SELECT Interview.id_interview, Event.name_event, Event.date_event, Participant.name_participant
         FROM Interview
@@ -257,29 +434,51 @@ def get_candidate_interviews(id_candidate):
         JOIN Event ON Interview.id_event = Event.id_event
         WHERE Interview.id_candidate = ? AND Interview.happened = 1
         ''', (id_candidate,)).fetchall()
+
         return interviews, None
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
+        # Ferme la connexion à la base de données
         conn.close()
 
 def get_last_added_candidate():
+    """
+    Récupère le dernier candidat ajouté à la base de données.
+
+    Returns:
+        tuple: Un tuple contenant le candidat et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
     if conn is None:
+        # Si la connexion échoue, renvoie une erreur
         return None, "Erreur base de données"
     try:
+        # Renvoie le dernier candidat ajouté
         candidate = conn.execute('SELECT * FROM Candidate ORDER BY id_candidate DESC LIMIT 1').fetchone()
         return candidate, None
     except sqlite3.Error as e:
+        # Gère les erreurs de requête SQL
         print(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
+        # Ferme la connexion à la base de données
         conn.close()
 
 # Participant functions
 
 def create_participant(name, email):
+    """
+    Crée un nouveau participant dans la base de données.
+
+    Args:
+        name (str): Le nom du participant.
+        email (str): L'adresse email du participant.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
@@ -294,6 +493,12 @@ def create_participant(name, email):
     return None
 
 def get_all_participants():
+    """
+    Récupère tous les participants de la base de données.
+
+    Returns:
+        tuple: Un tuple contenant une liste de participants et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
@@ -310,6 +515,15 @@ def get_all_participants():
         conn.close()
 
 def get_participant(participant_id):
+    """
+    Récupère un participant de la base de données en utilisant son identifiant.
+
+    Args:
+        participant_id (int): L'identifiant du participant.
+
+    Returns:
+        tuple: Un tuple contenant le participant et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
@@ -323,6 +537,17 @@ def get_participant(participant_id):
         conn.close()
 
 def edit_participant(name, email, id_participant):
+    """
+    Met à jour un participant dans la base de données.
+
+    Args:
+        name (str): Le nom du participant.
+        email (str): L'adresse email du participant.
+        id_participant (int): L'identifiant du participant.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
@@ -337,6 +562,15 @@ def edit_participant(name, email, id_participant):
     return None
 
 def delete_participant(id_participant):
+    """
+    Supprime un participant de la base de données en utilisant son identifiant.
+
+    Args:
+        id_participant (int): L'identifiant du participant.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
@@ -351,6 +585,15 @@ def delete_participant(id_participant):
     return None
 
 def get_participant_interviews(id_participant):
+    """
+    Récupère les interviews associées à un participant.
+
+    Args:
+        id_participant (int): L'identifiant du participant.
+
+    Returns:
+        tuple: Un tuple contenant une liste d'interviews et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
@@ -371,6 +614,12 @@ def get_participant_interviews(id_participant):
         conn.close()
 
 def get_last_added_participant():
+    """
+    Récupère le dernier participant ajouté à la base de données.
+
+    Returns:
+        tuple: Un tuple contenant le participant et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
@@ -386,6 +635,17 @@ def get_last_added_participant():
 # Interview functions
 
 def create_interview(id_event, id_participant, id_candidate):
+    """
+    Crée un nouvel interview dans la base de données.
+
+    Args:
+        id_event (int): L'identifiant de l'événement.
+        id_participant (int): L'identifiant du participant.
+        id_candidate (int): L'identifiant du candidat.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
@@ -400,6 +660,15 @@ def create_interview(id_event, id_participant, id_candidate):
     return None
 
 def get_interview(id_interview):
+    """
+    Récupère un interview de la base de données en utilisant son identifiant.
+
+    Args:
+        id_interview (int): L'identifiant de l'interview.
+
+    Returns:
+        tuple: Un tuple contenant l'interview et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
@@ -413,6 +682,16 @@ def get_interview(id_interview):
         conn.close()
 
 def get_candidate_from_event_participants_inverviews(id_event, id_participant):
+    """
+    Récupère les candidats associés aux interviews d'un participant pour un événement.
+
+    Args:
+        id_event (int): L'identifiant de l'événement.
+        id_participant (int): L'identifiant du participant.
+
+    Returns:
+        tuple: Un tuple contenant une liste d'interviews et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
@@ -431,6 +710,16 @@ def get_candidate_from_event_participants_inverviews(id_event, id_participant):
         conn.close()
 
 def edit_interview(id_interview, happened):
+    """
+    Met à jour un interview dans la base de données.
+
+    Args:
+        id_interview (int): L'identifiant de l'interview.
+        happened (int): Le statut de l'interview (0 ou 1).
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
@@ -445,6 +734,15 @@ def edit_interview(id_interview, happened):
     return None
 
 def delete_interview(id_interview):
+    """
+    Supprime un interview de la base de données en utilisant son identifiant.
+
+    Args:
+        id_interview (int): L'identifiant de l'interview.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
@@ -458,9 +756,18 @@ def delete_interview(id_interview):
         conn.close()
     return None
 
-#Tag functions
+# Tag functions
 
 def create_tag(name):
+    """
+    Crée un nouveau tag dans la base de données.
+
+    Args:
+        name (str): Le nom du tag.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
@@ -475,6 +782,12 @@ def create_tag(name):
         conn.close()
 
 def get_all_tags():
+    """
+    Récupère tous les tags de la base de données.
+
+    Returns:
+        tuple: Un tuple contenant une liste de tags et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
@@ -491,6 +804,15 @@ def get_all_tags():
         conn.close()
 
 def get_tag(tag_id):
+    """
+    Récupère un tag de la base de données en utilisant son identifiant.
+
+    Args:
+        tag_id (int): L'identifiant du tag.
+
+    Returns:
+        tuple: Un tuple contenant le tag et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
@@ -504,6 +826,16 @@ def get_tag(tag_id):
         conn.close()
 
 def edit_tag(name, id_tag):
+    """
+    Met à jour un tag dans la base de données.
+
+    Args:
+        name (str): Le nom du tag.
+        id_tag (int): L'identifiant du tag.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
@@ -518,6 +850,15 @@ def edit_tag(name, id_tag):
     return None
 
 def delete_tag(id_tag):
+    """
+    Supprime un tag de la base de données en utilisant son identifiant.
+
+    Args:
+        id_tag (int): L'identifiant du tag.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
@@ -532,6 +873,15 @@ def delete_tag(id_tag):
     return None
 
 def get_candidate_tags(id_candidate):
+    """
+    Récupère les tags associés à un candidat.
+
+    Args:
+        id_candidate (int): L'identifiant du candidat.
+
+    Returns:
+        tuple: Un tuple contenant une liste de tags et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
     try:
         tags = conn.execute('''
@@ -549,6 +899,16 @@ def get_candidate_tags(id_candidate):
         conn.close()
 
 def add_tag_to_candidate(id_candidate, id_tag):
+    """
+    Ajoute un tag à un candidat.
+
+    Args:
+        id_candidate (int): L'identifiant du candidat.
+        id_tag (int): L'identifiant du tag.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     try:
         conn.execute('INSERT INTO Candidate_tag (id_candidate, id_tag) VALUES (?, ?)', (id_candidate, id_tag))
@@ -562,6 +922,16 @@ def add_tag_to_candidate(id_candidate, id_tag):
         conn.close()
 
 def remove_tag_from_candidate(id_candidate, id_tag):
+    """
+    Supprime un tag d'un candidat.
+
+    Args:
+        id_candidate (int): L'identifiant du candidat.
+        id_tag (int): L'identifiant du tag.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     try:
         conn.execute('DELETE FROM Candidate_tag WHERE id_candidate = ? AND id_tag = ?', (id_candidate, id_tag))
@@ -575,6 +945,15 @@ def remove_tag_from_candidate(id_candidate, id_tag):
         conn.close()
 
 def get_participant_tags(id_participant):
+    """
+    Récupère les tags associés à un participant.
+
+    Args:
+        id_participant (int): L'identifiant du participant.
+
+    Returns:
+        tuple: Un tuple contenant une liste de tags et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
     try:
         tags = conn.execute('''
@@ -592,6 +971,16 @@ def get_participant_tags(id_participant):
         conn.close()
 
 def add_tag_to_participant(id_participant, id_tag):
+    """
+    Ajoute un tag à un participant.
+
+    Args:
+        id_participant (int): L'identifiant du participant.
+        id_tag (int): L'identifiant du tag.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     try:
         conn.execute('INSERT INTO Participant_tag (id_participant, id_tag) VALUES (?, ?)', (id_participant, id_tag))
@@ -605,6 +994,16 @@ def add_tag_to_participant(id_participant, id_tag):
         conn.close()
 
 def remove_tag_from_participant(id_participant, id_tag):
+    """
+    Supprime un tag d'un participant.
+
+    Args:
+        id_participant (int): L'identifiant du participant.
+        id_tag (int): L'identifiant du tag.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     try:
         conn.execute('DELETE FROM Participant_tag WHERE id_participant = ? AND id_tag = ?', (id_participant, id_tag))
@@ -618,6 +1017,15 @@ def remove_tag_from_participant(id_participant, id_tag):
         conn.close()
 
 def get_event_tags(id_event):
+    """
+    Récupère les tags associés à un événement.
+
+    Args:
+        id_event (int): L'identifiant de l'événement.
+
+    Returns:
+        tuple: Un tuple contenant une liste de tags et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
     try:
         tags = conn.execute('''
@@ -635,6 +1043,16 @@ def get_event_tags(id_event):
         conn.close()
 
 def add_tag_to_event(id_event, id_tag):
+    """
+    Ajoute un tag à un événement.
+
+    Args:
+        id_event (int): L'identifiant de l'événement.
+        id_tag (int): L'identifiant du tag.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     try:
         conn.execute('INSERT INTO Event_tag (id_event, id_tag) VALUES (?, ?)', (id_event, id_tag))
@@ -648,6 +1066,16 @@ def add_tag_to_event(id_event, id_tag):
         conn.close()
 
 def remove_tag_from_event(id_event, id_tag):
+    """
+    Supprime un tag d'un événement.
+
+    Args:
+        id_event (int): L'identifiant de l'événement.
+        id_tag (int): L'identifiant du tag.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
     conn = get_db_connection()
     try:
         conn.execute('DELETE FROM Event_tag WHERE id_event = ? AND id_tag = ?', (id_event, id_tag))
@@ -661,6 +1089,12 @@ def remove_tag_from_event(id_event, id_tag):
         conn.close()
 
 def get_last_added_event():
+    """
+    Récupère le dernier événement ajouté à la base de données.
+
+    Returns:
+        tuple: Un tuple contenant l'événement et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
