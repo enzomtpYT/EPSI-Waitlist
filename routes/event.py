@@ -32,10 +32,6 @@ def edit_event(id_event):
         if error is None:
             error = database.edit_event(name, date, id_event)
             if error is None:
-                if tags:
-                    current_tags, error = database.get_event_tags(id_event)
-                    current_tag_ids = [tag['id_tag'] for tag in current_tags]
-
                 flash("Événement mis à jour avec succès!", "success")
                 return redirect(url_for('event.edit_event', id_event=id_event))
             else:
