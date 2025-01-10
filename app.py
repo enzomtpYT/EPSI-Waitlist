@@ -1,6 +1,5 @@
 from flask import Flask, render_template, session
 import os
-# from lib import models
 from routes.index import index_bp
 from routes.admin import admin_bp
 from routes.liste import liste_bp
