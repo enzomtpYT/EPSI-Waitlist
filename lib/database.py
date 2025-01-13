@@ -257,12 +257,10 @@ def get_event_interview_candidate(todayevent, id_participant):
     if conn is None:
         return None, "Erreur base de données"
     try:
-        list = conn.execute(f'SELECT id_candidate FROM Interview WHERE id_event = \'{todayevent}\' AND id_participant = \'{id_participant}\' AND happened = \'0\'').fetchall()
+        list = conn.execute(f'SELECT Interview.id_candidate, Candidate.lastname_candidate, Candidate.name_candidate, Candidate.email_candidate, Interview.id_interview FROM Interview JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate WHERE id_event = \'{todayevent}\' AND id_participant = \'{id_participant}\' AND happened = \'0\'').fetchall()
         candid = []
-        for candidat in list:
-            cad = conn.execute(f'SELECT * FROM Candidate WHERE id_candidate = \'{candidat["id_candidate"]}\'').fetchall()
-            for el in cad:
-                candid.append(el)
+        for el in list:
+            candid.append(el)
         return candid, None
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
