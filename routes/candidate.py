@@ -32,10 +32,10 @@ def edit_candidate(id_candidate):
             error = database.edit_candidate(lastname, name, email, id_candidate)
             if error is None:
                 flash("Candidat mis à jour avec succès!", "success")
-                return redirect(url_for('candidate.edit_candidate_route', id_candidate=id_candidate))
+                return redirect(url_for('candidate.edit_candidate', id_candidate=id_candidate))
             else:
                 flash(f"Erreur lors de la mise à jour du candidat: {error}", "danger")
-                return redirect(url_for('candidate.edit_candidate_route', id_candidate=id_candidate))
+                return redirect(url_for('candidate.edit_candidate', id_candidate=id_candidate))
 
     return render_template('candidate.html', candidate=candidate, tags=tags, interviews=interviews, candidate_tags=candidate_tags)
 
