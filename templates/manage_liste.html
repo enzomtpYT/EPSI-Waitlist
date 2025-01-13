@@ -16,14 +16,14 @@
                     <div class="candidates">
                     {% for item in value %}
                         {% if loop.index <= 5 %}
-                            <div class="managecandidate">
-                                <h4>{{ item.name_candidate }} - {{ item.lastname_candidate }}</h4>
-                                {% if loop.index != 1 %}
-                                    <button style="display: none;">SKIP</button>
-                                {% else %}
-                                    <button class="current">SKIP</button>
-                                {% endif %}
-                            </div>
+                            {% if loop.index == 1 %}
+                                <div class="managecandidate current">
+                            {% else %}
+                                <div class="managecandidate">
+                            {% endif %}
+                                    <h4>{{ item.name_candidate }} - {{ item.lastname_candidate }}</h4>
+                                    <button class="shy">SKIP</button>
+                                </div>
                         {% endif %}
                     {% endfor %}
                     </div>

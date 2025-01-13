@@ -43,6 +43,20 @@ tr:nth-child(odd), td {
     border-bottom: 1px solid #e9ecef;
 }
 
+.shy {
+    display: none;
+}
+
 .current > button {
     display: block;
+}
+
+.current > h4 {
+    color: red;
+    font-size: 1.5rem;
+}
+
+.current {
+    background-color: #c5c6c6;
+    border-radius: 20px;
 }
