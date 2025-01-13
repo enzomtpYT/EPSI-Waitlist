@@ -84,3 +84,8 @@
     margin-bottom: 0.5rem;
     color: #007bff;
 }
+
+.link {
+    text-decoration: none;
+    color: #007bff;
+}

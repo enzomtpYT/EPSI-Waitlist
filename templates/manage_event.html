@@ -13,6 +13,7 @@
                 <th>Nom</th>
                 <th>Date</th>
                 <th>Tags</th>
+                <th>Lien</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -28,9 +29,10 @@
                         {% endif %}
                     {% endfor %}
                 </td>
+                <td><a class="link" href="{{ url_for('liste.liste_id', id=event.id_event) }}">Voir liste</a></td>
                 <td class="actionbtn">
                     <a href="/admin/manage_event/event/{{ event.id_event }}">
-                        <button type="button">Voir</button>
+                        <button type="button">Éditer</button>
                     </a>
                     <form action="/admin/manage_event/{{ event.id_event }}/delete" method="post" style="display:inline;">
                         <button class="delete" type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');">Supprimer</button>
