@@ -26,7 +26,7 @@ def edit_participant(id_participant):
             error = 'L\'adresse email est obligatoire.'
 
         if error is None:
-            error = database.edit_participant(name, id_participant)
+            error = database.edit_participant(name, email, id_participant)
             if error is None:
                 flash("Participant mis à jour avec succès!", "success")
                 return redirect(url_for('participant.edit_participant', id_participant=id_participant))
