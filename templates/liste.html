@@ -8,6 +8,7 @@
   {% if datas.message %}
     <h1>{{ datas.message }}</h1>
   {% else %}
+    <h1>{{ datas.title }}</h1>
     <div class="listecontainer">
       {% for dict_item in datas.list %}
           {% for key, value in dict_item.items() %}
