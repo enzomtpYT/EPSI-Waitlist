@@ -6,6 +6,7 @@ liste_bp = Blueprint('liste', __name__)
 
 def get_data():
     todayevent, error = database.get_today_events()
+    event, error = database.get_event(todayevent)
     if error:
         message = error
         candid = None
@@ -31,7 +32,8 @@ def get_data():
             list[interv['name_participant']].append(dict(candid))  # Convert Row to dict
 
     data = {
-        "list": [list]
+        "list": [list],
+        "title": event['name_event']
     }
     return data, message
 
