@@ -60,3 +60,8 @@ tr:nth-child(odd), td {
     background-color: #c5c6c6;
     border-radius: 20px;
 }
+
+.managecandidate > form > button {
+    max-width: 100%;
+    width: 100%;
+}

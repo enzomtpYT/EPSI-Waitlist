@@ -16,12 +16,7 @@
               <h2 class="interv">{{ key }}</h2>
               <div class="candidates">
                 {% for item in value %}
-                  <form action="{{ url_for('liste.remove_candidate_from_list', id_interview=item.id_interview) }}" method="post" style="display:inline;">
-                    <button type="submit" class="delete remove-tag">{{ item.name_candidate }} {{ item.lastname_candidate }}
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10 4.293 5.707a1 1 0 0 1 0-1.414" clip-rule="evenodd"></path></svg>
-                    </button>
-                  </form>
+                  <h4>{{ item.name_candidate }} - {{ item.lastname_candidate }}</h4>
                 {% endfor %}
               </div>
             </div>

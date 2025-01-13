@@ -1,4 +1,4 @@
-from flask import Blueprint, Response, render_template, flash, jsonify, redirect, url_for
+from flask import Blueprint, request, render_template, flash, jsonify, redirect, url_for
 from lib import database
 import time, json
 
@@ -32,7 +32,8 @@ def get_data(id=None, error=None):
 
     data = {
         "list": [list],
-        "title": event['name_event']
+        "title": event['name_event'],
+        "event_id": id
     }
     return data, message
 
@@ -68,6 +69,13 @@ def manage_liste():
         flash(mess)
     return render_template('manage_liste.html', datas=d)
 
+@liste_bp.route("/liste/<int:id>/manage")
+def manage_liste_id(id):
+    d, mess = get_data(id)
+    if mess:
+        flash(mess)
+    return render_template('manage_liste.html', datas=d)
+
 @liste_bp.route("/remove_candidate_from_list/<int:id_interview>", methods=['POST'])
 def remove_candidate_from_list(id_interview):
     error = database.delete_interview(id_interview)
@@ -75,7 +83,7 @@ def remove_candidate_from_list(id_interview):
         flash(f"Erreur lors de la suppression de l'entretien: {error}", "danger")
     else:
         flash("Entretien supprimé avec succès!", "success")
-    return redirect(url_for('liste.liste'))
+    return redirect(request.referrer)
 
 
 # Old stuff keep for live data
