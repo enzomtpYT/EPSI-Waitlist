@@ -60,6 +60,14 @@ def liste_id(id):
         flash(mess)
     return render_template('liste.html', datas=d)
 
+@liste_bp.route("/liste/manage")
+def manage_liste():
+    today, error = database.get_today_events()
+    d, mess = get_data(today, error)
+    if mess:
+        flash(mess)
+    return render_template('manage_liste.html', datas=d)
+
 
 # Old stuff keep for live data
 
