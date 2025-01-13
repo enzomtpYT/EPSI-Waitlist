@@ -34,3 +34,15 @@ tr:nth-child(odd), td {
     padding: 2rem;
     flex-direction: column;
 }
+
+.managecandidate {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.current > button {
+    display: block;
+}
