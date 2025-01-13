@@ -1,5 +1,6 @@
 from flask import Flask, request
 from flask_socketio import SocketIO, send
+from sock import socketio, app
 import os, time
 from routes.index import index_bp
 from routes.admin import admin_bp
@@ -16,9 +17,6 @@ from routes.event import event_bp
 from routes.manage_waitlist import manage_waitlist_bp
 from routes.create_tag import create_tag_bp
 from routes.manage_tag import manage_tag_bp
-
-app = Flask(__name__)
-socketio = SocketIO(app)
 
 # Set the secret key to a random value
 app.secret_key = os.urandom(24)
