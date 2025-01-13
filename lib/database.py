@@ -687,6 +687,28 @@ def get_interview(id_interview):
     finally:
         conn.close()
 
+def update_interview_status(interview_id, status):
+    """
+    Met à jour le statut d'un entretien.
+
+    Args:
+        interview_id (int): L'identifiant de l'entretien.
+        status (int): Le nouveau statut de l'entretien.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    try:
+        conn.execute('UPDATE Interview SET happened = ? WHERE id_interview = ?', (status, interview_id))
+        conn.commit()
+        return None
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la mise à jour de l'entretien: {e}")
+        return "Erreur lors de la mise à jour de l'entretien"
+    finally:
+        conn.close()
+
 def get_candidate_from_event_participants_inverviews(id_event, id_participant):
     """
     Récupère les candidats associés aux interviews d'un participant pour un événement.
