@@ -53,13 +53,14 @@ tbody {
 }
 
 .button-group {
-    justify-content: center;
+    justify-content: space-evenly;
     align-items: center;
+    text-align: center;
+
     width: 100%;
     display: flex;
-    gap: 10px; /* Adjust the gap as needed */
 }
 
 .button-group > button {
-    width: 100%;
+    max-width: 40%;
 }

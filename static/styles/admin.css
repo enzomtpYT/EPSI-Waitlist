@@ -20,14 +20,25 @@
 }
 
 .admin-section > table > tbody > tr > td > * > button {
-    max-width: 49%;
+    max-width: 40%;
+    margin: 0.5rem;
+}
+
+.admin-section > table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    border-radius: 20px;
+    overflow: hidden;
 }
 
 .admin-section {
     display: flex;
     flex-direction: column;
-    padding: 0.2rem 1rem;
-    background-color: #f8f9fa;
+    padding: 1rem;
+    background-color: #ececec;
+    border-radius: 20px;
+    margin: 1rem;
 }
 
 .admin-container {
@@ -35,7 +46,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     grid-gap: 10px;
     padding: 0.2rem 1rem;
 }
@@ -67,4 +78,9 @@
 
 .admin-buttons > a > button {
     max-width: 100%;
+}
+
+.admin-section > h2 {
+    margin-bottom: 0.5rem;
+    color: #007bff;
 }
