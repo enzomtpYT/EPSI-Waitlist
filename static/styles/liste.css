@@ -32,4 +32,5 @@ tr:nth-child(odd), td {
     width: 100%;
     display: flex;
     padding: 2rem;
+    flex-direction: column;
 }
