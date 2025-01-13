@@ -1,4 +1,6 @@
-from flask import Blueprint, request, render_template, flash, jsonify, redirect, url_for
+from flask import Blueprint, request, render_template, flash, jsonify, redirect, session, url_for
+from flask_socketio import SocketIO, join_room, send
+from sock import socketio
 from lib import database
 import time, json
 
@@ -23,12 +25,13 @@ def get_data(id=None, error=None):
 
     list = {}
 
-    for interv in inter:
-        all, error = database.get_event_interview_candidate(id, interv['id_participant'])
-        if interv['name_participant'] not in list:
-            list[interv['name_participant']] = []
-        for candid in all:
-            list[interv['name_participant']].append(dict(candid))  # Convert Row to dict
+    if inter:
+        for interv in inter:
+            all, error = database.get_event_interview_candidate(id, interv['id_participant'])
+            if interv['name_participant'] not in list:
+                list[interv['name_participant']] = []
+            for candid in all:
+                list[interv['name_participant']].append(dict(candid))  # Convert Row to dict
 
     data = {
         "list": [list],
@@ -37,14 +40,9 @@ def get_data(id=None, error=None):
     }
     return data, message
 
-def refresh():
-    previous_data = None
-    while True:
-        data = get_data()
-        if data != previous_data:
-            yield json.dumps(data)
-            previous_data = data
-        time.sleep(1)
+def reload(id):
+    js, _ = get_data(id)
+    send(js, room=id, namespace='/liste/live')
 
 @liste_bp.route("/liste")
 def liste():
@@ -78,11 +76,13 @@ def manage_liste_id(id):
 
 @liste_bp.route("/remove_candidate_from_list/<int:id_interview>", methods=['POST'])
 def remove_candidate_from_list(id_interview):
+    id_event, error = database.get_interview(id_interview)
     error = database.delete_interview(id_interview)
     if error:
         flash(f"Erreur lors de la suppression de l'entretien: {error}", "danger")
     else:
         flash("Entretien supprimé avec succès!", "success")
+    reload(id_event['id_event'])
     return redirect(request.referrer)
 
 # rcfaife = remove_candidate_from_all_interviews_for_event
@@ -93,21 +93,22 @@ def remove_candidate_from_all_interviews_for_event(id_event, id_candidate):
         flash(f"Erreur lors de la suppression du candidat: {error}", "danger")
     else:
         flash("Candidat supprimé avec succès!", "success")
+    
+    reload(id_event)
     return redirect(request.referrer)
 
-# Old stuff keep for live data
+@socketio.on('join', namespace='/liste/live')
+def on_join(data):
+    print("Joining room "+data['room'])
+    join_room(data['room'])
+    print("Joined room "+data['room'])
+    js, _ = get_data(data['room'])
+    send(js, room=data['room'], namespace='/liste/live')
+    print("Sent data to room "+data['room'])
 
-# @liste_bp.route("/liste/data")
-# def liste_data():
-#     today, error = database.get_today_events()
-#     data , mess = get_data(today, error)
-#     return jsonify(data)
-
-# @liste_bp.route("/liste/data/<int:id>")
-# def liste_data_id(id):
-#     data, mess = get_data(id)
-#     return jsonify(data)
-
-# @liste_bp.route("/liste/data-live")
-# def live():
-#     return Response(refresh(), mimetype='text/event-stream')
+@socketio.on('reload', namespace='/liste/live')
+def on_reload(data):
+    print("Reloading room "+data['room'])
+    js, _ = get_data(data['room'])
+    send(js, room=data['room'], namespace='/liste/live')
+    print("Sent data to room "+data['room'])

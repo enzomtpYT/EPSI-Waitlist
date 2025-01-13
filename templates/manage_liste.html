@@ -39,5 +39,15 @@
             {% endfor %}
       {% endfor %}
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const socket = io('/liste/live');
+            socket.emit('join', { room: `{{ datas.event_id }}` });
+
+            socket.on('message', (data) => {
+                console.log(data);
+            });
+        });
+    </script>
   {% endif %}
 {% endblock %}
