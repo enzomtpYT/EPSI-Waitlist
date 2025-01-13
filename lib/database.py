@@ -468,6 +468,35 @@ def get_last_added_candidate():
         # Ferme la connexion à la base de données
         conn.close()
 
+def remove_candidate_from_all_interviews_for_event(id_event, id_candidate):
+    """
+    Supprime un candidat de tous les entretiens associés à un événement.
+
+    Args:
+        id_event (int): L'identifiant de l'événement.
+        id_candidate (int): L'identifiant du candidat.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        # Si la connexion échoue, renvoie une erreur
+        return "Erreur base de données"
+    try:
+        # Exécute la requête pour supprimer le candidat de tous les entretiens associés à l'événement
+        conn.execute("DELETE FROM Interview WHERE id_event = ? AND id_candidate = ?", (id_event, id_candidate))
+        # Sauvegarde les modifications
+        conn.commit()
+    except sqlite3.Error as e:
+        # Gère les erreurs de requête SQL
+        print(f"Erreur lors de la suppression du candidat: {e}")
+        return "Erreur lors de la suppression du candidat"
+    finally:
+        # Ferme la connexion à la base de données
+        conn.close()
+    return None
+
 # Participant functions
 
 def create_participant(name, email):

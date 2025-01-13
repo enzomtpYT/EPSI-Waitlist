@@ -85,6 +85,15 @@ def remove_candidate_from_list(id_interview):
         flash("Entretien supprimé avec succès!", "success")
     return redirect(request.referrer)
 
+# rcfaife = remove_candidate_from_all_interviews_for_event
+@liste_bp.route("/rcfaife/<int:id_event>/<int:id_candidate>", methods=['POST'])
+def remove_candidate_from_all_interviews_for_event(id_event, id_candidate):
+    error = database.remove_candidate_from_all_interviews_for_event(id_event, id_candidate)
+    if error:
+        flash(f"Erreur lors de la suppression du candidat: {error}", "danger")
+    else:
+        flash("Candidat supprimé avec succès!", "success")
+    return redirect(request.referrer)
 
 # Old stuff keep for live data
 
