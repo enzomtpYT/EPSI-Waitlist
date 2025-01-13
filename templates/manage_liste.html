@@ -10,33 +10,34 @@
     <h1>{{ datas.title }}</h1>
     <div class="listecontainer">
       {% for dict_item in datas.list %}
-            {% for key, value in dict_item.items() %}
-                <div class="column">
-                    <h2 class="interv">{{ key }}</h2>
-                    <div class="candidates">
-                    {% for item in value %}
-                        {% if loop.index <= 5 %}
-                            {% if loop.index == 1 %}
-                                <div class="managecandidate current">
-                            {% else %}
-                                <div class="managecandidate">
-                            {% endif %}
-                                    <form action="{{ url_for('liste.remove_candidate_from_list', id_interview=item.id_interview) }}" method="post" style="display:inline;">
-                                      <button type="submit" class="delete remove-tag">{{ item.name_candidate }} {{ item.lastname_candidate }}
-                                      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                      <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10 4.293 5.707a1 1 0 0 1 0-1.414" clip-rule="evenodd"></path></svg>
-                                      </button>
-                                    </form>
-                                    <form action="{{ url_for('liste.remove_candidate_from_all_interviews_for_event', id_event=datas.event_id, id_candidate=item.id_candidate) }}" method="post" style="display:inline;">
-                                      <button type="submit" class="add  ">remove all</button>
-                                    </form>
-                                    <button class="shy">SKIP</button>
-                                </div>
-                        {% endif %}
-                    {% endfor %}
-                    </div>
-                </div>
-            {% endfor %}
+        {% for key, value in dict_item.items() %}
+          <div class="column">
+            <h2 class="interv">{{ key }}</h2>
+            <div class="candidates">
+              {% for item in value %}
+                {% if loop.index <= 5 %}
+                  {% if loop.index == 1 %}
+                    <div class="managecandidate current">
+                  {% else %}
+                    <div class="managecandidate">
+                  {% endif %}
+                  <div class="dropdown">
+                    <button>{{ item.name_candidate }} {{ item.lastname_candidate }}</button>
+                    <div class="dropdown-content">
+                      <form action="{{ url_for('liste.remove_candidate_from_list', id_interview=item.id_interview) }}" method="post" style="display:inline;">
+                        <button type="submit" class="dropdown-item">Supprimer cet entretien</button>
+                      </form>
+                      <form action="{{ url_for('liste.remove_candidate_from_all_interviews_for_event', id_event=datas.event_id, id_candidate=item.id_candidate) }}" method="post" style="display:inline;">
+                        <button type="submit" class="dropdown-item">Supprimer tous les entretiens de ce candidat</button>
+                      </form>
+                    </div></div>
+                    <button class="shy">SKIP</button>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
       {% endfor %}
     </div>
   {% endif %}
