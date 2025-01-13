@@ -29,7 +29,9 @@
         {% endfor %}
       {% endif %}
     {% endwith %}
-    {% include 'navbar.html' %}
+    {% if parameters.navbar != 'false' %}
+        {% include 'navbar.html' %}
+    {% endif %}
     <div class="content">
         {% block content %}{% endblock %}
     </div>

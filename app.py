@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from flask_socketio import SocketIO, send
 import os, time
 from routes.index import index_bp
@@ -55,7 +55,7 @@ def handleMessage(msg):
 
 @app.context_processor
 def inject_routes():
-    return dict(custom_route_names=custom_route_names)
+    return dict(custom_route_names=custom_route_names, parameters=request.args.to_dict())
 
 if __name__ == "__main__":
     debug_mode = os.getenv('FLASK_ENV') == 'development'
