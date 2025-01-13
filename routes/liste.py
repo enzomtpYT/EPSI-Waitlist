@@ -60,11 +60,20 @@ def liste_id(id):
         flash(mess)
     return render_template('liste.html', datas=d)
 
-@liste_bp.route("/liste/data")
-def liste_data():
-    data , mess = get_data()
-    return jsonify(data)
 
-@liste_bp.route("/liste/data-live")
-def live():
-    return Response(refresh(), mimetype='text/event-stream')
+# Old stuff keep for live data
+
+# @liste_bp.route("/liste/data")
+# def liste_data():
+#     today, error = database.get_today_events()
+#     data , mess = get_data(today, error)
+#     return jsonify(data)
+
+# @liste_bp.route("/liste/data/<int:id>")
+# def liste_data_id(id):
+#     data, mess = get_data(id)
+#     return jsonify(data)
+
+# @liste_bp.route("/liste/data-live")
+# def live():
+#     return Response(refresh(), mimetype='text/event-stream')
