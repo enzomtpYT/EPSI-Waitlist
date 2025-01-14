@@ -92,12 +92,13 @@
 .actionbtn {
     display: grid;
     gap: 10px;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     padding: 0.2rem 1rem;
 }
 
 .actionbtn > * {
     width: 100%;
+    max-width: 100%;
 }
 
 .actionbtn > * > button {
