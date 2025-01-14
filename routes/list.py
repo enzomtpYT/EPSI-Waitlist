@@ -74,6 +74,15 @@ def manage_list_id(id):
         flash(mess)
     return render_template('manage_list.html', datas=d)
 
+@list_bp.route("/interview_finished/<int:interview_id>", methods=['POST'])
+def interview_finished(interview_id):
+    error = database.update_interview_status(interview_id, 1)
+    if error:
+        flash(f"Erreur lors de la mise à jour de l'entretien: {error}", "danger")
+    else:
+        flash("Entretien terminé avec succès!", "success")
+    return redirect(request.referrer)
+
 @list_bp.route("/remove_candidate_from_list/<int:id_interview>", methods=['POST'])
 def remove_candidate_from_list(id_interview):
     id_event, error = database.get_interview(id_interview)
