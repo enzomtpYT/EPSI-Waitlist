@@ -6,8 +6,8 @@ manage_waitlist_bp = Blueprint('manage_waitlist', __name__)
 @manage_waitlist_bp.route("/admin/manage_waitlist/<int:id_event>", methods=['GET', 'POST'])
 def manage_waitlist(id_event):
     event, error = database.get_event(id_event)
-    participants, error = database.get_event_participant(id_event)
-    candidates, error = database.get_event_candidates(id_event)
+    participants, error = database.get_all_participants()
+    candidates, error = database.get_all_candidates()
     existing_interviews = {}
     
     for participant in participants:
