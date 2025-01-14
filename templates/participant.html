@@ -74,8 +74,8 @@
                 <td>{{ interview.date_event }}</td>
                 <td>{{interview.name_candidate}} {{ interview.lastname_candidate }}</td>
                 <td>{% if interview.duration_interview is not none %}{{ interview.duration_interview }}{% else %}&nbsp;{% endif %}</td>
-                <td>
-                    <button type="button" class="actionbtn feedback-btn" data-feedback-candidate="{{ interview.feedback_candidate }}" data-feedback-participant="{{ interview.feedback_participant }}">
+                <td class="actionbtn">
+                    <button type="button" class="feedback-btn" data-feedback-candidate="{{ interview.feedback_candidate }}" data-feedback-participant="{{ interview.feedback_participant }}">
                         Voir les feedbacks
                     </button>
                 </td>
