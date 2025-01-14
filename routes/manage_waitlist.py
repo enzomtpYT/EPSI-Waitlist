@@ -20,25 +20,50 @@ def manage_waitlist(id_event):
             existing_interviews[participant['id_participant']].append(row['id_candidate'])
     print(f'------EXISTING------\n{existing_interviews}\n------EXISTING------')
 
+    def transform_data(data):
+        transformed_data = {}
+        for key, values in data.items():
+            new_key = int(key.replace('part', ''))
+            new_values = [int(value.replace('cand', '')) for value in values]
+            transformed_data[new_key] = new_values
+        return transformed_data
+
     if request.method == 'POST':
         form_data = request.form.to_dict(flat=False)
+        form_data = transform_data(form_data)
         error = None
         
         print(f'------FORM DATA------\n{form_data}\n------FORM DATA------')
-
+        
+        # Check for difference in existing interviews and new interviews
+        removed = {}
+        added = {}
         for id_participant, all_candidates in form_data.items():
-            for id_candidate in all_candidates:
-                if int(id_candidate) in existing_interviews[int(id_participant)]:
-                    continue
-                else:
-                    error = database.create_interview(id_event, id_participant, id_candidate)
+            removed[id_participant] = list(set(existing_interviews[int(id_participant)]) - set(all_candidates))
+            added[id_participant] = list(set(all_candidates) - set(existing_interviews[int(id_participant)]))
+            
+        print(f'------REMOVED------\n{removed}\n------REMOVED------')
+        print(f'------ADDED------\n{added}\n------ADDED------')
+        
+        for id_participant, candidates in removed.items():
+            for id_candidate in candidates:
+                interview, error = database.get_interview_by_candidate_event_participant(id_candidate, id_event, id_participant)
+                error = database.delete_interview(interview['id_interview'])
+                if error is not None:
+                    break
+            if error is not None:
+                break
+        
+        for id_participant, candidates in added.items():
+            for id_candidate in candidates:
+                error = database.create_interview(id_event, id_participant, id_candidate)
                 if error is not None:
                     break
             if error is not None:
                 break
 
         if error is None:
-            flash('Entretien créé avec succès.', 'success')
+            flash('Entretien modifié, avec succès.', 'success')
             return redirect(url_for('manage_waitlist.manage_waitlist', id_event=id_event))
         else:
             flash(error, 'danger')

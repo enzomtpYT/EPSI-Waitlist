@@ -811,6 +811,33 @@ def delete_interview(id_interview):
         conn.close()
     return None
 
+def get_interview_by_candidate_event_participant(id_candidate, id_event, id_participant):
+    """
+    Récupère un entretien en utilisant l'identifiant du candidat, de l'événement et du participant.
+
+    Args:
+        id_candidate (int): L'identifiant du candidat.
+        id_event (int): L'identifiant de l'événement.
+        id_participant (int): L'identifiant du participant.
+
+    Returns:
+        tuple: Un tuple contenant l'entretien et un message d'erreur si une erreur est survenue.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+    try:
+        interview = conn.execute('''
+        SELECT * FROM Interview
+        WHERE id_candidate = ? AND id_event = ? AND id_participant = ?
+        ''', (id_candidate, id_event, id_participant)).fetchone()
+        return interview, None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
 # Tag functions
 
 def create_tag(name):
