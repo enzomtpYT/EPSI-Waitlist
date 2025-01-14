@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Add tag to event tags
             const tagElement = document.createElement('div');
             tagElement.classList.add('tagitem');
+            tagElement.style.display = 'inline';
             tagElement.innerHTML = `
                 <input type="hidden" name="event_tags[]" value="${tagId}">
                 <button class="delete remove-tag" type="button" data-tag-id="${tagId}">
