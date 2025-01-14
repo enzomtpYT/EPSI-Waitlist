@@ -26,7 +26,6 @@ a:hover {
 form {
     display: flex;
     flex-direction: column;
-    margin: 1rem 0;
 }
 
 input {
@@ -191,14 +190,6 @@ h1 {
     width: auto;
     background-color: #4f4f4f;
     color: #fff;
-}
-
-.taggrid {
-    min-width: 5vw;
-}
-
-.actionbtn {
-    max-width: 5vw;
 }
 
 .plussvg {

@@ -1,14 +1,18 @@
 .admin-section > table > thead > tr > th {
-    text-align: left;
+    border-right: 1px solid #4f4f4f;
     border-bottom: 1px solid #4f4f4f;
     align-items: center;
     text-align: center;
 }
 
 .admin-section > table > tbody > tr > td {
-    text-align: left;
+    border-right: 1px solid #4f4f4f;
     align-items: center;
     text-align: center;
+}
+
+.admin-section > table > tbody > tr > td:last-child, .admin-section > table > thead > tr > th:last-child {
+    border-right: none;
 }
 
 .admin-section > table > tbody > tr:nth-child(even) {
@@ -17,11 +21,6 @@
 
 .admin-section > table > tbody > tr:nth-child(odd) {
     background-color: #fff;
-}
-
-.admin-section > table > tbody > tr > td > * > button {
-    max-width: 40%;
-    margin: 0.5rem;
 }
 
 .admin-section > table {
@@ -46,7 +45,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
     grid-gap: 10px;
     padding: 0.2rem 1rem;
 }
@@ -90,8 +89,25 @@
     color: #007bff;
 }
 
-@media screen and (max-width: 600px) {
-    .admin-container {
-        grid-template-columns: repeat(1, 1fr);
-    }
+.actionbtn {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    padding: 0.2rem 1rem;
+}
+
+.actionbtn > * {
+    width: 100%;
+}
+
+.actionbtn > * > button {
+    max-width: 100%;
+    margin: 0;
+}
+
+.manageinfos {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    padding: 0.2rem 1rem;
 }
