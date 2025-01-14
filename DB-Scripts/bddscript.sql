@@ -29,7 +29,8 @@ CREATE TABLE Interview(
    PRIMARY KEY(id_interview),
    FOREIGN KEY(id_participant) REFERENCES Participant(id_participant),
    FOREIGN KEY(id_event) REFERENCES Event(id_event),
-   FOREIGN KEY(id_candidate) REFERENCES Candidate(id_candidate)
+   FOREIGN KEY(id_candidate) REFERENCES Candidate(id_candidate),
+   UNIQUE(id_candidate, id_participant, id_event) -- Add unique constraint to avoid duplicate interviews
 );
 
 CREATE TABLE Tag(
