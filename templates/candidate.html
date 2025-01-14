@@ -5,52 +5,54 @@
 {% block content %}
 <h1>Candidat : {{ candidate.name_candidate }} {{ candidate.lastname_candidate }}</h1>
 
-<div class="admin-section">
-    <h2>Modifier les informations du/de la candidat.e</h2>
-    <form action="{{ url_for('candidate.edit_candidate', id_candidate=candidate.id_candidate) }}" method="post">
-        <label for="candidate_lastname">Nom :</label>
-        <input type="text" id="candidate_lastname" name="candidate_lastname" value="{{ candidate.lastname_candidate }}">
-
-        <label for="candidate_name">Prénom :</label>
-        <input type="text" id="candidate_name" name="candidate_name" value="{{ candidate.name_candidate }}">
-
-        <label for="candidate_email">E-mail :</label>
-        <input type="email" id="candidate_email" name="candidate_email" value="{{ candidate.email_candidate }}">
-
-        <button type="submit">Enregistrer</button>
-    </form>
-</div>
-
-<div class="admin-section">
-    <h2>Tags du/de la candidat.e</h2>
-    <div class="taglist">
-        {% for tag in candidate_tags %}
-            <form class="tagform" action="{{ url_for('candidate.remove_tag_candidate', id_candidate=candidate.id_candidate) }}" method="post" style="display:inline;">
-                <input type="hidden" name="tag" value="{{ tag.id_tag }}">
-                <button class="delete remove-tag" type="submit" name="remove_tag">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10 4.293 5.707a1 1 0 0 1 0-1.414" clip-rule="evenodd"></path></svg>
-                {{ tag.name_tag }}
-                </button>
-            </form>
-        {% endfor %}
+<div class="manageinfos">
+    <div class="admin-section">
+        <h2>Modifier les informations du/de la candidat.e</h2>
+        <form action="{{ url_for('candidate.edit_candidate', id_candidate=candidate.id_candidate) }}" method="post">
+            <label for="candidate_lastname">Nom :</label>
+            <input type="text" id="candidate_lastname" name="candidate_lastname" value="{{ candidate.lastname_candidate }}">
+    
+            <label for="candidate_name">Prénom :</label>
+            <input type="text" id="candidate_name" name="candidate_name" value="{{ candidate.name_candidate }}">
+    
+            <label for="candidate_email">E-mail :</label>
+            <input type="email" id="candidate_email" name="candidate_email" value="{{ candidate.email_candidate }}">
+    
+            <button type="submit">Enregistrer</button>
+        </form>
     </div>
-</div>
-
-<div class="admin-section">
-    <h2>Ajouter un tag</h2>
-    <div class="taglist">
-        {% for tag in tags %}
-            <form class="tagform" action="{{ url_for('candidate.add_tag_candidate', id_candidate=candidate.id_candidate) }}" method="post" style="display: inline;">
-                {% if tag.id_tag not in candidate_tags|map(attribute='id_tag') %}
-                <input type="hidden" name="tag" value="{{ tag.id_tag }}">
-                    <button class="add-tag" type="submit" name="add_tag">
-                    <svg class="plussvg" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10 4.293 5.707a1 1 0 0 1 0-1.414" clip-rule="evenodd"></path></svg>
+    
+    <div class="admin-section">
+        <h2>Tags du/de la candidat.e</h2>
+        <div class="taglist">
+            {% for tag in candidate_tags %}
+                <form class="tagform" action="{{ url_for('candidate.remove_tag_candidate', id_candidate=candidate.id_candidate) }}" method="post" style="display:inline;">
+                    <input type="hidden" name="tag" value="{{ tag.id_tag }}">
+                    <button class="delete remove-tag" type="submit" name="remove_tag">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10 4.293 5.707a1 1 0 0 1 0-1.414" clip-rule="evenodd"></path></svg>
                     {{ tag.name_tag }}
                     </button>
-                {% endif %}
-            </form>
-        {% endfor %}
+                </form>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="admin-section">
+        <h2>Ajouter un tag</h2>
+        <div class="taglist">
+            {% for tag in tags %}
+                <form class="tagform" action="{{ url_for('candidate.add_tag_candidate', id_candidate=candidate.id_candidate) }}" method="post" style="display: inline;">
+                    {% if tag.id_tag not in candidate_tags|map(attribute='id_tag') %}
+                    <input type="hidden" name="tag" value="{{ tag.id_tag }}">
+                        <button class="add-tag" type="submit" name="add_tag">
+                        <svg class="plussvg" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10 4.293 5.707a1 1 0 0 1 0-1.414" clip-rule="evenodd"></path></svg>
+                        {{ tag.name_tag }}
+                        </button>
+                    {% endif %}
+                </form>
+            {% endfor %}
+        </div>
     </div>
 </div>
 

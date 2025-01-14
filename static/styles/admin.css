@@ -107,7 +107,13 @@
 
 .manageinfos {
     display: grid;
-    gap: 10px;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    padding: 0.2rem 1rem;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.manageinfos > .admin-section {
+    margin: 16px;
+}
+
+.manageinfos > .admin-section > * > button {
+    max-width: 100%;
 }
