@@ -192,7 +192,7 @@ def get_today_events():
     finally:
         conn.close()
 
-def get_event_candidates(todayevent):
+def get_event_candidates(id):
     """
     Récupère les candidats associés à un événement.
 
@@ -206,7 +206,7 @@ def get_event_candidates(todayevent):
     if conn is None:
         return None, "Erreur base de données"
     try:
-        candids = conn.execute(f'SELECT id_candidate FROM Participates WHERE id_event = \'{todayevent}\'').fetchall()
+        candids = conn.execute(f'SELECT id_candidate FROM Participates WHERE id_event = \'{id}\'').fetchall()
         candid = []
         for candidat in candids:
             candid.append(conn.execute(f'SELECT * FROM Candidate WHERE id_candidate = \'{candidat["id_candidate"]}\'').fetchall()[0])
@@ -217,7 +217,7 @@ def get_event_candidates(todayevent):
         conn.close()
     return candid, None
 
-def get_event_participant(todayevent):
+def get_event_participant(id):
     """
     Récupère les participants associés à un événement.
 
@@ -231,7 +231,7 @@ def get_event_participant(todayevent):
     if conn is None:
         return None, "Erreur base de données"
     try:
-        inters = conn.execute(f'SELECT id_participant FROM Attends WHERE id_event = \'{todayevent}\'').fetchall()
+        inters = conn.execute(f'SELECT id_participant FROM Attends WHERE id_event = \'{id}\'').fetchall()
         inter = []
         for intervenant in inters:
             inter.append(conn.execute(f'SELECT * FROM Participant WHERE id_participant = \'{intervenant["id_participant"]}\'').fetchall()[0])
