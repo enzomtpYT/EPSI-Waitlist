@@ -3,12 +3,12 @@
 {% block title %}Liste{% endblock %}
 
 {% block content %}
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/liste.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/list.css') }}">
   {% if datas.message %}
     <h1>{{ datas.message }}</h1>
   {% else %}
     <h1>{{ datas.title }}</h1>
-    <div class="listecontainer">
+    <div class="listcontainer">
       {% for dict_item in datas.list %}
         {% for key, value in dict_item.items() %}
           <div class="column">
@@ -24,10 +24,10 @@
                   <div class="dropdown">
                     <button>{{ item.name_candidate }} {{ item.lastname_candidate }}</button>
                     <div class="dropdown-content">
-                      <form action="{{ url_for('liste.remove_candidate_from_list', id_interview=item.id_interview) }}" method="post" style="display:inline;">
+                      <form action="{{ url_for('list.remove_candidate_from_list', id_interview=item.id_interview) }}" method="post" style="display:inline;">
                         <button type="submit" class="dropdown-item">Supprimer cet entretien</button>
                       </form>
-                      <form action="{{ url_for('liste.remove_candidate_from_all_interviews_for_event', id_event=datas.event_id, id_candidate=item.id_candidate) }}" method="post" style="display:inline;">
+                      <form action="{{ url_for('list.remove_candidate_from_all_interviews_for_event', id_event=datas.event_id, id_candidate=item.id_candidate) }}" method="post" style="display:inline;">
                         <button type="submit" class="dropdown-item">Supprimer tous les entretiens de ce candidat</button>
                       </form>
                     </div></div>
@@ -42,7 +42,7 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
-            const socket = io('/liste/live');
+            const socket = io('/list/live');
             socket.emit('join', { room: `{{ datas.event_id }}` });
 
             socket.on('message', (data) => {

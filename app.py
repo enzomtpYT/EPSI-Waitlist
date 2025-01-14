@@ -4,7 +4,7 @@ from sock import socketio, app
 import os, time
 from routes.index import index_bp
 from routes.admin import admin_bp
-from routes.liste import liste_bp
+from routes.list import list_bp
 from routes.create_candidate import create_candidate_bp
 from routes.manage_candidate import manage_candidate_bp
 from routes.candidate import candidate_bp
@@ -24,7 +24,7 @@ app.secret_key = os.urandom(24)
 # Register the blueprints
 app.register_blueprint(index_bp)
 app.register_blueprint(admin_bp)
-app.register_blueprint(liste_bp)
+app.register_blueprint(list_bp)
 app.register_blueprint(create_candidate_bp)
 app.register_blueprint(manage_candidate_bp)
 app.register_blueprint(candidate_bp)
@@ -41,7 +41,7 @@ app.register_blueprint(manage_tag_bp)
 custom_route_names = {
     "/": "Accueil",
     "/admin": "Admin",
-    "/liste": "Liste"
+    "/list": "List"
 }
 
 @socketio.on('message')

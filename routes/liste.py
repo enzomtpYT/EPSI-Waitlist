@@ -4,7 +4,7 @@ from sock import socketio
 from lib import database
 import time, json
 
-liste_bp = Blueprint('liste', __name__)
+list_bp = Blueprint('list', __name__)
 
 def get_data(id=None, error=None):
     event, error = database.get_event(id)
@@ -42,39 +42,39 @@ def get_data(id=None, error=None):
 
 def reload(id):
     js, _ = get_data(id)
-    send(js, room=id, namespace='/liste/live')
+    send(js, room=id, namespace='/list/live')
 
-@liste_bp.route("/liste")
-def liste():
+@list_bp.route("/list")
+def list():
     today, error = database.get_today_events()
     d, mess = get_data(today, error)
     if mess:
         flash(mess)
-    return render_template('liste.html', datas=d)
+    return render_template('list.html', datas=d)
 
-@liste_bp.route("/liste/<int:id>")
-def liste_id(id):
+@list_bp.route("/list/<int:id>")
+def list_id(id):
     d, mess = get_data(id)
     if mess:
         flash(mess)
-    return render_template('liste.html', datas=d)
+    return render_template('list.html', datas=d)
 
-@liste_bp.route("/liste/manage")
-def manage_liste():
+@list_bp.route("/list/manage")
+def manage_list():
     today, error = database.get_today_events()
     d, mess = get_data(today, error)
     if mess:
         flash(mess)
-    return render_template('manage_liste.html', datas=d)
+    return render_template('manage_list.html', datas=d)
 
-@liste_bp.route("/liste/<int:id>/manage")
-def manage_liste_id(id):
+@list_bp.route("/list/<int:id>/manage")
+def manage_list_id(id):
     d, mess = get_data(id)
     if mess:
         flash(mess)
-    return render_template('manage_liste.html', datas=d)
+    return render_template('manage_list.html', datas=d)
 
-@liste_bp.route("/remove_candidate_from_list/<int:id_interview>", methods=['POST'])
+@list_bp.route("/remove_candidate_from_list/<int:id_interview>", methods=['POST'])
 def remove_candidate_from_list(id_interview):
     id_event, error = database.get_interview(id_interview)
     error = database.delete_interview(id_interview)
@@ -86,29 +86,29 @@ def remove_candidate_from_list(id_interview):
     return redirect(request.referrer)
 
 # rcfaife = remove_candidate_from_all_interviews_for_event
-@liste_bp.route("/rcfaife/<int:id_event>/<int:id_candidate>", methods=['POST'])
+@list_bp.route("/rcfaife/<int:id_event>/<int:id_candidate>", methods=['POST'])
 def remove_candidate_from_all_interviews_for_event(id_event, id_candidate):
     error = database.remove_candidate_from_all_interviews_for_event(id_event, id_candidate)
     if error:
         flash(f"Erreur lors de la suppression du candidat: {error}", "danger")
     else:
         flash("Candidat supprimé avec succès!", "success")
-    
+
     reload(id_event)
     return redirect(request.referrer)
 
-@socketio.on('join', namespace='/liste/live')
+@socketio.on('join', namespace='/list/live')
 def on_join(data):
     print("Joining room "+data['room'])
     join_room(data['room'])
     print("Joined room "+data['room'])
     js, _ = get_data(data['room'])
-    send(js, room=data['room'], namespace='/liste/live')
+    send(js, room=data['room'], namespace='/list/live')
     print("Sent data to room "+data['room'])
 
-@socketio.on('reload', namespace='/liste/live')
+@socketio.on('reload', namespace='/list/live')
 def on_reload(data):
     print("Reloading room "+data['room'])
     js, _ = get_data(data['room'])
-    send(js, room=data['room'], namespace='/liste/live')
+    send(js, room=data['room'], namespace='/list/live')
     print("Sent data to room "+data['room'])

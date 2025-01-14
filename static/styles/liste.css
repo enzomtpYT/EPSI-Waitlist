@@ -6,7 +6,7 @@ tr:nth-child(odd), td {
     background-color: #ffb9f2;
 } */
 
-.listecontainer {
+.listcontainer {
     display: flex;
 }
 
