@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Gérer les participants{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/manage_participants.css') }}">
+<h1>Gérer les participants pour l'événement: {{ event.name_event }}</h1>
+
+<div class="admin-section">
+    <h2>Ajouter des participants</h2>
+    <form action="{{ url_for('event.manage_participants ', id_event=event.id_event) }}" method="post">
+        <div class="listcontainer">
+            {% for tag in tags %}
+                <div class="column">
+                  <h2 class="tag">{{ tag.name_tag }}</h2>
+                  <div class="candidates">
+                    {% for participant in participants %}
+                        {% if participant. %}
+                        {# <h4>{{ item.name_candidate }} - {{ item.lastname_candidate }}</h4> #}
+                    {% endfor %}
+                  </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <button type="submit">Ajouter des participants</button>
+    </form>
+</div>
+
+{% endblock %}

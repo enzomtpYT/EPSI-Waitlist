@@ -75,3 +75,23 @@ def view_interviews(id_event):
 def delete_event(id_event):
     database.delete_event(id_event)
     return redirect(url_for('manage_event.manage_event'))
+
+@event_bp.route('/admin/manage_event/event/<int:id_event>/manage_participants', methods=['GET'])
+def manage_participants(id_event):
+    event, error = database.get_event(id_event)
+    participants, error = database.get_all_participants()
+    candidates, error = database.get_all_candidates()
+    tags, error = database.get_all_tags()
+    eventtag, error = database.get_event_tags(id_event)
+    datas = {
+        "event": dict(event),
+        "participants": [dict(participant) for participant in participants],
+        "candidates": [dict(candidate) for candidate in candidates],
+        "tags": dict(tags),
+        "eventtag": dict(eventtag)
+    }
+    print(datas)
+    if error:
+        flash(error, "danger")
+        return redirect(url_for('event.edit_event', id_event=id_event))
+    return render_template('manage_participants.html', data=datas)
