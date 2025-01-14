@@ -47,13 +47,18 @@ tr:nth-child(odd), td {
     display: none;
 }
 
-.current > button {
+.current > div > button {
     display: block;
 }
 
-.current > h4 {
+.current > div > h4 {
     color: red;
     font-size: 1.5rem;
+}
+
+.current > div > form > button {
+    display: block;
+    background-color: rgb(67, 187, 67);
 }
 
 .current {
@@ -64,6 +69,11 @@ tr:nth-child(odd), td {
 .managecandidate > form > button {
     max-width: 100%;
     width: 100%;
+}
+
+.stacked-button {
+    display: flex;
+    flex-direction: column;
 }
 
 .dropdown {
@@ -102,4 +112,8 @@ tr:nth-child(odd), td {
     max-width: 100%;
     border-radius: 0;
     margin: 0;
+}
+
+.stacked-button > button, .stacked-button > form > button {
+    max-width: 100%;
 }
