@@ -57,25 +57,34 @@
 
 <h1>Entretiens lors de l'événement : {{ event.name_event }}</h1>
 
-<div class="admin-section">
-    <h2>Liste d'attente</h2>
-    <a href="{{ url_for('manage_waitlist.manage_waitlist', id_event=event.id_event) }}">
-        <button type="button">Gérer la liste d'attente</button>
-    </a>
-</div>
+<div class="manageinfos">
+    <div class="admin-section">
+        <h2>Participants à l'Événement</h2>
+        <a href="{{ url_for('event.view_interviews', id_event=event.id_event) }}">
+            <button type="button">Voir les participants</button>
+        </a>
+    </div>
 
-<div class="admin-section">
-    <h2>Entretiens de l'événement</h2>
-    <a href="{{ url_for('event.view_interviews', id_event=event.id_event) }}">
-        <button type="button">Voir les entretiens</button>
-    </a>
-</div>
+    <div class="admin-section">
+        <h2>Liste d'attente</h2>
+        <a href="{{ url_for('manage_waitlist.manage_waitlist', id_event=event.id_event) }}">
+            <button type="button">Gérer la liste d'attente</button>
+        </a>
+    </div>
 
-<div class="admin-section">
-    <h2>Supprimer l'événement</h2>
-    <form action="/admin/manage_event/event/{{ event.id_event }}/delete" method="post">
-        <button class="delete" type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet Événement ?');">Supprimer</button>
-    </form>
+    <div class="admin-section">
+        <h2>Historique de l'événement</h2>
+        <a href="{{ url_for('event.view_interviews', id_event=event.id_event) }}">
+            <button type="button">Voir les entretiens</button>
+        </a>
+    </div>
+
+    <div class="admin-section">
+        <h2>Supprimer l'événement</h2>
+        <form action="/admin/manage_event/event/{{ event.id_event }}/delete" method="post">
+            <button class="delete" type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet Événement ?');">Supprimer</button>
+        </form>
+    </div>
 </div>
 
 {% endblock %}
