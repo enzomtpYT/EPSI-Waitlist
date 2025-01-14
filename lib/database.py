@@ -764,30 +764,6 @@ def get_candidate_from_event_participants_inverviews(id_event, id_participant):
     finally:
         conn.close()
 
-def edit_interview(id_interview, happened):
-    """
-    Met à jour un interview dans la base de données.
-
-    Args:
-        id_interview (int): L'identifiant de l'interview.
-        happened (int): Le statut de l'interview (0 ou 1).
-
-    Returns:
-        str: Un message d'erreur si une erreur est survenue, None sinon.
-    """
-    conn = get_db_connection()
-    if conn is None:
-        return "Erreur base de données"
-    try:
-        conn.execute('UPDATE Interview SET happened = ? WHERE id_interview = ?', (happened, id_interview))
-        conn.commit()
-    except sqlite3.Error as e:
-        print(f"Erreur lors de la mise à jour de l'interview: {e}")
-        return "Erreur lors de la mise à jour de l'interview"
-    finally:
-        conn.close()
-    return None
-
 def delete_interview(id_interview):
     """
     Supprime un interview de la base de données en utilisant son identifiant.
