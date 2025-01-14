@@ -429,7 +429,7 @@ def get_candidate_interviews(id_candidate):
     try:
         # Renvoie les entretiens du candidat
         interviews = conn.execute('''
-        SELECT Interview.id_interview, Event.name_event, Event.date_event, Participant.name_participant
+        SELECT Interview.id_interview, Event.name_event, Event.date_event, Participant.name_participant, Interview.feedback_candidate, Interview.feedback_participant, Interview.duration_interview
         FROM Interview
         JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
         JOIN Participant ON Interview.id_participant = Participant.id_participant
@@ -632,7 +632,7 @@ def get_participant_interviews(id_participant):
         return None, "Erreur base de données"
     try:
         interviews = conn.execute('''
-        SELECT Interview.id_interview, Event.name_event, Event.date_event, Candidate.lastname_candidate, Candidate.name_candidate
+        SELECT Interview.id_interview, Event.name_event, Event.date_event, Candidate.lastname_candidate, Candidate.name_candidate, Interview.feedback_participant, Interview.feedback_candidate, Interview.duration_interview
         FROM Interview
         JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
         JOIN Participant ON Interview.id_participant = Participant.id_participant
