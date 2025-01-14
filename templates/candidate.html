@@ -63,6 +63,7 @@
                 <th>Événement</th>
                 <th>Date</th>
                 <th>Intervenant</th>
+                <th>Durée de l'entretien</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -72,6 +73,7 @@
                 <td>{{ interview.name_event }}</td>
                 <td>{{ interview.date_event }}</td>
                 <td>{{ interview.name_participant }}</td>
+                <td>{% if interview.duration_interview is not none %}{{ interview.duration_interview }}{% else %}&nbsp;{% endif %}</td>
                 <td>
                     <button type="button" class="actionbtn feedback-btn" data-feedback-candidate="{{ interview.feedback_candidate }}" data-feedback-participant="{{ interview.feedback_participant }}">
                         Voir les feedbacks
@@ -90,10 +92,10 @@
     <div class="modal-content">
         <span class="close">&times;</span>
         <h2>Feedback de l'entretien</h2>
-        <p><strong>Feedback du candidat:</strong></p>
-        <p id="candidateFeedback"></p>
         <p><strong>Feedback de l'intervenant:</strong></p>
         <p id="participantFeedback"></p>
+        <p><strong>Feedback du candidat:</strong></p>
+        <p id="candidateFeedback"></p>
     </div>
 </div>
 
@@ -114,10 +116,10 @@ var span = document.getElementsByClassName("close")[0];
 // When the user clicks on the button, open the modal
 document.querySelectorAll('.feedback-btn').forEach(button => {
     button.onclick = function() {
-        var candidateFeedback = this.getAttribute('data-feedback-candidate');
         var participantFeedback = this.getAttribute('data-feedback-participant');
-        document.getElementById('candidateFeedback').innerText = candidateFeedback;
+        var candidateFeedback = this.getAttribute('data-feedback-candidate');
         document.getElementById('participantFeedback').innerText = participantFeedback;
+        document.getElementById('candidateFeedback').innerText = candidateFeedback;
         modal.style.display = "block";
     }
 });
