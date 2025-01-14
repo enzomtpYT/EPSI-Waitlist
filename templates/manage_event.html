@@ -29,7 +29,7 @@
                         {% endif %}
                     {% endfor %}
                 </td>
-                <td><a class="link" href="{{ url_for('list.list_id', id=event.id_event) }}">Voir liste</a></td>
+                <td><a class="link" href="{{ url_for('list.manage_list_id', id=event.id_event) }}">Voir liste</a></td>
                 <td class="actionbtn">
                     <a href="/admin/manage_event/event/{{ event.id_event }}">
                         <button type="button">Éditer</button>
