@@ -18,7 +18,6 @@ def manage_waitlist(id_event):
         existing_interviews[participant['id_participant']] = []
         for row in b:
             existing_interviews[participant['id_participant']].append(row['id_candidate'])
-    print(f'------EXISTING------\n{existing_interviews}\n------EXISTING------')
 
     def transform_data(data):
         transformed_data = {}
@@ -33,19 +32,19 @@ def manage_waitlist(id_event):
         form_data = transform_data(form_data)
         error = None
         
-        print(f'------FORM DATA------\n{form_data}\n------FORM DATA------')
+        # Detect if all interviews are removed from a participant
+        removed_participants = set(existing_interviews.keys()) - set(form_data.keys())
+        for id_participant in removed_participants:
+            form_data[id_participant] = []
         
-        # Check for difference in existing interviews and new interviews
-        removed = {}
-        added = {}
+        changes = {'removed': {}, 'added': {}}
         for id_participant, all_candidates in form_data.items():
-            removed[id_participant] = list(set(existing_interviews[int(id_participant)]) - set(all_candidates))
-            added[id_participant] = list(set(all_candidates) - set(existing_interviews[int(id_participant)]))
-            
-        print(f'------REMOVED------\n{removed}\n------REMOVED------')
-        print(f'------ADDED------\n{added}\n------ADDED------')
+            changes['removed'][id_participant] = list(set(existing_interviews[int(id_participant)]) - set(all_candidates))
+            changes['added'][id_participant] = list(set(all_candidates) - set(existing_interviews[int(id_participant)]))
         
-        for id_participant, candidates in removed.items():
+        print(f'------CHANGES------\n{changes}\n------CHANGES------')
+        
+        for id_participant, candidates in changes['removed'].items():
             for id_candidate in candidates:
                 interview, error = database.get_interview_by_candidate_event_participant(id_candidate, id_event, id_participant)
                 error = database.delete_interview(interview['id_interview'])
@@ -54,7 +53,7 @@ def manage_waitlist(id_event):
             if error is not None:
                 break
         
-        for id_participant, candidates in added.items():
+        for id_participant, candidates in changes['added'].items():
             for id_candidate in candidates:
                 error = database.create_interview(id_event, id_participant, id_candidate)
                 if error is not None:
