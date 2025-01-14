@@ -5,51 +5,53 @@
 {% block content %}
 <h1>Événement : {{ event.name_event }}</h1>
 
-<div class="admin-section">
-    <h2>Modifier les informations de l'événement</h2>
-    <form action="/admin/manage_event/event/{{ event.id_event }}" method="post">
-        <label for="name_event">Nom :</label>
-        <input type="text" id="name_event" name="name_event" value="{{ event.name_event }}">
+<div class="manageinfos">
+    <div class="admin-section">
+        <h2>Modifier les informations de l'événement</h2>
+        <form action="/admin/manage_event/event/{{ event.id_event }}" method="post">
+            <label for="name_event">Nom :</label>
+            <input type="text" id="name_event" name="name_event" value="{{ event.name_event }}">
 
-        <label for="date_event">Date :</label>
-        <input type="date" id="date_event" name="date_event" value="{{ event.date_event }}">
+            <label for="date_event">Date :</label>
+            <input type="date" id="date_event" name="date_event" value="{{ event.date_event }}">
 
-        <button type="submit">Enregistrer</button>
+            <button type="submit">Enregistrer</button>
 
-    </form>
-</div>
-
-<div class="admin-section">
-    <h2>Tags de l'événement</h2>
-    <div class="taglist">
-        {% for tag in event_tags %}
-            <form class="tagform" action="{{ url_for('event.remove_tag_event', id_event=event.id_event) }}" method="post" style="display:inline;">
-                <input type="hidden" name="tag" value="{{ tag.id_tag }}">
-                <button class="delete remove-tag" type="submit" name="remove_tag">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10 4.293 5.707a1 1 0 0 1 0-1.414" clip-rule="evenodd"></path></svg>
-                {{ tag.name_tag }}
-                </button>
-            </form>
-        {% endfor %}
+        </form>
     </div>
-</div>
 
-<div class="admin-section">
-    <h2>Ajouter un tag</h2>
-    <div class="taglist">
-        {% for tag in tags %}
-            <form class="tagform" action="{{ url_for('event.add_tag_event', id_event=event.id_event) }}" method="post" style="display: inline;">
-                {% if tag.id_tag not in event_tags|map(attribute='id_tag') %}
-                <input type="hidden" name="tag" value="{{ tag.id_tag }}">
-                    <button class="add-tag" type="submit" name="add_tag">
-                    <svg class="plussvg" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+    <div class="admin-section">
+        <h2>Tags de l'événement</h2>
+        <div class="taglist">
+            {% for tag in event_tags %}
+                <form class="tagform" action="{{ url_for('event.remove_tag_event', id_event=event.id_event) }}" method="post" style="display:inline;">
+                    <input type="hidden" name="tag" value="{{ tag.id_tag }}">
+                    <button class="delete remove-tag" type="submit" name="remove_tag">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10 4.293 5.707a1 1 0 0 1 0-1.414" clip-rule="evenodd"></path></svg>
                     {{ tag.name_tag }}
                     </button>
-                {% endif %}
-            </form>
-        {% endfor %}
+                </form>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="admin-section">
+        <h2>Ajouter un tag</h2>
+        <div class="taglist">
+            {% for tag in tags %}
+                <form class="tagform" action="{{ url_for('event.add_tag_event', id_event=event.id_event) }}" method="post" style="display: inline;">
+                    {% if tag.id_tag not in event_tags|map(attribute='id_tag') %}
+                    <input type="hidden" name="tag" value="{{ tag.id_tag }}">
+                        <button class="add-tag" type="submit" name="add_tag">
+                        <svg class="plussvg" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10 4.293 5.707a1 1 0 0 1 0-1.414" clip-rule="evenodd"></path></svg>
+                        {{ tag.name_tag }}
+                        </button>
+                    {% endif %}
+                </form>
+            {% endfor %}
+        </div>
     </div>
 </div>
 
