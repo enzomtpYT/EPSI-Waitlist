@@ -23,8 +23,9 @@ CREATE TABLE Event(
 CREATE TABLE Interview(
    id_interview INTEGER,
    happened NUMERIC NOT NULL DEFAULT 0,
-   feedback TEXT,
-   duration NUMERIC,
+   feedback_candidate TEXT,
+   feedback_participant TEXT,
+   duration_interview NUMERIC,
    id_participant INTEGER NOT NULL,
    id_event INTEGER NOT NULL,
    id_candidate INTEGER NOT NULL,

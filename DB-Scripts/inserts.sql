@@ -61,6 +61,83 @@ INSERT INTO Event (id_event, name_event, date_event) VALUES
 -- (35, 1, 1, 7, 0),
 -- (36, 1, 1, 8, 0);
 
+INSERT INTO Interview (id_interview,happened,id_participant,id_event,id_candidate,feedback_candidate, feedback_participant, duration) VALUES
+	 (2,0,1,1,3,NULL,NULL,NULL),
+	 (3,0,1,1,4,NULL,NULL,NULL),
+	 (1,0,1,1,1,NULL,NULL,NULL),
+	 (4,1,4,1,3,NULL,NULL,NULL),
+	 (5,1,4,1,4,NULL,NULL,NULL),
+	 (6,0,4,1,5,NULL,NULL,NULL),
+	 (7,0,3,1,1,NULL,NULL,NULL),
+	 (8,0,3,1,5,NULL,NULL,NULL),
+	 (9,0,3,1,2,NULL,NULL,NULL),
+	 (10,0,2,1,1,NULL,NULL,NULL);
+INSERT INTO Interview (id_interview,happened,id_participant,id_event,id_candidate,feedback,duration) VALUES
+	 (11,0,2,1,4,NULL,NULL,NULL),
+	 (12,1,6,1,3,NULL,NULL,NULL),
+	 (13,0,6,1,4,NULL,NULL,NULL),
+	 (14,0,6,1,5,NULL,NULL,NULL),
+	 (15,0,2,2,1,NULL,NULL,NULL),
+	 (16,0,2,2,6,NULL,NULL,NULL),
+	 (17,0,5,2,6,NULL,NULL,NULL),
+	 (18,0,4,2,1,NULL,NULL,NULL),
+	 (19,0,4,2,6,NULL,NULL,NULL),
+	 (20,0,4,2,3,NULL,NULL,NULL);
+INSERT INTO Interview (id_interview,happened,id_participant,id_event,id_candidate,feedback,duration) VALUES
+	 (21,0,3,2,5,NULL,NULL,NULL),
+	 (22,0,3,2,4,NULL,NULL,NULL),
+	 (23,0,3,3,2,NULL,NULL,NULL),
+	 (24,0,1,3,2,NULL,NULL,NULL),
+	 (25,0,1,3,7,NULL,NULL,NULL),
+	 (26,0,6,3,2,NULL,NULL,NULL),
+	 (27,0,6,3,1,NULL,NULL,NULL),
+	 (28,0,6,3,5,NULL,NULL,NULL),
+	 (29,0,5,3,6,NULL,NULL,NULL),
+	 (30,0,5,3,7,NULL,NULL,NULL);
+INSERT INTO Interview (id_interview,happened,id_participant,id_event,id_candidate,feedback,duration) VALUES
+	 (31,0,4,3,4,NULL,NULL,NULL),
+	 (32,0,4,3,6,NULL,NULL,NULL),
+	 (33,0,4,3,1,NULL,NULL,NULL),
+	 (34,0,4,3,5,NULL,NULL,NULL),
+	 (35,0,4,4,5,NULL,NULL,NULL),
+	 (36,0,4,4,2,NULL,NULL,NULL),
+	 (37,0,4,4,1,NULL,NULL,NULL),
+	 (38,0,2,4,3,NULL,NULL,NULL),
+	 (39,0,2,4,7,NULL,NULL,NULL),
+	 (40,0,1,4,2,NULL,NULL,NULL);
+INSERT INTO Interview (id_interview,happened,id_participant,id_event,id_candidate,feedback,duration) VALUES
+	 (41,0,6,4,3,NULL,NULL,NULL),
+	 (42,0,6,4,2,NULL,NULL,NULL),
+	 (43,0,5,4,5,NULL,NULL,NULL),
+	 (44,0,5,4,2,NULL,NULL,NULL),
+	 (45,0,5,5,6,NULL,NULL,NULL),
+	 (46,0,5,5,2,NULL,NULL,NULL),
+	 (47,0,3,5,6,NULL,NULL,NULL),
+	 (48,0,3,5,2,NULL,NULL,NULL),
+	 (49,0,3,5,7,NULL,NULL,NULL),
+	 (50,0,2,5,3,NULL,NULL,NULL);
+INSERT INTO Interview (id_interview,happened,id_participant,id_event,id_candidate,feedback,duration) VALUES
+	 (51,0,2,5,2,NULL,NULL,NULL),
+	 (52,0,2,5,7,NULL,NULL,NULL),
+	 (53,0,1,5,6,NULL,NULL,NULL),
+	 (54,0,6,5,3,NULL,NULL,NULL),
+	 (55,0,6,5,2,NULL,NULL,NULL),
+	 (56,0,6,5,7,NULL,NULL,NULL),
+	 (57,0,4,5,6,NULL,NULL,NULL),
+	 (58,0,4,5,3,NULL,NULL,NULL),
+	 (59,0,6,6,4,NULL,NULL,NULL),
+	 (60,0,6,6,3,NULL,NULL,NULL);
+INSERT INTO Interview (id_interview,happened,id_participant,id_event,id_candidate,feedback,duration) VALUES
+	 (61,0,6,6,1,NULL,NULL,NULL),
+	 (62,0,3,6,4,NULL,NULL,NULL),
+	 (63,0,3,6,3,NULL,NULL,NULL),
+	 (64,0,2,6,7,NULL,NULL,NULL),
+	 (65,0,1,6,7,NULL,NULL,NULL),
+	 (66,0,1,6,4,NULL,NULL,NULL),
+	 (67,0,5,6,7,NULL,NULL,NULL),
+	 (68,0,5,6,4,NULL,NULL,NULL);
+
+
 INSERT INTO Participates (id_candidate, id_event) VALUES
 (1, 1),
 (2, 2),
