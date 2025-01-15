@@ -3,6 +3,7 @@ CREATE TABLE Candidate(
    lastname_candidate TEXT NOT NULL,
    name_candidate TEXT NOT NULL,
    email_candidate TEXT NOT NULL,
+   password_candidate TEXT NOT NULL,
    PRIMARY KEY(id_candidate)
 );
 
@@ -10,6 +11,7 @@ CREATE TABLE Participant(
    id_participant INTEGER,
    name_participant TEXT NOT NULL,
    email_participant TEXT,
+   password_participant TEXT NOT NULL,
    PRIMARY KEY(id_participant)
 );
 
@@ -43,9 +45,26 @@ CREATE TABLE Tag(
    UNIQUE(name_tag)
 );
 
+CREATE TABLE Office(
+   id_employee INTEGER,
+   lastname_employee TEXT NOT NULL,
+   name_employee TEXT NOT NULL,
+   email_employee TEXT NOT NULL,
+   password_employee TEXT NOT NULL,
+   PRIMARY KEY(id_employee)
+);
+
+CREATE TABLE Role(
+   id_role INTEGER,
+   name_role TEXT NOT NULL,
+   PRIMARY KEY(id_role),
+   UNIQUE(name_role)
+);
+
 CREATE TABLE Participates(
    id_candidate INTEGER,
    id_event INTEGER,
+   priority INTEGER,
    PRIMARY KEY(id_candidate, id_event),
    FOREIGN KEY(id_candidate) REFERENCES Candidate(id_candidate),
    FOREIGN KEY(id_event) REFERENCES Event(id_event)
@@ -81,4 +100,28 @@ CREATE TABLE Participant_tag(
    PRIMARY KEY(id_participant, id_tag),
    FOREIGN KEY(id_participant) REFERENCES Participant(id_participant),
    FOREIGN KEY(id_tag) REFERENCES Tag(id_tag)
+);
+
+CREATE TABLE Employee_role(
+   id_employee INTEGER,
+   id_role INTEGER,
+   PRIMARY KEY(id_employee, id_role),
+   FOREIGN KEY(id_employee) REFERENCES Office(id_employee),
+   FOREIGN KEY(id_role) REFERENCES Role(id_role)
+);
+
+CREATE TABLE Candidate_role(
+   id_candidate INTEGER,
+   id_role INTEGER,
+   PRIMARY KEY(id_candidate, id_role),
+   FOREIGN KEY(id_candidate) REFERENCES Candidate(id_candidate),
+   FOREIGN KEY(id_role) REFERENCES Role(id_role)
+);
+
+CREATE TABLE Participant_role(
+   id_participant INTEGER,
+   id_role INTEGER,
+   PRIMARY KEY(id_participant, id_role),
+   FOREIGN KEY(id_participant) REFERENCES Participant(id_participant),
+   FOREIGN KEY(id_role) REFERENCES Role(id_role)
 );
