@@ -64,7 +64,7 @@ CREATE TABLE Role(
 CREATE TABLE Participates(
    id_candidate INTEGER,
    id_event INTEGER,
-   weight INTEGER,
+   priority INTEGER,
    PRIMARY KEY(id_candidate, id_event),
    FOREIGN KEY(id_candidate) REFERENCES Candidate(id_candidate),
    FOREIGN KEY(id_event) REFERENCES Event(id_event)
