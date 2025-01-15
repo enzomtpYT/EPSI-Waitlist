@@ -1,37 +1,7 @@
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash
-from lib import database
+from lib import database, api
 
 event_bp = Blueprint('event', __name__)
-
-def get_event_participants(id_event):
-    event, error = database.get_event(id_event)
-    participants, error = database.get_all_participants()
-    candidates, error = database.get_all_candidates()
-    alltags, error = database.get_all_tags()
-    eventtag, error = database.get_event_tags(id_event)
-    
-    event = dict(event)
-    participants = [dict(participant) for participant in participants]
-    candidates = [dict(candidate) for candidate in candidates]
-    alltags = [dict(tag) for tag in alltags]
-    
-    for participant in participants:
-        tags, error = database.get_participant_tags(participant["id_participant"])
-        participant["tags"] = [tag["id_tag"] for tag in tags]
-    for candidate in candidates:
-        tags, error = database.get_candidate_tags(candidate["id_candidate"])
-        candidate["tags"] = [tag["id_tag"] for tag in tags]
-    event["tags"] = [tag["id_tag"] for tag in eventtag]
-    
-    datas = {
-        "event": dict(event),
-        "participants": participants,
-        "candidates": candidates,
-        "tags": alltags
-    }
-    if error:
-        return None, error
-    return datas, None
 
 @event_bp.route("/admin/event")
 def event():
@@ -108,20 +78,9 @@ def delete_event(id_event):
 
 @event_bp.route('/admin/manage_event/event/<int:id_event>/manage_event_participants', methods=['GET'])
 def manage_event_participants(id_event):
-    datas, error = get_event_participants(id_event)
+    datas, error = api.get_event_participants(id_event)
     print(datas)
     if error:
         flash(error, "danger")
         return redirect(url_for('event.edit_event', id_event=id_event))
-    # return jsonify(datas)
-    return render_template('manage_event_participants.html', data=datas)
-
-@event_bp.route('/admin/manage_event/event/<int:id_event>/manage_event_participants/api', methods=['GET'])
-def manage_event_participants(id_event):
-    datas, error = get_event_participants(id_event)
-    print(datas)
-    if error:
-        flash(error, "danger")
-        return redirect(url_for('event.edit_event', id_event=id_event))
-    # return jsonify(datas)
     return render_template('manage_event_participants.html', data=datas)
