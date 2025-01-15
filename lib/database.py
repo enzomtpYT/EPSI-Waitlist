@@ -206,16 +206,18 @@ def get_event_candidates(id):
     if conn is None:
         return None, "Erreur base de données"
     try:
-        candids = conn.execute(f'SELECT id_candidate FROM Participates WHERE id_event = \'{id}\'').fetchall()
-        candid = []
-        for candidat in candids:
-            candid.append(conn.execute(f'SELECT * FROM Candidate WHERE id_candidate = \'{candidat["id_candidate"]}\'').fetchall()[0])
+        candidates = conn.execute('''
+        SELECT Candidate.*, Participates.priority
+        FROM Candidate
+        JOIN Participates ON Candidate.id_candidate = Participates.id_candidate
+        WHERE Participates.id_event = ?
+        ''', (id,)).fetchall()
+        return candidates, None
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
-    return candid, None
 
 def get_event_participant(id):
     """
@@ -231,16 +233,18 @@ def get_event_participant(id):
     if conn is None:
         return None, "Erreur base de données"
     try:
-        inters = conn.execute(f'SELECT id_participant FROM Attends WHERE id_event = \'{id}\'').fetchall()
-        inter = []
-        for intervenant in inters:
-            inter.append(conn.execute(f'SELECT * FROM Participant WHERE id_participant = \'{intervenant["id_participant"]}\'').fetchall()[0])
+        inter = conn.execute('''
+        SELECT Participant.*
+        FROM Participant
+        JOIN Attends ON Participant.id_participant = Attends.id_participant
+        WHERE Attends.id_event = ?
+        ''', (id,)).fetchall()
+        return inter, None
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
-    return inter, None
 
 def get_event_interview_candidate(todayevent, id_participant):
     """
@@ -1270,3 +1274,127 @@ def get_last_added_event():
         return None, "Erreur requête base de données"
     finally:
         conn.close()
+
+# Attends and Participates functions
+
+def edit_participates(id_candidat, id_event, priority):
+    """
+    Met à jour la priorité d'un candidat pour un événement.
+
+    Args:
+        id_candidat (int): L'identifiant du candidat.
+        id_event (int): L'identifiant de l'événement.
+        priority (int): La priorité du candidat pour l'événement.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        conn.execute('UPDATE Participates SET priority = ? WHERE id_candidate = ? AND id_event = ?', (priority, id_candidat, id_event))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la mise à jour de la priorité du candidat: {e}")
+        return "Erreur lors de la mise à jour de la priorité du candidat"
+    finally:
+        conn.close()
+    return None
+
+def create_participates(id_candidate, id_event, priority):
+    """
+    Crée une nouvelle participation dans la base de données.
+
+    Args:
+        id_candidate (int): L'identifiant du candidat.
+        id_event (int): L'identifiant de l'événement.
+        priority (int): La priorité du candidat pour l'événement.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        conn.execute('INSERT INTO Participates (id_candidate, id_event, priority) VALUES (?, ?, ?)', (id_candidate, id_event, priority))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la création de la participation: {e}")
+        return "Erreur lors de la création de la participation"
+    finally:
+        conn.close()
+    return None
+
+def delete_participates(id_candidate, id_event):
+    """
+    Supprime une participation de la base de données en utilisant l'identifiant du candidat et de l'événement.
+
+    Args:
+        id_candidate (int): L'identifiant du candidat.
+        id_event (int): L'identifiant de l'événement.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        conn.execute("DELETE FROM Participates WHERE id_candidate = ? AND id_event = ?", (id_candidate, id_event))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la suppression de la participation: {e}")
+        return "Erreur lors de la suppression de la participation"
+    finally:
+        conn.close()
+    return None
+
+def create_attends(id_participant, id_event):
+    """
+    Crée une nouvelle participation dans la base de données.
+
+    Args:
+        id_participant (int): L'identifiant du participant.
+        id_event (int): L'identifiant de l'événement.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        conn.execute('INSERT INTO Attends (id_participant, id_event) VALUES (?, ?)', (id_participant, id_event))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la création de la participation: {e}")
+        return "Erreur lors de la création de la participation"
+    finally:
+        conn.close()
+    return None
+
+def create_attends(id_participant, id_event):
+    """
+    Crée une nouvelle participation dans la base de données.
+
+    Args:
+        id_participant (int): L'identifiant du participant.
+        id_event (int): L'identifiant de l'événement.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        conn.execute('INSERT INTO Attends (id_participant, id_event) VALUES (?, ?)', (id_participant, id_event))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la création de la participation: {e}")
+        return "Erreur lors de la création de la participation"
+    finally:
+        conn.close()
+    return None
