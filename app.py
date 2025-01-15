@@ -17,6 +17,8 @@ from routes.event import event_bp
 from routes.manage_waitlist import manage_waitlist_bp
 from routes.create_tag import create_tag_bp
 from routes.manage_tag import manage_tag_bp
+from routes.participant_dashboard import participant_dashboard_bp
+from routes.candidate_dashboard import candidate_dashboard_bp
 
 # Set the secret key to a random value
 app.secret_key = os.urandom(24)
@@ -37,6 +39,8 @@ app.register_blueprint(event_bp)
 app.register_blueprint(manage_waitlist_bp)
 app.register_blueprint(create_tag_bp)
 app.register_blueprint(manage_tag_bp)
+app.register_blueprint(participant_dashboard_bp)
+app.register_blueprint(candidate_dashboard_bp)
 
 custom_route_names = {
     "/": "Accueil",
