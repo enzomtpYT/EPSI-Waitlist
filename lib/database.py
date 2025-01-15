@@ -1375,9 +1375,9 @@ def create_attends(id_participant, id_event):
         conn.close()
     return None
 
-def create_attends(id_participant, id_event):
+def delete_attends(id_participant, id_event):
     """
-    Crée une nouvelle participation dans la base de données.
+    Supprime une participation de la base de données en utilisant l'identifiant du participant et de l'événement.
 
     Args:
         id_participant (int): L'identifiant du participant.
@@ -1390,11 +1390,11 @@ def create_attends(id_participant, id_event):
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute('INSERT INTO Attends (id_participant, id_event) VALUES (?, ?)', (id_participant, id_event))
+        conn.execute("DELETE FROM Attends WHERE id_participant = ? AND id_event = ?", (id_participant, id_event))
         conn.commit()
     except sqlite3.Error as e:
-        print(f"Erreur lors de la création de la participation: {e}")
-        return "Erreur lors de la création de la participation"
+        print(f"Erreur lors de la suppression de la participation: {e}")
+        return "Erreur lors de la suppression de la participation"
     finally:
         conn.close()
     return None
