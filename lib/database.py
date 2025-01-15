@@ -497,6 +497,64 @@ def remove_candidate_from_all_interviews_for_event(id_event, id_candidate):
         conn.close()
     return None
 
+def add_candidate_to_event(id_event, id_candidate):
+    """
+    Ajoute un candidat à un événement.
+
+    Args:
+        id_event (int): L'identifiant de l'événement.
+        id_candidate (int): L'identifiant du candidat.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        # Si la connexion échoue, renvoie une erreur
+        return "Erreur base de données"
+    try:
+        # Exécute la requête pour ajouter le candidat à l'événement
+        conn.execute('INSERT INTO Participates (id_event, id_candidate) VALUES (?, ?)', (id_event, id_candidate))
+        # Sauvegarde les modifications
+        conn.commit()
+    except sqlite3.Error as e:
+        # Gère les erreurs de requête SQL
+        print(f"Erreur lors de l'ajout du candidat à l'événement: {e}")
+        return "Erreur lors de l'ajout du candidat à l'événement"
+    finally:
+        # Ferme la connexion à la base de données
+        conn.close()
+    return None
+
+def delete_candidate_from_event(id_event, id_candidate):
+    """
+    Supprime un candidat d'un événement.
+
+    Args:
+        id_event (int): L'identifiant de l'événement.
+        id_candidate (int): L'identifiant du candidat.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        # Si la connexion échoue, renvoie une erreur
+        return "Erreur base de données"
+    try:
+        # Exécute la requête pour supprimer le candidat de l'événement
+        conn.execute("DELETE FROM Participates WHERE id_event = ? AND id_candidate = ?", (id_event, id_candidate))
+        # Sauvegarde les modifications
+        conn.commit()
+    except sqlite3.Error as e:
+        # Gère les erreurs de requête SQL
+        print(f"Erreur lors de la suppression du candidat: {e}")
+        return "Erreur lors de la suppression du candidat"
+    finally:
+        # Ferme la connexion à la base de données
+        conn.close()
+    return None
+
 # Participant functions
 
 def create_participant(name, email):
@@ -664,6 +722,54 @@ def get_last_added_participant():
         return None, "Erreur requête base de données"
     finally:
         conn.close()
+
+def delete_participant_from_event(id_event, id_participant):
+    """
+    Supprime un participant d'un événement.
+
+    Args:
+        id_event (int): L'identifiant de l'événement.
+        id_participant (int): L'identifiant du participant.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        conn.execute("DELETE FROM Attends WHERE id_event = ? AND id_participant = ?", (id_event, id_participant))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la suppression de l'intervenant: {e}")
+        return "Erreur lors de la suppression de l'intervenant"
+    finally:
+        conn.close()
+    return None
+
+def add_participant_to_event(id_event, id_participant):
+    """
+    Ajoute un participant à un événement.
+
+    Args:
+        id_event (int): L'identifiant de l'événement.
+        id_participant (int): L'identifiant du participant.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        conn.execute('INSERT INTO Attends (id_event, id_participant) VALUES (?, ?)', (id_event, id_participant))
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de l'ajout de l'intervenant à l'événement: {e}")
+        return "Erreur lors de l'ajout de l'intervenant à l'événement"
+    finally:
+        conn.close()
+    return None
 
 # Interview functions
 
