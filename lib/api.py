@@ -22,11 +22,15 @@ def get_event_participants(id_event):
         participant["tags"] = [tag["id_tag"] for tag in tags]
         if participant["id_participant"] in [participant["id_participant"] for participant in eventparticipants]:
             participant["attends"] = True
+        else:
+            participant["attends"] = False
     for candidate in candidates:
         tags, error = database.get_candidate_tags(candidate["id_candidate"])
         candidate["tags"] = [tag["id_tag"] for tag in tags]
         if candidate["id_candidate"] in [candidate["id_candidate"] for candidate in eventcandidates]:
             candidate["attends"] = True
+        else:
+            candidate["attends"] = False
     event["tags"] = [tag["id_tag"] for tag in eventtag]
     
     datas = {
