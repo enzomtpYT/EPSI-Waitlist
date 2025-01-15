@@ -6,31 +6,81 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='styles/manage_event_participants.css') }}">
 <h1>Gérer les participants pour l'événement: {{ data.event.name_event }}</h1>
 
-<div class="admin-section">
-    <h2>Ajouter des participants</h2>
-    <form action="{{ url_for('event.manage_event_participants', id_event=data.event.id_event) }}" method="post">
-        <table>
-            <tr>
-                <th>Nom</th>
-                <th>Email</th>
-                <th>Type</th>
-                <th>Actions</th>
-            </tr>
-            {% for participant in data.participants %}
-            <tr>
-                <td>{{ participant.name_participant }}</td>
-                <td>{{ participant.email_participant }}</td>
-                <td>Intervenant</td>
-                <td>
-                    <input type="checkbox" name="participants[]" value="{{ participant.id_participant }}">
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-        <button type="submit">Ajouter des participants</button>
-    </form>
-</div>
 
-<pre>{{ data | tojson(indent=2) }}</pre>
+<div class="tagnform">
+    <div class="admin-section tag-section">
+        <h2>Filtrer par tags</h2>
+        <div class="tag-selector">
+            {% for tag in data.tags %}
+            <div class="tag">
+                {% if tag.id_tag in data.event.tags %}
+                    <input type="checkbox" name="tags[]" value="{{ tag.id_tag }}" id="tag-{{ tag.id_tag }}" checked>
+                {% else %}
+                    <input type="checkbox" name="tags[]" value="{{ tag.id_tag }}" id="tag-{{ tag.id_tag }}">
+                {% endif %}
+                <label for="tag-{{ tag.id_tag }}">{{ tag.name_tag }}</label>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="table-sections">
+        <form action="{{ url_for('event.manage_event_participants', id_event=data.event.id_event) }}" method="post">
+        <div class="admin-section interv">
+            <h2>Ajouter des Intervenants</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for participant in data.participants %}
+                    <tr>
+                        <td>{{ participant.name_participant }}</td>
+                        <td>{{ participant.email_participant }}</td>
+                        <td>
+                            {% if participant.tags|selectattr('id_tag', 'in', data.event.tags|map(attribute='id_tag'))|list or participant.attends == true %}
+                                <input class="checkbox" type="checkbox" name="participants[]" value="{{ participant.id_participant }}" checked>
+                            {% else %}
+                                <input class="checkbox" type="checkbox" name="participants[]" value="{{ participant.id_participant }}">
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="admin-section cand">
+            <h2>Ajouter des Candidats</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for candidate in data.candidates %}
+                    <tr>
+                        <td>{{ candidate.name_candidate }}</td>
+                        <td>{{ candidate.email_candidate }}</td>
+                        <td>
+                            {% if candidate.tags|selectattr('id_tag', 'in', data.event.tags|map(attribute='id_tag'))|list or candidate.attends == true %}
+                                <input class="checkbox" type="checkbox" name="candidates[]" value="{{ candidate.id_candidate }}" checked>
+                            {% else %}
+                                <input class="checkbox" type="checkbox" name="candidates[]" value="{{ candidate.id_candidate }}">
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
