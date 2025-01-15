@@ -3,7 +3,6 @@ CREATE TABLE Candidate(
    lastname_candidate TEXT NOT NULL,
    name_candidate TEXT NOT NULL,
    email_candidate TEXT NOT NULL,
-   password_candidate TEXT NOT NULL,
    PRIMARY KEY(id_candidate)
 );
 
@@ -11,7 +10,6 @@ CREATE TABLE Participant(
    id_participant INTEGER,
    name_participant TEXT NOT NULL,
    email_participant TEXT,
-   password_participant TEXT NOT NULL,
    PRIMARY KEY(id_participant)
 );
 
@@ -50,8 +48,16 @@ CREATE TABLE Office(
    lastname_employee TEXT NOT NULL,
    name_employee TEXT NOT NULL,
    email_employee TEXT NOT NULL,
-   password_employee TEXT NOT NULL,
    PRIMARY KEY(id_employee)
+);
+
+CREATE TABLE Users(
+   id_user INTEGER,
+   username TEXT NOT NULL,
+   password_user TEXT,
+   salt TEXT,
+   PRIMARY KEY(id_user),
+   UNIQUE(username)
 );
 
 CREATE TABLE Role(
@@ -59,6 +65,13 @@ CREATE TABLE Role(
    name_role TEXT NOT NULL,
    PRIMARY KEY(id_role),
    UNIQUE(name_role)
+);
+
+CREATE TABLE Permission(
+   id_permission INTEGER,
+   name_permission TEXT NOT NULL,
+   PRIMARY KEY(id_permission),
+   UNIQUE(name_permission)
 );
 
 CREATE TABLE Participates(
@@ -102,26 +115,42 @@ CREATE TABLE Participant_tag(
    FOREIGN KEY(id_tag) REFERENCES Tag(id_tag)
 );
 
-CREATE TABLE Employee_role(
-   id_employee INTEGER,
-   id_role INTEGER,
-   PRIMARY KEY(id_employee, id_role),
-   FOREIGN KEY(id_employee) REFERENCES Office(id_employee),
-   FOREIGN KEY(id_role) REFERENCES Role(id_role)
-);
-
-CREATE TABLE Candidate_role(
+CREATE TABLE Candidate_user(
    id_candidate INTEGER,
-   id_role INTEGER,
-   PRIMARY KEY(id_candidate, id_role),
+   id_user INTEGER,
+   PRIMARY KEY(id_candidate, id_user),
    FOREIGN KEY(id_candidate) REFERENCES Candidate(id_candidate),
-   FOREIGN KEY(id_role) REFERENCES Role(id_role)
+   FOREIGN KEY(id_user) REFERENCES Users(id_user)
 );
 
-CREATE TABLE Participant_role(
+CREATE TABLE Participant_user(
    id_participant INTEGER,
-   id_role INTEGER,
-   PRIMARY KEY(id_participant, id_role),
+   id_user INTEGER,
+   PRIMARY KEY(id_participant, id_user),
    FOREIGN KEY(id_participant) REFERENCES Participant(id_participant),
-   FOREIGN KEY(id_role) REFERENCES Role(id_role)
+   FOREIGN KEY(id_user) REFERENCES Users(id_user)
+);
+
+CREATE TABLE Employee_user(
+   id_employee INTEGER,
+   id_user INTEGER,
+   PRIMARY KEY(id_employee, id_user),
+   FOREIGN KEY(id_employee) REFERENCES Office(id_employee),
+   FOREIGN KEY(id_user) REFERENCES Users(id_user)
+);
+
+CREATE TABLE User_role(
+   id_role INTEGER,
+   id_user INTEGER,
+   PRIMARY KEY(id_role, id_user),
+   FOREIGN KEY(id_role) REFERENCES Role(id_role),
+   FOREIGN KEY(id_user) REFERENCES Users(id_user)
+);
+
+CREATE TABLE Role_permission(
+   id_role INTEGER,
+   id_permission INTEGER,
+   PRIMARY KEY(id_role, id_permission),
+   FOREIGN KEY(id_role) REFERENCES Role(id_role),
+   FOREIGN KEY(id_permission) REFERENCES Permission(id_permission)
 );
