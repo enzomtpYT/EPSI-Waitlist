@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Gérer les participants{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/manage_event_participants.css') }}">
+<h1>Gérer les participants pour l'événement: {{ data.event.name_event }}</h1>
+
+<div class="admin-section">
+    <h2>Ajouter des participants</h2>
+    <form action="{{ url_for('event.manage_event_participants', id_event=data.event.id_event) }}" method="post">
+        <table>
+            <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Email</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+            {% for participant in data.participants %}
+            <tr>
+                <td>{{ participant.last_name }}</td>
+                <td>{{ participant.first_name }}</td>
+                <td>{{ participant.email }}</td>
+                <td>{{ participant.status }}</td>
+                <td>
+                    {# <a href="{{ url_for('event.delete_participant', id_event=data.event.id_event, id_participant=participant.id_participant) }}">Supprimer</a> #}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <button type="submit">Ajouter des participants</button>
+    </form>
+</div>
+
+<pre>{{ data | tojson(indent=2) }}</pre>
+
+{% endblock %}
