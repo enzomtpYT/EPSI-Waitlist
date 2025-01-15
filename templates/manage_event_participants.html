@@ -38,6 +38,7 @@
                 </thead>
                 <tbody>
                     {% for participant in data.participants %}
+                    {% if participant.tags|selectattr('id_tag', 'in', data.event.tags|map(attribute='id_tag'))|list or participant.attends == true %}
                     <tr>
                         <td>{{ participant.name_participant }}</td>
                         <td>{{ participant.email_participant }}</td>
@@ -49,6 +50,7 @@
                             {% endif %}
                         </td>
                     </tr>
+                    {% endif %}
                     {% endfor %}
                 </tbody>
             </table>
@@ -65,6 +67,7 @@
                 </thead>
                 <tbody>
                     {% for candidate in data.candidates %}
+                    {% if candidate.tags|selectattr('id_tag', 'in', data.event.tags|map(attribute='id_tag'))|list or candidate.attends == true %}
                     <tr>
                         <td>{{ candidate.name_candidate }}</td>
                         <td>{{ candidate.email_candidate }}</td>
@@ -76,6 +79,7 @@
                             {% endif %}
                         </td>
                     </tr>
+                    {% endif %}
                     {% endfor %}
                 </tbody>
             </table>
