@@ -156,7 +156,7 @@ def get_event_interviews(id_event):
     try:
         event = conn.execute('SELECT * FROM Event WHERE id_event = ?', (id_event,)).fetchone()
         interviews = conn.execute('''
-        SELECT Interview.id_interview, Participant.name_participant, Candidate.lastname_candidate, Candidate.name_candidate
+        SELECT Interview.id_interview, Participant.name_participant, Candidate.lastname_candidate, Candidate.name_candidate, Interview.feedback_participant, Interview.feedback_candidate, Interview.duration_interview
         FROM Interview
         JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
         JOIN Participant ON Interview.id_participant = Participant.id_participant
