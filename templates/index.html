@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}Hello World{% endblock %}
+{% block title %}Accueil{% endblock %}
 
 {% block content %}
 <h1>Bienvenu sur l'application de gestion de file d'attente de l'EPSI</h1>
 
-<div class="admin-container">
-
+{% if 'role' in session %}
+    {% if session['role'] == 'admin' %}
     <div class="admin-section">
         <h2>Section administration</h2>
         <div class="admin-buttons">
@@ -15,7 +15,7 @@
             </a>
         </div>
     </div>
-
+    {% elif session['role'] == 'participant' %}
     <div class="admin-section">
         <h2>Section intervenants</h2>
         <div class="admin-buttons">
@@ -24,7 +24,7 @@
             </a>
         </div>
     </div>
-
+    {% elif session['role'] == 'candidate' %}
     <div class="admin-section">
         <h2>Section candidats</h2>
         <div class="admin-buttons">
@@ -33,7 +33,16 @@
             </a>
         </div>
     </div>
-
+    {% endif %}
+{% else %}
+<div class="admin-section">
+    <h2>Connexion</h2>
+    <div class="admin-buttons">
+        <a href="{{ url_for('auth.login') }}">
+            <button type="button">Se connecter</button>
+        </a>
+    </div>
 </div>
+{% endif %}
 
 {% endblock %}

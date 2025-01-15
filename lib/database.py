@@ -1398,3 +1398,38 @@ def delete_attends(id_participant, id_event):
     finally:
         conn.close()
     return None
+
+# Authentication functions
+
+def get_admin_by_email(email):
+    conn = get_db_connection()
+    try:
+        admin = conn.execute('SELECT * FROM Admin WHERE email = ?', (email,)).fetchone()
+        return admin, None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def get_participant_by_email(email):
+    conn = get_db_connection()
+    try:
+        participant = conn.execute('SELECT * FROM Participant WHERE email = ?', (email,)).fetchone()
+        return participant, None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def get_candidate_by_email(email):
+    conn = get_db_connection()
+    try:
+        candidate = conn.execute('SELECT * FROM Candidate WHERE email = ?', (email,)).fetchone()
+        return candidate, None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()

@@ -1,7 +1,8 @@
-from flask import Flask, request
+from flask import Flask, request, session
 from flask_socketio import SocketIO, send
 from sock import socketio, app
 import os, time
+from routes.auth import auth_bp
 from routes.index import index_bp
 from routes.admin import admin_bp
 from routes.list import list_bp
@@ -43,6 +44,7 @@ app.register_blueprint(manage_tag_bp)
 app.register_blueprint(api_bp)
 app.register_blueprint(participant_dashboard_bp)
 app.register_blueprint(candidate_dashboard_bp)
+app.register_blueprint(auth_bp)
 
 custom_route_names = {
     "/": "Accueil",
@@ -64,3 +66,7 @@ def inject_routes():
 if __name__ == "__main__":
     debug_mode = os.getenv('FLASK_ENV') == 'development'
     socketio.run(app, host="127.0.0.1", port=8080, debug=debug_mode)
+
+@app.context_processor
+def inject_session():
+    return dict(session=session)
