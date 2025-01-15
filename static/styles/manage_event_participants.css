@@ -53,3 +53,17 @@ table {
     margin: 0;
     padding: 0;
 }
+
+input[type="number"] {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    width: auto;
+    text-align: center;
+    background-color: rgb(0, 123, 255, 0.5);
+    color: white;
+    border-radius: 8px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+}
