@@ -42,18 +42,18 @@ CREATE TABLE Candidate(
    lastname_candidate TEXT NOT NULL,
    name_candidate TEXT NOT NULL,
    email_candidate TEXT NOT NULL,
-   id_user INTEGER NOT NULL,
+   id_user INTEGER,
    PRIMARY KEY(id_candidate),
-   FOREIGN KEY(id_user) REFERENCES Users(id_user)
+   FOREIGN KEY(id_user) REFERENCES User(id_user)
 );
 
 CREATE TABLE Participant(
    id_participant INTEGER,
    name_participant TEXT NOT NULL,
    email_participant TEXT,
-   id_user INTEGER NOT NULL,
+   id_user INTEGER,
    PRIMARY KEY(id_participant),
-   FOREIGN KEY(id_user) REFERENCES Users(id_user)
+   FOREIGN KEY(id_user) REFERENCES User(id_user)
 );
 
 CREATE TABLE Interview(
@@ -76,9 +76,9 @@ CREATE TABLE Office(
    lastname_employee TEXT NOT NULL,
    name_employee TEXT NOT NULL,
    email_employee TEXT NOT NULL,
-   id_user INTEGER NOT NULL,
+   id_user INTEGER,
    PRIMARY KEY(id_employee),
-   FOREIGN KEY(id_user) REFERENCES Users(id_user)
+   FOREIGN KEY(id_user) REFERENCES User(id_user)
 );
 
 CREATE TABLE Participates(
@@ -127,7 +127,7 @@ CREATE TABLE User_role(
    id_user INTEGER,
    PRIMARY KEY(id_role, id_user),
    FOREIGN KEY(id_role) REFERENCES Role(id_role),
-   FOREIGN KEY(id_user) REFERENCES Users(id_user)
+   FOREIGN KEY(id_user) REFERENCES User(id_user)
 );
 
 CREATE TABLE Role_permission(
