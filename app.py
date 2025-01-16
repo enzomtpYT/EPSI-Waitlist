@@ -54,19 +54,14 @@ custom_route_names = {
 
 @socketio.on('message')
 def handleMessage(msg):
-
     print('Message: ' + msg)
     time.sleep(5)
     send(msg, broadcast=True)
 
 @app.context_processor
 def inject_routes():
-    return dict(custom_route_names=custom_route_names, parameters=request.args.to_dict())
+    return dict(custom_route_names=custom_route_names, parameters=request.args.to_dict(), session=session)
 
 if __name__ == "__main__":
     debug_mode = os.getenv('FLASK_ENV') == 'development'
     socketio.run(app, host="127.0.0.1", port=8080, debug=debug_mode)
-
-@app.context_processor
-def inject_session():
-    return dict(session=session)
