@@ -304,6 +304,28 @@ def create_candidate(lastname, name, email):
         # Fermes la connexion à la base de données
         conn.close()
 
+def get_candidate_email(id_candidate):
+    """
+    Récupère l'adresse email d'un candidat en utilisant son identifiant.
+
+    Args:
+        id_candidate (int): L'identifiant du candidat.
+
+    Returns:
+        str: L'adresse email du candidat.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return None
+    try:
+        candidate = conn.execute('SELECT email_candidate FROM Candidate WHERE id_candidate = ?', (id_candidate,)).fetchone()
+        return candidate['email_candidate']
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None
+    finally:
+        conn.close()
+
 def get_all_candidates():
     """
     Récupère tous les candidats de la base de données.
@@ -1401,35 +1423,99 @@ def delete_attends(id_participant, id_event):
 
 # Authentication functions
 
-def get_admin_by_email(email):
+def auth_get_session(username):
+    """
+    Récupère la session d'un utilisateur en utilisant son nom d'utilisateur.
+
+    Args:
+        username (str): Le nom d'utilisateur de l'utilisateur.
+
+    Returns:
+        tuple: Un tuple contenant la session et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
     try:
-        admin = conn.execute('SELECT * FROM Admin WHERE email = ?', (email,)).fetchone()
-        return admin, None
+        session = conn.execute('SELECT session_token FROM User WHERE username = ?', (username,)).fetchone()
+        return session, None
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
 
-def get_participant_by_email(email):
+def auth_get_salt(username):
+    """
+    Récupère le sel d'un utilisateur en utilisant son nom d'utilisateur.
+
+    Args:
+        username (str): Le nom d'utilisateur de l'utilisateur.
+
+    Returns:
+        tuple: Un tuple contenant le sel et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
     try:
-        participant = conn.execute('SELECT * FROM Participant WHERE email = ?', (email,)).fetchone()
-        return participant, None
+        salt = conn.execute('SELECT salt FROM User WHERE username = ?', (username,)).fetchone()
+        return salt, None
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
 
-def get_candidate_by_email(email):
+def auth_get_hashedpassword(username):
+    """
+    Récupère le mot de passe hashé d'un utilisateur en utilisant son nom d'utilisateur.
+
+    Args:
+        username (str): Le nom d'utilisateur de l'utilisateur.
+
+    Returns:
+        tuple: Un tuple contenant le mot de passe hashé et un message d'erreur si une erreur est survenue.
+    """
     conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
     try:
-        candidate = conn.execute('SELECT * FROM Candidate WHERE email = ?', (email,)).fetchone()
-        return candidate, None
+        password_user = conn.execute('SELECT password_user FROM User WHERE username = ?', (username,)).fetchone()
+        return password_user, None
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def auth_register_candidate(id_candidate, username, password_user, salt, session_token):
+    """
+    Enregistre un candidat dans la base de données.
+
+    Args:
+        id_candidate (int): L'identifiant du candidat.
+        username (str): Le nom d'utilisateur du candidat.
+        password_user (str): Le mot de passe hashé du candidat.
+        salt (str): Le sel du candidat.
+        session_token (str): Le jeton de session du candidat.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        conn.execute('INSERT INTO User (username, password_user, salt, session_token) VALUES (?, ?, ?, ?)', (username, password_user, salt, session_token))
+        conn.commit()
+        # get latest user id
+        user_id = conn.execute('SELECT id_user FROM User WHERE username = ?', (username,)).fetchone()
+        # add user to candidate table
+        conn.execute('UPDATE Candidate SET id_user = ? WHERE id_candidate = ?', (user_id[0], id_candidate))
+        return None
+    except sqlite3.Error as e:
+        print(f"Erreur lors de l'enregistrement du candidat: {e}")
+        return "Erreur lors de l'enregistrement du candidat"
     finally:
         conn.close()
