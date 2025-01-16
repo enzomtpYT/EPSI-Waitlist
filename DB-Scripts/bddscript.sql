@@ -19,7 +19,7 @@ CREATE TABLE Role(
    UNIQUE(name_role)
 );
 
-CREATE TABLE Users(
+CREATE TABLE User(
    id_user INTEGER,
    username TEXT NOT NULL,
    password_user TEXT,
