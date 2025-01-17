@@ -1536,3 +1536,169 @@ def get_user_permissions(user_id):
         return None, "Erreur requête base de données"
     finally:
         conn.close()
+
+# Employee functions
+
+def create_employee(lastname, name, email):
+    """
+    Crée un nouvel employé dans la base de données.
+
+    Args:
+        lastname (str): Le nom de famille de l'employé.
+        name (str): Le prénom de l'employé.
+        email (str): L'adresse email de l'employé.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        # Insere l'employé dans la base de données
+        cursor = conn.cursor()
+        cursor.execute('INSERT INTO Office (lastname_employee, name_employee, email_employee) VALUES (?, ?, ?)', (lastname, name, email))
+        employee_id = cursor.lastrowid
+        # Sauvegarde les modifications
+        conn.commit()
+        return employee_id, None
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la création de l'employé: {e}")
+        return None, "Erreur lors de la création de l'employé"
+    finally:
+        # Fermes la connexion à la base de données
+        conn.close()
+
+def get_employee_email(id_employee):
+    """
+    Récupère l'adresse email d'un employé en utilisant son identifiant.
+
+    Args:
+        id_employee (int): L'identifiant de l'employé.
+
+    Returns:
+        str: L'adresse email de l'employé.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return None
+    try:
+        employee = conn.execute('SELECT email_employee FROM Office WHERE id_employee = ?', (id_employee,)).fetchone()
+        return employee['email_employee']
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None
+    finally:
+        conn.close()
+
+def get_all_employees():
+    """
+    Récupère tous les employés de la base de données.
+
+    Returns:
+        tuple: Un tuple contenant une liste d'employés et un message d'erreur si une erreur est survenue.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+
+    try:
+        # Renvoie tous les employés de la base de données
+        employees = conn.execute('SELECT * FROM Office').fetchall()
+
+        if employees:
+            return employees, None
+        else:
+            return None, "Pas d'employé"
+
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+
+    finally:
+        # Fermes la connexion à la base de données
+        conn.close()
+
+def get_employee(employee_id):
+    """
+    Récupère un employé de la base de données en utilisant son identifiant.
+
+    Args:
+        employee_id (int): L'identifiant de l'employé.
+
+    Returns:
+        tuple: Un tuple contenant l'employé et un message d'erreur si une erreur est survenue.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        # Si la connexion échoue, renvoie une erreur
+        return None, "Erreur base de données"
+    try:
+        # Exécute la requête pour récupérer l'employé
+        employee = conn.execute('SELECT * FROM Office WHERE id_employee = ?', (employee_id,)).fetchone()
+        return employee, None
+    except sqlite3.Error as e:
+        # Gère les erreurs de requête SQL
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        # Ferme la connexion à la base de données
+        conn.close()
+
+def edit_employee(lastname, name, email, id_employee):
+    """
+    Met à jour un employé dans la base de données.
+
+    Args:
+        lastname (str): Le nom de famille de l'employé.
+        name (str): Le prénom de l'employé.
+        email (str): L'adresse email de l'employé.
+        id_employee (int): L'identifiant de l'employé.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+
+    try:
+        # Met à jour l'employé dans la base de données
+        conn.execute('UPDATE Office SET lastname_employee = ?, name_employee = ?, email_employee = ? WHERE id_employee = ?', (lastname, name, email, id_employee))
+        # Sauvegarde les modifications
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la mise à jour de l'employé: {e}")
+        return "Erreur lors de la mise à jour de l'employé"
+    finally:
+        # Fermes la connexion à la base de données
+        conn.close()
+    return None
+
+def delete_employee(id_employee):
+    """
+    Supprime un employé de la base de données en utilisant son identifiant.
+
+    Args:
+        id_employee (int): L'identifiant de l'employé.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        # Si la connexion échoue, renvoie une erreur
+        return "Erreur base de données"
+    try:
+        # Exécute la requête pour supprimer l'employé
+        conn.execute("DELETE FROM Office WHERE id_employee = ?", (id_employee,))
+        # Sauvegarde les modifications
+        conn.commit()
+    except sqlite3.Error as e:
+        # Gère les erreurs de requête SQL
+        print(f"Erreur lors de la suppression de l'employé: {e}")
+        return "Erreur lors de la suppression de l'employé"
+    finally:
+        # Ferme la connexion à la base de données
+        conn.close()
+    return None
