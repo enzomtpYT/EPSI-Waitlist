@@ -1543,7 +1543,7 @@ def auth_register_employee(id_employee, username, password_user, salt, session_t
         # get latest user id
         user_id = conn.execute('SELECT id_user FROM User WHERE username = ?', (username,)).fetchone()
         # add user to employee table
-        conn.execute('UPDATE Employee SET id_user = ? WHERE id_employee = ?', (user_id[0], id_employee))
+        conn.execute('UPDATE Office SET id_user = ? WHERE id_employee = ?', (user_id[0], id_employee))
         return None
     except sqlite3.Error as e:
         print(f"Erreur lors de l'enregistrement de l'employé: {e}")
