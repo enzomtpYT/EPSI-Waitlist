@@ -7,11 +7,11 @@
 <h1>Connexion</h1>
 <form class="loginform" action="{{ url_for('auth.login') }}" method="post">
     <div class="iconified-input">
-        <i class="fa fa-user icon"></i>
+        <i class="fa-light fa-envelope icon"></i>
         <input type="text" id="username" name="username" placeholder="Email/Nom d'utilisateur" autocomplete="email" required>
     </div>
     <div class="iconified-input">
-        <i class="fa fa-lock icon"></i>
+        <i class="fa-light fa-lock icon"></i>
         <input type="password" id="password" name="password" placeholder="Mot de passe" autocomplete="current-password" required>
     </div>
     <button type="submit">Se connecter</button>
