@@ -1445,28 +1445,6 @@ def auth_get_session(username):
     finally:
         conn.close()
 
-def auth_get_salt(username):
-    """
-    Récupère le sel d'un utilisateur en utilisant son nom d'utilisateur.
-
-    Args:
-        username (str): Le nom d'utilisateur de l'utilisateur.
-
-    Returns:
-        tuple: Un tuple contenant le sel et un message d'erreur si une erreur est survenue.
-    """
-    conn = get_db_connection()
-    if conn is None:
-        return None, "Erreur base de données"
-    try:
-        salt = conn.execute('SELECT salt FROM User WHERE username = ?', (username,)).fetchone()
-        return salt, None
-    except sqlite3.Error as e:
-        print(f"Erreur requête base de données: {e}")
-        return None, "Erreur requête base de données"
-    finally:
-        conn.close()
-
 def auth_get_hashedpassword(username):
     """
     Récupère le mot de passe hashé d'un utilisateur en utilisant son nom d'utilisateur.
@@ -1489,7 +1467,7 @@ def auth_get_hashedpassword(username):
     finally:
         conn.close()
 
-def auth_register_candidate(id_candidate, username, password_user, salt, session_token):
+def auth_register_candidate(id_candidate, username, password_user, session_token):
     """
     Enregistre un candidat dans la base de données.
 
@@ -1497,7 +1475,6 @@ def auth_register_candidate(id_candidate, username, password_user, salt, session
         id_candidate (int): L'identifiant du candidat.
         username (str): Le nom d'utilisateur du candidat.
         password_user (str): Le mot de passe hashé du candidat.
-        salt (str): Le sel du candidat.
         session_token (str): Le jeton de session du candidat.
 
     Returns:
@@ -1507,7 +1484,7 @@ def auth_register_candidate(id_candidate, username, password_user, salt, session
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute('INSERT INTO User (username, password_user, salt, session_token) VALUES (?, ?, ?, ?)', (username, password_user, salt, session_token))
+        conn.execute('INSERT INTO User (username, password_user, session_token) VALUES (?, ?, ?)', (username, password_user, session_token))
         conn.commit()
         # get latest user id
         user_id = conn.execute('SELECT id_user FROM User WHERE username = ?', (username,)).fetchone()
@@ -1520,7 +1497,7 @@ def auth_register_candidate(id_candidate, username, password_user, salt, session
     finally:
         conn.close()
 
-def auth_register_employee(id_employee, username, password_user, salt, session_token):
+def auth_register_employee(id_employee, username, password_user, session_token):
     """
     Enregistre un employé dans la base de données.
 
@@ -1528,7 +1505,6 @@ def auth_register_employee(id_employee, username, password_user, salt, session_t
         id_employee (int): L'identifiant de l'employé.
         username (str): Le nom d'utilisateur de l'employé.
         password_user (str): Le mot de passe hashé de l'employé.
-        salt (str): Le sel de l'employé.
         session_token (str): Le jeton de session de l'employé.
 
     Returns:
@@ -1538,7 +1514,7 @@ def auth_register_employee(id_employee, username, password_user, salt, session_t
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute('INSERT INTO User (username, password_user, salt, session_token) VALUES (?, ?, ?, ?)', (username, password_user, salt, session_token))
+        conn.execute('INSERT INTO User (username, password_user, session_token) VALUES (?, ?, ?)', (username, password_user, session_token))
         conn.commit()
         # get latest user id
         user_id = conn.execute('SELECT id_user FROM User WHERE username = ?', (username,)).fetchone()

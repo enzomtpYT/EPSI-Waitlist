@@ -1,10 +1,7 @@
 from lib import database
-import bcrypt, datetime, hashlib
+import bcrypt, hashlib, random,time
 
 def verify_login(username, password):
-    salt, error = database.auth_get_salt(username)
-    if error:
-        return False, error
     dbhashed_password, error = database.auth_get_hashedpassword(username)
     dbhashed_password = dbhashed_password[0]
     if error:
@@ -17,28 +14,27 @@ def verify_login(username, password):
     else:
         return False, error
 
-def register_candidate(id_candidate, password):
-    salt = bcrypt.gensalt()
+def genpassword(password):
+    salt = bcrypt.gensalt(random.randint(12,16))
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hashed_password
+
+def register_candidate(id_candidate, password):
     username = database.get_candidate_email(id_candidate)
-    session_token = hashlib.md5((datetime.datetime.now().strftime('%Y%m%d%H%M%S') + username).encode('utf-8')).hexdigest()
-    error = database.auth_register_candidate(id_candidate, username, hashed_password, salt, session_token)
+    session_token = hashlib.md5(random.randbytes(random.randint(8,32))).hexdigest()
+    error = database.auth_register_candidate(id_candidate, username, genpassword(password), session_token)
     return error
 
 def register_participant(id_participant, password):
-    salt = bcrypt.gensalt()
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
     username = database.get_participant_email(id_participant)
-    session_token = hashlib.md5((datetime.datetime.now().strftime('%Y%m%d%H%M%S') + username).encode('utf-8')).hexdigest()
-    error = database.auth_register_participant(id_participant, username, hashed_password, salt, session_token)
+    session_token = hashlib.md5(random.randbytes(random.randint(8,32))).hexdigest()
+    error = database.auth_register_participant(id_participant, username, genpassword(password), session_token)
     return error
 
 def register_employee(id_employee, password):
-    salt = bcrypt.gensalt()
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
     username = database.get_employee_email(id_employee)
-    session_token = hashlib.md5((datetime.datetime.now().strftime('%Y%m%d%H%M%S') + username).encode('utf-8')).hexdigest()
-    error = database.auth_register_employee(id_employee, username, hashed_password, salt, session_token)
+    session_token = hashlib.md5(random.randbytes(random.randint(8,32))).hexdigest()
+    error = database.auth_register_employee(id_employee, username, genpassword(password), session_token)
     return error
 
 def user_has_permission(user_id, permission_name):
