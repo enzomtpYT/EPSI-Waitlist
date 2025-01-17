@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
-from lib import auth
+from lib import auth, database
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -24,12 +24,38 @@ def logout():
     return redirect(url_for('auth.login'))
 
 @auth_bp.route('/register/<int:id_candidate>', methods=['POST', 'GET'])
-def register(id_candidate):
+def register_candidate(id_candidate):
     if request.method == 'POST':
         password = request.form.get('password')
         if not password:
             flash('Password is required', 'error')
         error = auth.register_candidate(id_candidate, password)
+        if error:
+            flash(f'Registration failed: {error}', 'error')
+        else:
+            flash('Registration successful', 'success')
+    return redirect(request.referrer)
+
+@auth_bp.route('/register/<int:id_participant>', methods=['POST', 'GET'])
+def register_participant(id_participant):
+    if request.method == 'POST':
+        password = request.form.get('password')
+        if not password:
+            flash('Password is required', 'error')
+        error = auth.register_participant(id_participant, password)
+        if error:
+            flash(f'Registration failed: {error}', 'error')
+        else:
+            flash('Registration successful', 'success')
+    return redirect(request.referrer)
+
+@auth_bp.route('/register/<int:id_employee>', methods=['POST', 'GET'])
+def register_employee(id_employee):
+    if request.method == 'POST':
+        password = request.form.get('password')
+        if not password:
+            flash('Password is required', 'error')
+        error = auth.register_employee(id_employee, password)
         if error:
             flash(f'Registration failed: {error}', 'error')
         else:
