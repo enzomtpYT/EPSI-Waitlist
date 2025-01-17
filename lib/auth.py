@@ -41,3 +41,9 @@ def register_employee(id_employee, password):
     session_token = hashlib.md5((datetime.datetime.now().strftime('%Y%m%d%H%M%S') + username).encode('utf-8')).hexdigest()
     error = database.auth_register_employee(id_employee, username, hashed_password, salt, session_token)
     return error
+
+def user_has_permission(user_id, permission_name):
+    permissions, error = database.get_user_permissions(user_id)
+    if error:
+        return False
+    return permission_name in permissions

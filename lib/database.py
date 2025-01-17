@@ -1519,3 +1519,20 @@ def auth_register_candidate(id_candidate, username, password_user, salt, session
         return "Erreur lors de l'enregistrement du candidat"
     finally:
         conn.close()
+
+def get_user_permissions(user_id):
+    conn = get_db_connection()
+    try:
+        permissions = conn.execute('''
+        SELECT Permission.name_permission
+        FROM Permission
+        JOIN RolePermission ON Permission.id_permission = RolePermission.id_permission
+        JOIN UserRole ON RolePermission.id_role = UserRole.id_role
+        WHERE UserRole.id_user = ?
+        ''', (user_id,)).fetchall()
+        return [permission['name_permission'] for permission in permissions], None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
