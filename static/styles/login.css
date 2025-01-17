@@ -9,12 +9,11 @@
     text-align: center;
 }
 
-.loginform > button {
-    margin: 0;
-    max-width: 50%;
-}
-
 .loginform > .iconified-input {
     margin: 0 0 24px 0;
     width: 100%;
+}
+
+.loginform > button {
+    width: fit-content;
 }
