@@ -1584,28 +1584,6 @@ def get_user_permissions(user_id):
 
 # Employee functions
 
-def get_employee_email(id_employee):
-    """
-    Récupère l'adresse email d'un employé en utilisant son identifiant.
-
-    Args:
-        id_employee (int): L'identifiant de l'employé.
-
-    Returns:
-        str: L'adresse email de l'employé.
-    """
-    conn = get_db_connection()
-    if conn is None:
-        return None
-    try:
-        employee = conn.execute('SELECT email_employee FROM Employee WHERE id_employee = ?', (id_employee,)).fetchone()
-        return employee['email_employee'] if employee else None
-    except sqlite3.Error as e:
-        print(f"Erreur requête base de données: {e}")
-        return None
-    finally:
-        conn.close()
-
 def create_employee(lastname, name, email):
     """
     Crée un nouvel employé dans la base de données.
