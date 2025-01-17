@@ -7,7 +7,7 @@
     </ul>
     <ul class="navul">
         {% if session.token %}
-        <li class="navli"><a href="{{ url_for('auth.logout') }}"><button class="authbtn"></button></a></li>
+        <li class="navli"><a href="{{ url_for('auth.logout') }}"><button class="authbtn">Se Déconnecter</button></a></li>
         {% else %}
         <li class="navli"><a href="{{ url_for('auth.login') }}"><button class="authbtn">Se Connecter</button></a></li>
         {% endif %}
