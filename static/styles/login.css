@@ -1,0 +1,20 @@
+.loginform {
+    margin: 0 40vw;
+    background-color: #ececec;
+    border-radius: 20px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.loginform > button {
+    margin: 0;
+    max-width: 50%;
+}
+
+.loginform > .iconified-input {
+    margin: 0 0 24px 0;
+    width: 100%;
+}
