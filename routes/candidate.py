@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from lib import database
+import random, string
 
 candidate_bp = Blueprint('candidate', __name__)
 
@@ -37,7 +38,9 @@ def edit_candidate(id_candidate):
                 flash(f"Erreur lors de la mise à jour du candidat: {error}", "danger")
                 return redirect(url_for('candidate.edit_candidate', id_candidate=id_candidate))
 
-    return render_template('candidate.html', candidate=candidate, tags=tags, interviews=interviews, candidate_tags=candidate_tags)
+    # Generate random password min 8 characters max 16 characters with at least one uppercase letter, one lowercase letter, one number and one special character
+    password = ''.join(random.choice(string.ascii_letters + string.digits + string.punctuation) for i in range(random.randint(8, 16)))
+    return render_template('candidate.html', candidate=candidate, tags=tags, interviews=interviews, candidate_tags=candidate_tags, rpassword=password)
 
 @candidate_bp.route("/admin/manage_candidate/candidate/<int:id_candidate>/add_tag_candidate", methods=['POST'])
 def add_tag_candidate(id_candidate):
