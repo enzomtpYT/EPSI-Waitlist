@@ -3,8 +3,12 @@ from flask_socketio import SocketIO, send
 from sock import socketio, app
 import os, time
 from routes.auth import auth_bp
+from routes.api_router import api_bp
 from routes.index import index_bp
 from routes.admin import admin_bp
+from routes.create_employee import create_employee_bp
+from routes.manage_employee import manage_employee_bp
+from routes.employee import employee_bp
 from routes.list import list_bp
 from routes.create_candidate import create_candidate_bp
 from routes.manage_candidate import manage_candidate_bp
@@ -18,7 +22,6 @@ from routes.event import event_bp
 from routes.manage_waitlist import manage_waitlist_bp
 from routes.create_tag import create_tag_bp
 from routes.manage_tag import manage_tag_bp
-from routes.api_router import api_bp
 from routes.participant_dashboard import participant_dashboard_bp
 from routes.candidate_dashboard import candidate_dashboard_bp
 
@@ -26,8 +29,13 @@ from routes.candidate_dashboard import candidate_dashboard_bp
 app.secret_key = os.urandom(24)
 
 # Register the blueprints
+app.register_blueprint(auth_bp)
+app.register_blueprint(api_bp)
 app.register_blueprint(index_bp)
 app.register_blueprint(admin_bp)
+app.register_blueprint(create_employee_bp)
+app.register_blueprint(manage_employee_bp)
+app.register_blueprint(employee_bp)
 app.register_blueprint(list_bp)
 app.register_blueprint(create_candidate_bp)
 app.register_blueprint(manage_candidate_bp)
@@ -41,10 +49,8 @@ app.register_blueprint(event_bp)
 app.register_blueprint(manage_waitlist_bp)
 app.register_blueprint(create_tag_bp)
 app.register_blueprint(manage_tag_bp)
-app.register_blueprint(api_bp)
 app.register_blueprint(participant_dashboard_bp)
 app.register_blueprint(candidate_dashboard_bp)
-app.register_blueprint(auth_bp)
 
 custom_route_names = {
     "/": "Accueil",

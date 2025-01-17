@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Gérer Employés{% endblock %}
+
+{% block content %}
+<h1>Gérer les employés</h1>
+
+<div class="admin-section">
+    <h2>Liste des employés</h2>
+    {% if employees %}
+    <table>
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>E-mail</th>
+                <th>Rôle</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for employee in employees %}
+            <tr>
+                <td>{{ employee.lastname_employee }}</td>
+                <td>{{ employee.name_employee }}</td>
+                <td>{{ employee.email_employee }}</td>
+                {# <td class="taggrid">
+                    {% for tag in employee.tags %}
+                        {% if tag.name_tag %}
+                            <p class="display-tag">{{ tag.name_tag }}</p>
+                        {% endif %}
+                    {% endfor %}
+                </td> #}
+                <td class="actionbtn">
+                    <a href="/admin/manage_employee/employee/{{ employee.id_employee }}">
+                        <button type="button">Voir</button>
+                    </a>
+                    <form action="/admin/manage_employee/{{ employee.id_employee }}/delete" method="post" style="display:inline;">
+                        <button class="delete" type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce candidat ?');">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>Aucun employé n'existe.</p>
+    {% endif %}
+</div>
+
+{% endblock %}
