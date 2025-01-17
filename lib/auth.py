@@ -9,8 +9,7 @@ def verify_login(username, password):
     dbhashed_password = dbhashed_password[0]
     if error:
         return False, error
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt[0])
-    if hashed_password == dbhashed_password:
+    if bcrypt.checkpw(password.encode('utf-8'), dbhashed_password):
         session, error = database.auth_get_session(username)
         if error:
             return False, error

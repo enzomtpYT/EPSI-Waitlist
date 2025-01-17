@@ -1520,7 +1520,52 @@ def auth_register_candidate(id_candidate, username, password_user, salt, session
     finally:
         conn.close()
 
+def auth_register_employee(id_employee, username, password_user, salt, session_token):
+    """
+    Enregistre un employé dans la base de données.
+
+    Args:
+        id_employee (int): L'identifiant de l'employé.
+        username (str): Le nom d'utilisateur de l'employé.
+        password_user (str): Le mot de passe hashé de l'employé.
+        salt (str): Le sel de l'employé.
+        session_token (str): Le jeton de session de l'employé.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        conn.execute('INSERT INTO User (username, password_user, salt, session_token) VALUES (?, ?, ?, ?)', (username, password_user, salt, session_token))
+        conn.commit()
+        # get latest user id
+        user_id = conn.execute('SELECT id_user FROM User WHERE username = ?', (username,)).fetchone()
+        # add user to employee table
+        conn.execute('UPDATE Employee SET id_user = ? WHERE id_employee = ?', (user_id[0], id_employee))
+        return None
+    except sqlite3.Error as e:
+        print(f"Erreur lors de l'enregistrement de l'employé: {e}")
+        return "Erreur lors de l'enregistrement de l'employé"
+    finally:
+        conn.close()
+
 def get_user_permissions(user_id):
+    """
+    Récupère les permissions associées à un identifiant utilisateur donné depuis la base de données.
+
+    Args:
+        user_id (int): L'identifiant de l'utilisateur dont les permissions doivent être récupérées.
+
+    Returns:
+        tuple: Un tuple contenant :
+            - list: Une liste de noms de permissions associées à l'utilisateur.
+            - str: Un message d'erreur si une erreur est survenue, sinon None.
+
+    Raises:
+        sqlite3.Error: Si une erreur de base de données survient lors de l'exécution de la requête.
+    """
     conn = get_db_connection()
     try:
         permissions = conn.execute('''
@@ -1534,5 +1579,29 @@ def get_user_permissions(user_id):
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
+# Employee functions
+
+def get_employee_email(id_employee):
+    """
+    Récupère l'adresse email d'un employé en utilisant son identifiant.
+
+    Args:
+        id_employee (int): L'identifiant de l'employé.
+
+    Returns:
+        str: L'adresse email de l'employé.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return None
+    try:
+        employee = conn.execute('SELECT email_employee FROM Employee WHERE id_employee = ?', (id_employee,)).fetchone()
+        return employee['email_employee'] if employee else None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None
     finally:
         conn.close()

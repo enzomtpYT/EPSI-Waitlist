@@ -36,7 +36,7 @@ def register_candidate(id_candidate):
             flash('Registration successful', 'success')
     return redirect(request.referrer)
 
-@auth_bp.route('/register/<int:id_participant>', methods=['POST', 'GET'])
+@auth_bp.route('/register/participant/<int:id_participant>', methods=['POST', 'GET'])
 def register_participant(id_participant):
     if request.method == 'POST':
         password = request.form.get('password')
@@ -49,7 +49,7 @@ def register_participant(id_participant):
             flash('Registration successful', 'success')
     return redirect(request.referrer)
 
-@auth_bp.route('/register/<int:id_employee>', methods=['POST', 'GET'])
+@auth_bp.route('/register/employee/<int:id_employee>', methods=['POST', 'GET'])
 def register_employee(id_employee):
     if request.method == 'POST':
         password = request.form.get('password')
