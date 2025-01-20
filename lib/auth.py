@@ -54,3 +54,7 @@ def check_turnstile(response):
         return True
     else:
         return False
+    
+def check_permission(session, permission_name):
+    perms, error = database.auth_get_perms_from_session(session)
+    print(perms)

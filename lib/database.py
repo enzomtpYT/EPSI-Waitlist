@@ -1547,10 +1547,42 @@ def get_user_permissions(user_id):
         permissions = conn.execute('''
         SELECT Permission.name_permission
         FROM Permission
-        JOIN RolePermission ON Permission.id_permission = RolePermission.id_permission
-        JOIN UserRole ON RolePermission.id_role = UserRole.id_role
-        WHERE UserRole.id_user = ?
+        JOIN Role_permission ON Permission.id_permission = Role_permission.id_permission
+        JOIN User_role ON Role_permission.id_role = User_role.id_role
+        WHERE User_role.id_user = ?
         ''', (user_id,)).fetchall()
+        return [permission['name_permission'] for permission in permissions], None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def auth_get_perms_from_session(session_token):
+    """
+    Récupère les permissions associées à une session donnée depuis la base de données.
+
+    Args:
+        session_token (str): Le jeton de session dont les permissions doivent être récupérées.
+
+    Returns:
+        tuple: Un tuple contenant :
+            - list: Une liste de noms de permissions associées à la session.
+            - str: Un message d'erreur si une erreur est survenue, sinon None.
+
+    Raises:
+        sqlite3.Error: Si une erreur de base de données survient lors de l'exécution de la requête.
+    """
+    conn = get_db_connection()
+    try:
+        permissions = conn.execute('''
+        SELECT Permission.name_permission
+        FROM Permission
+        JOIN Role_permission ON Permission.id_permission = Role_permission.id_permission
+        JOIN User_role ON Role_permission.id_role = User_role.id_role
+        JOIN User ON User_role.id_user = User.id_user
+        WHERE User.session_token = ?
+        ''', (str(session_token),)).fetchall()
         return [permission['name_permission'] for permission in permissions], None
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
