@@ -34,7 +34,7 @@
                         {% endif %}
                         <td>{% if interview.duration_interview is not none %}{{ interview.duration_interview }}{% else %}&nbsp;{% endif %}</td>
                         <td class="actionbtn">
-                            <button type="button" class="feedback-btn">
+                            <button type="button" class="edit-feedback" interview-id="{{ interview.id_interview }}">
                                 Editer mon feedback
                             </button>
                             <button type="button" class="feedback-btn" data-feedback-candidate="{{ interview.feedback_candidate }}" data-feedback-participant="{{ interview.feedback_participant }}">
@@ -64,6 +64,17 @@
     </div>
 </div>
 
+<div id="editmodel" class="modal">
+    <div class="modal-content editfed">
+        <span class="close">&times;</span>
+        <form action="" method="post">
+            <textarea class="feedbackarea" name="feedback" id="feedbackarea" placeholder="Détails du feedback"></textarea>
+            <input type="hidden" id="id_interview" name="id_interview" value="">
+            <button type="submit">Envoyer</button>
+        </form>
+    </div>
+</div>
+
 <script>
 
 function display(event_name) {
@@ -81,11 +92,13 @@ if (events.length > 0) {
     events[0].style.display = 'block';
 }
 
+var editmodal = document.getElementById('editmodel');
+
 // Get the modal
 var modal = document.getElementById("feedbackModal");
 
 // Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close")[0];
+var span = document.getElementsByClassName("close");
 
 // When the user clicks on the button, open the modal
 document.querySelectorAll('.feedback-btn').forEach(button => {
@@ -94,19 +107,35 @@ document.querySelectorAll('.feedback-btn').forEach(button => {
         var candidateFeedback = this.getAttribute('data-feedback-candidate');
         document.getElementById('participantFeedback').innerText = participantFeedback;
         document.getElementById('candidateFeedback').innerText = candidateFeedback;
-        modal.style.display = "block";
+        modal.style.display = "flex";
+    }
+});
+
+// When user click on the edit feedback button
+document.querySelectorAll('.edit-feedback').forEach(button => {
+    button.onclick = function() {
+        var interviewId = this.getAttribute('interview-id');
+        var id_interview = document.getElementById('id_interview');
+        id_interview.value = interviewId;
+        editmodal.style.display = "flex";
     }
 });
 
 // When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-    modal.style.display = "none";
-}
+Array.from(span).forEach(element => {
+    element.onclick = function() {
+        modal.style.display = "none";
+        editmodal.style.display = "none";
+    }
+});
 
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
     if (event.target == modal) {
         modal.style.display = "none";
+    }
+    if (event.target == editmodal) {
+        editmodal.style.display = "none";
     }
 }
 </script>

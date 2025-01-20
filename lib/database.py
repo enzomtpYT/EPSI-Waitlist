@@ -1934,3 +1934,5 @@ def delete_employee(id_employee):
         # Ferme la connexion à la base de données
         conn.close()
     return None
+
+# Feedback functions

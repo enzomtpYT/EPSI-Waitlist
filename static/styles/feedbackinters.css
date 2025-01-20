@@ -74,3 +74,12 @@
     justify-content: center;
     gap: 1rem;
 }
+
+.editfed {
+    display: flex;
+    flex-direction: column;
+}
+
+.editfed > span {
+    text-align: end;
+}
