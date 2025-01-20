@@ -1621,6 +1621,38 @@ def get_user_permissions(user_id):
     finally:
         conn.close()
 
+def get_user_role(user_id):
+    """
+    Récupère le rôle associé à un identifiant utilisateur donné depuis la base de données.
+
+    Args:
+        user_id (int): L'identifiant de l'utilisateur dont le rôle doit être récupéré.
+
+    Returns:
+        str: Le nom du rôle associé à l'utilisateur, ou None si une erreur est survenue ou si le rôle n'est pas trouvé.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        print("Erreur base de données")
+        return None
+    try:
+        role = conn.execute('''
+        SELECT Role.name_role
+        FROM Role
+        JOIN User_role ON Role.id_role = User_role.id_role
+        WHERE User_role.id_user = ?
+        ''', (user_id,)).fetchone()
+        if role:
+            return role['name_role']
+        else:
+            print("Rôle non trouvé")
+            return None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None
+    finally:
+        conn.close()
+
 def auth_get_perms_from_session(session_token):
     """
     Récupère les permissions associées à une session donnée depuis la base de données.
