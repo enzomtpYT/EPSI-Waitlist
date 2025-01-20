@@ -61,7 +61,7 @@ custom_route_names = {
 
 @app.before_request
 def checkroutes():
-    permission.checkroutes(session)
+    return permission.checkroutes(session)
 
 @socketio.on('message')
 def handleMessage(msg):
