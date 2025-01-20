@@ -610,16 +610,16 @@ def create_participant(name, email):
         cursor.execute('INSERT INTO User (username) VALUES (?)', (email,))
         user_id = cursor.lastrowid
 
-        # Insere le candidat dans la base de données
+        # Insere l'intervenant dans la base de données
         cursor.execute('INSERT INTO Participant (name_participant, email_participant, id_user) VALUES (?, ?, ?)', (name, email, user_id))
-        candidate_id = cursor.lastrowid
+        participant_id = cursor.lastrowid
 
         # Sauvegarde les modifications
         conn.commit()
-        return candidate_id, None
+        return participant_id, None
     except sqlite3.Error as e:
-        print(f"Erreur lors de la création du candidat: {e}")
-        return None, "Erreur lors de la création du candidat"
+        print(f"Erreur lors de la création de l'intervenant: {e}")
+        return None, "Erreur lors de la création de l'intervenant"
     finally:
         # Fermes la connexion à la base de données
         conn.close()
@@ -670,13 +670,13 @@ def get_participant(participant_id):
 
 def get_participant_email(id_participant):
     """
-    Récupère l'adresse email d'un candidat en utilisant son identifiant.
+    Récupère l'adresse email d'un intervenant en utilisant son identifiant.
 
     Args:
-        id_participant (int): L'identifiant du candidat.
+        id_participant (int): L'identifiant de l'intervenant.
 
     Returns:
-        str: L'adresse email du candidat.
+        str: L'adresse email de l'intervenant.
     """
     conn = get_db_connection()
     if conn is None:
@@ -1558,9 +1558,9 @@ def update_user_password(username, password, session_token):
     Met à jour le mot de passe et le sel d'un utilisateur dans la base de données.
 
     Args:
-        id_user (int): L'identifiant de l'utilisateur.
+        username (str): L'username de l'utilisateur.
         password (str): Le nouveau mot de passe haché de l'utilisateur.
-        salt (str): Le nouveau sel de l'utilisateur.
+        session_token (str): Le token de session de l'utilisateur.
 
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
@@ -1667,6 +1667,38 @@ def get_user_permissions(user_id):
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def get_user_role(user_id):
+    """
+    Récupère le rôle associé à un identifiant utilisateur donné depuis la base de données.
+
+    Args:
+        user_id (int): L'identifiant de l'utilisateur dont le rôle doit être récupéré.
+
+    Returns:
+        str: Le nom du rôle associé à l'utilisateur, ou None si une erreur est survenue ou si le rôle n'est pas trouvé.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        print("Erreur base de données")
+        return None
+    try:
+        role = conn.execute('''
+        SELECT Role.name_role
+        FROM Role
+        JOIN User_role ON Role.id_role = User_role.id_role
+        WHERE User_role.id_user = ?
+        ''', (user_id,)).fetchone()
+        if role:
+            return role['name_role']
+        else:
+            print("Rôle non trouvé")
+            return None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None
     finally:
         conn.close()
 

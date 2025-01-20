@@ -39,7 +39,7 @@ def edit_candidate(id_candidate):
                 return redirect(url_for('candidate.edit_candidate', id_candidate=id_candidate))
 
     # Generate random password min 8 characters max 16 characters with at least one uppercase letter, one lowercase letter, one number and one special character
-    password = ''.join(random.choice(string.ascii_letters + string.digits + string.punctuation) for i in range(random.randint(8, 16)))
+    password = ''.join(random.choice(string.ascii_letters + string.digits + string.punctuation.replace("'", "\\'")) for i in range(random.randint(8, 16)))
     return render_template('candidate.html', candidate=candidate, tags=tags, interviews=interviews, candidate_tags=candidate_tags, rpassword=password)
 
 @candidate_bp.route("/admin/manage_candidate/candidate/<int:id_candidate>/add_tag_candidate", methods=['POST'])

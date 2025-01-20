@@ -17,18 +17,18 @@
         <label for="employee_email">E-mail :</label>
         <input type="email" id="employee_email" name="employee_email">
 
-        <label for="employee_tags">Rôle de l'employé.e :</label>
+        <label for="employee_role">Rôle de l'employé.e :</label>
         <select id="role" name="role" required>
-        {% if session['role'] == 'superadmin' %}
-        <option value="superadmin">Superadmin</option>
-        <option value="admin">Admin</option>
-        <option value="employee">Employé</option>
-        {% elif session['role'] == 'admin' %}
-        <option value="admin">Admin</option>
-        <option value="employee">Employé</option>
-        {% elif session['role'] == 'employee' %}
-        <option value="employee">Employé</option>
-        {% endif %}
+            {% if user_role == 'superadmin' %}
+            <option value="superadmin">Superadmin</option>
+            <option value="admin">Admin</option>
+            <option value="employee">Employé</option>
+            {% elif user_role == 'admin' %}
+            <option value="admin">Admin</option>
+            <option value="employee">Employé</option>
+            {% elif user_role == 'employee' %}
+            <option value="employee">Employé</option>
+            {% endif %}
     </select>
 
         <div>

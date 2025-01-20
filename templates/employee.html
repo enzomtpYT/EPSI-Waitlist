@@ -46,4 +46,27 @@
     </form>
 </div>
 
+<script>
+// When button is clicked generate new password for user
+function newuser(id, password){
+    fetch(`/register/employee/${id}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            'password': password
+        })
+    })
+    .then(() => {
+        navigator.clipboard.writeText(password)
+        .then(() => alert('Le nouveau mot de passe a été copié dans le presse-papiers.'))
+        .catch(err => console.error('Erreur lors de la copie du mot de passe : ', err));
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+    })
+}
+</script>
+
 {% endblock %}
