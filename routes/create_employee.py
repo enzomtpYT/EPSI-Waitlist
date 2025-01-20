@@ -5,7 +5,8 @@ create_employee_bp = Blueprint('create_employee', __name__)
 
 @create_employee_bp.route('/admin/create_employee', methods=('GET', 'POST'))
 def create_employee():
-    user_role = session.get('role')
+    user_role = database.get_user_role_with_token(session.get('token'))
+    print(user_role)
     if request.method == 'POST':
         lastname = request.form['employee_lastname']
         name = request.form['employee_name']
