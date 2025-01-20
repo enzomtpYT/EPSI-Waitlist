@@ -1,7 +1,7 @@
 from flask import Flask, redirect, request, session, url_for
 from flask_socketio import SocketIO, send
 from sock import socketio, app
-from lib import auth
+from lib import permission
 import os, time
 from routes.auth import auth_bp
 from routes.api_router import api_bp
@@ -60,13 +60,8 @@ custom_route_names = {
 }
 
 @app.before_request
-def check_admin_route():
-    if request.path.startswith('/admin'):
-        if 'token' in session:
-            auth.check_permission(session['token'], 'view_dashboards')
-            print(f'Admin route accessed with session: {session['token']}')
-        else:
-            return redirect(url_for('auth.login'))
+def checkroutes():
+    permission.checkroutes(session)
 
 @socketio.on('message')
 def handleMessage(msg):
