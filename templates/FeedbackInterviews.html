@@ -7,30 +7,36 @@
 <h1>Entretiens passé</h1>
 
 <div class="eventcontainer">
-    <div class="cards">
-    abc
+    <div class="cards eventselector">
+    {% for event_name, event in events.items() %}
+        <a onclick="display('{{ event_name }}')" class="eventname">{{ event_name }}</a>
+    {% endfor %}
     </div>
-    {% for event in events %}
-        <div class="cards">
+    {% for event_name, event in events.items() %}
+        <div id="{{ event_name }}" class="cards event">
             <h2>{{ event.name_event }}</h2>
-            <p>{{event.interviews}}</p>
+            {% if event.interviews %}
             <table>
                 <thead>
                     <tr>
-                        <th>Intervenant</th>
-                        <th>Candidat</th>
+                        <th>Nom</th>
                         <th>Durée de l'entretien</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for interview in event.interviews %}
-                    <p>{{ interview.id_interview }}</p>
                     <tr>
-                        <td>{{ interview.name_participant }}</td>
-                        <td>{{ interview.name_candidate }} {{ interview.lastname_candidate }}</td>
+                        {% if interview.name_participant %}
+                            <td>{{ interview.name_participant }}</td>
+                        {% else %}
+                            <td>{{ interview.name_candidate }} {{ interview.lastname_candidate }}</td>
+                        {% endif %}
                         <td>{% if interview.duration_interview is not none %}{{ interview.duration_interview }}{% else %}&nbsp;{% endif %}</td>
                         <td class="actionbtn">
+                            <button type="button" class="feedback-btn">
+                                Editer mon feedback
+                            </button>
                             <button type="button" class="feedback-btn" data-feedback-candidate="{{ interview.feedback_candidate }}" data-feedback-participant="{{ interview.feedback_participant }}">
                                 Voir les feedbacks
                             </button>
@@ -39,17 +45,14 @@
                     {% endfor %}
                 </tbody>
             </table>
+            {% else %}
+            <p>Aucun entretien disponible.</p>
+            {% endif %}
         </div>
     {% endfor %}
 </div>
 
-<script>
 
-console.log("{{ events | safe }}");
-
-</script>
-
-{# 
 <div id="feedbackModal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
@@ -61,11 +64,23 @@ console.log("{{ events | safe }}");
     </div>
 </div>
 
-<a href="{{ url_for('event.edit_event', id_event=event_id) }}">
-    <button type="button">Retour</button>
-</a>
-
 <script>
+
+function display(event_name) {
+    console.log(event_name);
+    var todisplay = document.getElementById(event_name);
+    var events = document.getElementsByClassName('event');
+    for (var i = 0; i < events.length; i++) {
+        events[i].style.display = 'none';
+    }
+    todisplay.style.display = 'block';
+}
+
+var events = document.getElementsByClassName('event');
+if (events.length > 0) {
+    events[0].style.display = 'block';
+}
+
 // Get the modal
 var modal = document.getElementById("feedbackModal");
 
@@ -94,6 +109,6 @@ window.onclick = function(event) {
         modal.style.display = "none";
     }
 }
-</script> #}
+</script>
 
 {% endblock %}
