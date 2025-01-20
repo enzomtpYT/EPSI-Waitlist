@@ -295,12 +295,10 @@ def create_candidate(lastname, name, email):
         # Insère l'utilisateur dans la table User
         cursor.execute('INSERT INTO User (username) VALUES (?)', (email,))
         user_id = cursor.lastrowid
-        print(f"User created with ID: {user_id}")
 
         # Insere le candidat dans la base de données
         cursor.execute('INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate, id_user) VALUES (?, ?, ?, ?)', (lastname, name, email, user_id))
         candidate_id = cursor.lastrowid
-        print(f"Candidate created with ID: {candidate_id}")
 
         # Sauvegarde les modifications
         conn.commit()
@@ -607,14 +605,23 @@ def create_participant(name, email):
         return "Erreur base de données"
     try:
         cursor = conn.cursor()
-        cursor.execute('INSERT INTO Participant (name_participant, email_participant) VALUES (?, ?)', (name, email))
-        participant_id = cursor.lastrowid
+
+        # Insère l'utilisateur dans la table User
+        cursor.execute('INSERT INTO User (username) VALUES (?)', (email,))
+        user_id = cursor.lastrowid
+
+        # Insere le candidat dans la base de données
+        cursor.execute('INSERT INTO Participant (name_participant, email_participant, id_user) VALUES (?, ?, ?)', (name, email, user_id))
+        candidate_id = cursor.lastrowid
+
+        # Sauvegarde les modifications
         conn.commit()
-        return participant_id, None
+        return candidate_id, None
     except sqlite3.Error as e:
-        print(f"Erreur lors de la création de l'intervenant: {e}")
-        return None, "Erreur lors de la création de l'intervenant"
+        print(f"Erreur lors de la création du candidat: {e}")
+        return None, "Erreur lors de la création du candidat"
     finally:
+        # Fermes la connexion à la base de données
         conn.close()
 
 def get_all_participants():
