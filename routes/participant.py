@@ -36,8 +36,8 @@ def edit_participant(id_participant):
                 return redirect(url_for('participant.edit_participant', id_participant=id_participant))
 
     # Generate random password min 8 characters max 16 characters with at least one uppercase letter, one lowercase letter, one number and one special character
-    password = ''.join(random.choice(string.ascii_letters + string.digits + string.punctuation) for i in range(random.randint(8, 16)))
-    return render_template('participant.html', participant=participant, tags=tags, interviews=interviews, participant_id=id_participant, participant_tags=participant_tags, rpassword=password)
+    password = ''.join(random.choice(string.ascii_letters + string.digits + string.punctuation.replace("'", "\\'")) for i in range(random.randint(8, 16)))
+    return render_template('participant.html', participant=participant, tags=tags, interviews=interviews, participant_tags=participant_tags, rpassword=password)
 
 @participant_bp.route("/admin/manage_participant/participant/<int:id_participant>/add_tag_participant", methods=['POST'])
 def add_tag_participant(id_participant):

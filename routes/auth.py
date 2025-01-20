@@ -8,13 +8,13 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        
+
         # Check if turnstile is correct (captcha)
         cfturnstile = request.form.get('cf-turnstile-response')
         if not auth.check_turnstile(cfturnstile):
             flash('Captcha failed', 'error')
             return redirect(url_for('auth.login'))
-        
+
         # Check if credentials are correct
         vsession, error = auth.verify_login(username, password)
         if vsession:
@@ -31,7 +31,7 @@ def logout():
     session.clear()
     return redirect(url_for('auth.login'))
 
-@auth_bp.route('/register/<int:id_candidate>', methods=['POST', 'GET'])
+@auth_bp.route('/register/candidate/<int:id_candidate>', methods=['POST', 'GET'])
 def register_candidate(id_candidate):
     if request.method == 'POST':
         password = request.form.get('password')

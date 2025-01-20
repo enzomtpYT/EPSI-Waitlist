@@ -142,7 +142,7 @@ window.onclick = function(event) {
 
 // When button is clicked generate new password for user
 function newuser(id, password){
-    fetch(`/register/${id}`, {
+    fetch(`/register/candidate/${id}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
