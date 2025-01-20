@@ -49,3 +49,25 @@ def get_event_participants(id_event):
         return None, error
     
     return datas, None
+
+def api_interviews(session):
+    if 'token' not in session:
+        return {"error": "Unauthorized"}, 401
+    session_token = session['token']
+    interviews, error = database.get_user_past_interviews(session_token)
+    events = {}
+    for interview in interviews:
+        interview_dict = dict(interview)
+        if interview_dict['duration_interview'] is None:
+            interview_dict['duration_interview'] = 0
+        name = interview_dict['name_event']
+        if events.get(name) is None:
+            events[name] = {
+                'name_event': name,
+                'date_event': interview_dict['date_event'],
+                'interviews': []
+            }
+        interview_dict.pop('name_event')
+        interview_dict.pop('date_event')
+        events[name]['interviews'].append(interview_dict)
+    return events, None

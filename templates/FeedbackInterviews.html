@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Entretiens de l'utilisateur{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/feedbackinters.css') }}">
+<h1>Entretiens passé</h1>
+
+<div class="eventcontainer">
+    <div class="cards">
+    abc
+    </div>
+    {% for event in events %}
+        <div class="cards">
+            <h2>{{ event.name_event }}</h2>
+            <p>{{event.interviews}}</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Intervenant</th>
+                        <th>Candidat</th>
+                        <th>Durée de l'entretien</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for interview in event.interviews %}
+                    <p>{{ interview.id_interview }}</p>
+                    <tr>
+                        <td>{{ interview.name_participant }}</td>
+                        <td>{{ interview.name_candidate }} {{ interview.lastname_candidate }}</td>
+                        <td>{% if interview.duration_interview is not none %}{{ interview.duration_interview }}{% else %}&nbsp;{% endif %}</td>
+                        <td class="actionbtn">
+                            <button type="button" class="feedback-btn" data-feedback-candidate="{{ interview.feedback_candidate }}" data-feedback-participant="{{ interview.feedback_participant }}">
+                                Voir les feedbacks
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endfor %}
+</div>
+
+<script>
+
+console.log("{{ events | safe }}");
+
+</script>
+
+{# 
+<div id="feedbackModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Feedback de l'entretien</h2>
+        <p><strong>Feedback de l'intervenant :</strong></p>
+        <p id="participantFeedback"></p>
+        <p><strong>Feedback du candidat :</strong></p>
+        <p id="candidateFeedback"></p>
+    </div>
+</div>
+
+<a href="{{ url_for('event.edit_event', id_event=event_id) }}">
+    <button type="button">Retour</button>
+</a>
+
+<script>
+// Get the modal
+var modal = document.getElementById("feedbackModal");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks on the button, open the modal
+document.querySelectorAll('.feedback-btn').forEach(button => {
+    button.onclick = function() {
+        var participantFeedback = this.getAttribute('data-feedback-participant');
+        var candidateFeedback = this.getAttribute('data-feedback-candidate');
+        document.getElementById('participantFeedback').innerText = participantFeedback;
+        document.getElementById('candidateFeedback').innerText = candidateFeedback;
+        modal.style.display = "block";
+    }
+});
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+    modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+</script> #}
+
+{% endblock %}

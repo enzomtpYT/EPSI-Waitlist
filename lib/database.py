@@ -836,6 +836,55 @@ def add_participant_to_event(id_event, id_participant):
 
 # Interview functions
 
+def get_user_past_interviews(session_token):
+    """
+    Récupère les entretiens passés d'un utilisateur.
+
+    Args:
+        session_token (str): Le token de session de l'utilisateur.
+
+    Returns:
+        tuple: Un tuple contenant une liste d'entretiens et un message d'erreur si une erreur est survenue.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+    try:
+        user = conn.execute('SELECT * FROM User WHERE session_token = ?', (session_token,)).fetchone()
+        if user:
+            # Check if user is a candidate
+            candidate = conn.execute('SELECT * FROM Candidate WHERE id_user = ?', (user['id_user'],)).fetchone()
+            if candidate:
+                interviews = conn.execute('''
+                SELECT Interview.id_interview, Participant.name_participant, Event.name_event, Event.date_event, Interview.feedback_participant, Interview.feedback_candidate, Interview.duration_interview
+                FROM Interview
+                JOIN Participant ON Interview.id_participant = Participant.id_participant
+                JOIN Event ON Interview.id_event = Event.id_event
+                WHERE Interview.id_candidate = ? AND Interview.happened = 1
+                ''', (candidate['id_candidate'],)).fetchall()
+                return interviews, None
+
+            # Check if user is a participant
+            participant = conn.execute('SELECT * FROM Participant WHERE id_user = ?', (user['id_user'],)).fetchone()
+            if participant:
+                interviews = conn.execute('''
+                SELECT Interview.id_interview, Candidate.lastname_candidate, Candidate.name_candidate, Event.name_event, Event.date_event, Interview.feedback_participant, Interview.feedback_candidate, Interview.duration_interview
+                FROM Interview
+                JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
+                JOIN Event ON Interview.id_event = Event.id_event
+                WHERE Interview.id_participant = ? AND Interview.happened = 1
+                ''', (participant['id_participant'],)).fetchall()
+                return interviews, None
+
+            return None, "Utilisateur non trouvé"
+        else:
+            return None, "Utilisateur non trouvé"
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
 def create_interview(id_event, id_participant, id_candidate):
     """
     Crée un nouvel interview dans la base de données.
