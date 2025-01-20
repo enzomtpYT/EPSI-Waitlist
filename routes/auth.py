@@ -8,6 +8,14 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        
+        # Check if turnstile is correct (captcha)
+        cfturnstile = request.form.get('cf-turnstile-response')
+        if not auth.check_turnstile(cfturnstile):
+            flash('Captcha failed', 'error')
+            return redirect(url_for('auth.login'))
+        
+        # Check if credentials are correct
         vsession, error = auth.verify_login(username, password)
         if vsession:
             session['token'] = vsession['session_token']

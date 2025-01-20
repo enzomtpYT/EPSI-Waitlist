@@ -1,5 +1,5 @@
 from lib import database
-import bcrypt, hashlib, random,time
+import bcrypt, hashlib, random, requests
 
 def verify_login(username, password):
     dbhashed_password, error = database.auth_get_hashedpassword(username)
@@ -42,3 +42,15 @@ def user_has_permission(user_id, permission_name):
     if error:
         return False
     return permission_name in permissions
+
+def check_turnstile(response):
+    secretkey = "0x4AAAAAAA5lAF_NTbcBlcVnVcwfmmhB4VE"
+    data = {
+        "response": response,
+        "secret": secretkey
+    }
+    r = requests.post("https://challenges.cloudflare.com/turnstile/v0/siteverify", data=data)
+    if r.json()['success']:
+        return True
+    else:
+        return False
