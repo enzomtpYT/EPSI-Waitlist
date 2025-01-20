@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from lib import database
+import random, string
 
 participant_bp = Blueprint('participant', __name__)
 
@@ -32,8 +33,11 @@ def edit_participant(id_participant):
                 return redirect(url_for('participant.edit_participant', id_participant=id_participant))
             else:
                 flash(f"Erreur lors de la mise à jour du participant: {error}", "danger")
+                return redirect(url_for('participant.edit_participant', id_participant=id_participant))
 
-    return render_template('participant.html', interviews=interviews, participant_id=id_participant, participant=participant, tags=tags, participant_tags=participant_tags)
+    # Generate random password min 8 characters max 16 characters with at least one uppercase letter, one lowercase letter, one number and one special character
+    password = ''.join(random.choice(string.ascii_letters + string.digits + string.punctuation) for i in range(random.randint(8, 16)))
+    return render_template('participant.html', participant=participant, tags=tags, interviews=interviews, participant_id=id_participant, participant_tags=participant_tags, rpassword=password)
 
 @participant_bp.route("/admin/manage_participant/participant/<int:id_participant>/add_tag_participant", methods=['POST'])
 def add_tag_participant(id_participant):

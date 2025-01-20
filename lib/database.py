@@ -612,14 +612,14 @@ def create_participant(name, email):
 
         # Insere le candidat dans la base de données
         cursor.execute('INSERT INTO Participant (name_participant, email_participant, id_user) VALUES (?, ?, ?)', (name, email, user_id))
-        candidate_id = cursor.lastrowid
+        participant_id = cursor.lastrowid
 
         # Sauvegarde les modifications
         conn.commit()
-        return candidate_id, None
+        return participant_id, None
     except sqlite3.Error as e:
-        print(f"Erreur lors de la création du candidat: {e}")
-        return None, "Erreur lors de la création du candidat"
+        print(f"Erreur lors de la création de l'intervenant: {e}")
+        return None, "Erreur lors de la création de l'intervenant"
     finally:
         # Fermes la connexion à la base de données
         conn.close()
@@ -670,13 +670,13 @@ def get_participant(participant_id):
 
 def get_participant_email(id_participant):
     """
-    Récupère l'adresse email d'un candidat en utilisant son identifiant.
+    Récupère l'adresse email d'un intervenant en utilisant son identifiant.
 
     Args:
-        id_participant (int): L'identifiant du candidat.
+        id_participant (int): L'identifiant de l'intervenant.
 
     Returns:
-        str: L'adresse email du candidat.
+        str: L'adresse email de l'intervenant.
     """
     conn = get_db_connection()
     if conn is None:
