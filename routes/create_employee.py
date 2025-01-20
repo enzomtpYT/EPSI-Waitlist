@@ -1,14 +1,16 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from lib import database
 
 create_employee_bp = Blueprint('create_employee', __name__)
 
 @create_employee_bp.route('/admin/create_employee', methods=('GET', 'POST'))
 def create_employee():
+    user_role = session.get('role')
     if request.method == 'POST':
         lastname = request.form['employee_lastname']
         name = request.form['employee_name']
         email = request.form['employee_email']
+        role = request.form['role']
         error = None
 
         if not lastname:
@@ -17,9 +19,26 @@ def create_employee():
             error = 'Le prénom est obligatoire.'
         elif not email:
             error = 'L\'adresse email est obligatoire.'
+        elif not role:
+            error = 'Le rôle est obligatoire.'
+
+        # Check if the user is allowed to assign the selected role
+        if user_role == 'superadmin':
+            allowed_roles = ['superadmin', 'admin', 'employee']
+        elif user_role == 'admin':
+            allowed_roles = ['admin', 'employee']
+        elif user_role == 'employee':
+            allowed_roles = ['employee']
+        else:
+            flash('Access denied', 'danger')
+            return redirect(url_for('admin.create_employee'))
+
+        if role not in allowed_roles:
+            flash('You are not allowed to assign this role', 'danger')
+            return redirect(url_for('admin.create_employee'))
 
         if error is None:
-            employee_id, error = database.create_employee(lastname, name, email)
+            error = database.create_employee(lastname, name, email, role)
             flash("Employé créé avec succès!", "success")
             return redirect(url_for('create_employee.create_employee'))
         else:

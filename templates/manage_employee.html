@@ -24,13 +24,13 @@
                 <td>{{ employee.lastname_employee }}</td>
                 <td>{{ employee.name_employee }}</td>
                 <td>{{ employee.email_employee }}</td>
-                {# <td class="taggrid">
-                    {% for tag in employee.tags %}
-                        {% if tag.name_tag %}
-                            <p class="display-tag">{{ tag.name_tag }}</p>
+                <td>
+                    {% for role in employee.role %}
+                        {% if role.name_role %}
+                            <p class="display-tag">{{ role.name_role }}</p>
                         {% endif %}
                     {% endfor %}
-                </td> #}
+                </td>
                 <td class="actionbtn">
                     <a href="/admin/manage_employee/employee/{{ employee.id_employee }}">
                         <button type="button">Voir</button>

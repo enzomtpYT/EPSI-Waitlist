@@ -290,10 +290,18 @@ def create_candidate(lastname, name, email):
     if conn is None:
         return "Erreur base de données"
     try:
-        # Insere le candidat dans la base de données
         cursor = conn.cursor()
-        cursor.execute('INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate) VALUES (?, ?, ?)', (lastname, name, email))
+
+        # Insère l'utilisateur dans la table User
+        cursor.execute('INSERT INTO User (username) VALUES (?)', (email,))
+        user_id = cursor.lastrowid
+        print(f"User created with ID: {user_id}")
+
+        # Insere le candidat dans la base de données
+        cursor.execute('INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate, id_user) VALUES (?, ?, ?, ?)', (lastname, name, email, user_id))
         candidate_id = cursor.lastrowid
+        print(f"Candidate created with ID: {candidate_id}")
+
         # Sauvegarde les modifications
         conn.commit()
         return candidate_id, None
@@ -650,6 +658,28 @@ def get_participant(participant_id):
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def get_participant_email(id_participant):
+    """
+    Récupère l'adresse email d'un candidat en utilisant son identifiant.
+
+    Args:
+        id_participant (int): L'identifiant du candidat.
+
+    Returns:
+        str: L'adresse email du candidat.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return None
+    try:
+        participant = conn.execute('SELECT email_participant FROM Participant WHERE id_participant = ?', (id_participant,)).fetchone()
+        return participant['email_participant']
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None
     finally:
         conn.close()
 
@@ -1467,6 +1497,32 @@ def auth_get_hashedpassword(username):
     finally:
         conn.close()
 
+def update_user_password(username, password, session_token):
+    """
+    Met à jour le mot de passe et le sel d'un utilisateur dans la base de données.
+
+    Args:
+        id_user (int): L'identifiant de l'utilisateur.
+        password (str): Le nouveau mot de passe haché de l'utilisateur.
+        salt (str): Le nouveau sel de l'utilisateur.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        cursor = conn.cursor()
+        cursor.execute('UPDATE User SET password_user = ?, session_token = ? WHERE username = ?', (password, session_token, username))
+        conn.commit()
+        return None
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la mise à jour du mot de passe de l'utilisateur: {e}")
+        return "Erreur lors de la mise à jour du mot de passe de l'utilisateur"
+    finally:
+        conn.close()
+
 def auth_register_candidate(id_candidate, username, password_user, session_token):
     """
     Enregistre un candidat dans la base de données.
@@ -1592,7 +1648,7 @@ def auth_get_perms_from_session(session_token):
 
 # Employee functions
 
-def create_employee(lastname, name, email):
+def create_employee(lastname, name, email, role):
     """
     Crée un nouvel employé dans la base de données.
 
@@ -1612,6 +1668,15 @@ def create_employee(lastname, name, email):
         cursor = conn.cursor()
         cursor.execute('INSERT INTO Office (lastname_employee, name_employee, email_employee) VALUES (?, ?, ?)', (lastname, name, email))
         employee_id = cursor.lastrowid
+
+       # Récupère l'id_role correspondant au nom du rôle
+        role_id = cursor.execute('SELECT id_role FROM Role WHERE name_role = ?', (role,)).fetchone()
+        if role_id is None:
+            return None, "Rôle non trouvé"
+
+        # Insere l'association de l'employé avec le rôle dans la table User_role
+        cursor.execute('INSERT INTO User_role (id_user, id_role) VALUES (?, ?)', (employee_id, role_id[0]))
+
         # Sauvegarde les modifications
         conn.commit()
         return employee_id, None
@@ -1619,7 +1684,7 @@ def create_employee(lastname, name, email):
         print(f"Erreur lors de la création de l'employé: {e}")
         return None, "Erreur lors de la création de l'employé"
     finally:
-        # Fermes la connexion à la base de données
+        # Ferme la connexion à la base de données
         conn.close()
 
 def get_employee_email(id_employee):
