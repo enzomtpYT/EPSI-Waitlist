@@ -610,7 +610,7 @@ def create_participant(name, email):
         cursor.execute('INSERT INTO User (username) VALUES (?)', (email,))
         user_id = cursor.lastrowid
 
-        # Insere le candidat dans la base de données
+        # Insere l'intervenant dans la base de données
         cursor.execute('INSERT INTO Participant (name_participant, email_participant, id_user) VALUES (?, ?, ?)', (name, email, user_id))
         participant_id = cursor.lastrowid
 
@@ -1509,9 +1509,9 @@ def update_user_password(username, password, session_token):
     Met à jour le mot de passe et le sel d'un utilisateur dans la base de données.
 
     Args:
-        id_user (int): L'identifiant de l'utilisateur.
+        username (str): L'username de l'utilisateur.
         password (str): Le nouveau mot de passe haché de l'utilisateur.
-        salt (str): Le nouveau sel de l'utilisateur.
+        session_token (str): Le token de session de l'utilisateur.
 
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
