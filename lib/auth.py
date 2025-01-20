@@ -56,7 +56,15 @@ def check_turnstile(response):
         return False
     
 def check_permission(session, permission_name):
+    if database.auth_is_superuser(session):
+        return True
     perms, error = database.auth_get_perms_from_session(session)
+    for perm in perms:
+        if perm == '*':
+            return True
+        if '.*' in perm:
+            if permission_name.startswith(perm[:-1]):
+                return True
     if error:
         return False
     if permission_name in perms:

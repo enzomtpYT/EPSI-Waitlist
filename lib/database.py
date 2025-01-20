@@ -1590,6 +1590,32 @@ def auth_get_perms_from_session(session_token):
     finally:
         conn.close()
 
+def auth_is_superuser(session_token):
+    """
+    Vérifie si un utilisateur est un super-utilisateur.
+
+    Args:
+        session_token (str): Le jeton de session de l'utilisateur.
+
+    Returns:
+        bool: True si l'utilisateur est un super-utilisateur, False sinon.
+    """
+    conn = get_db_connection()
+    try:
+        is_superuser = conn.execute('''
+        SELECT Role.name_role
+        FROM Role
+        JOIN User_role ON Role.id_role = User_role.id_role
+        JOIN User ON User_role.id_user = User.id_user
+        WHERE User.session_token = ? AND Role.name_role = 'superadmin'
+        ''', (str(session_token),)).fetchone()
+        return is_superuser is not None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return False
+    finally:
+        conn.close()
+
 # Employee functions
 
 def create_employee(lastname, name, email):
