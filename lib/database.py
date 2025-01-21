@@ -1832,7 +1832,7 @@ def auth_get_user_type(session_token):
         session_token (str): Le jeton de session de l'utilisateur.
 
     Returns:
-        str: Le type d'utilisateur ("candidat" ou "participant"), ou None si non trouvé.
+        str: Le type d'utilisateur ("candidat", "participant" ou "employee"), ou None si non trouvé.
     """
     conn = get_db_connection()
     try:
@@ -1852,6 +1852,14 @@ def auth_get_user_type(session_token):
         ''', (str(session_token),)).fetchone()
         if user_type:
             return "participant"
+        user_type = conn.execute('''
+        SELECT Office.id_employee
+        FROM Office
+        JOIN User ON Office.id_user = User.id_user
+        WHERE User.session_token = ?
+        ''', (str(session_token),)).fetchone()
+        if user_type:
+            return "employee"
         return None
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
@@ -1859,6 +1867,52 @@ def auth_get_user_type(session_token):
     finally:
         conn.close()
 
+
+def auth_get_type_id(session_token):
+    """
+    Retourne l'id du type utilisateur (employee, candidate, participant) en fonction de son jeton de session.
+    
+    Args:
+        session_token (str): Le jeton de session de l'utilisateur.
+        
+    Returns:
+        tuple: Un tuple contenant l'id du type utilisateur et un message d'erreur si une erreur est survenue.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+    try:
+        user_type = conn.execute('''
+        SELECT Candidate.id_candidate
+        FROM Candidate
+        JOIN User ON Candidate.id_user = User.id_user
+        WHERE User.session_token = ?
+        ''', (str(session_token),)).fetchone()
+        if user_type:
+            return user_type['id_candidate'], None
+        user_type = conn.execute('''
+        SELECT Participant.id_participant
+        FROM Participant
+        JOIN User ON Participant.id_user = User.id_user
+        WHERE User.session_token = ?
+        ''', (str(session_token),)).fetchone()
+        if user_type:
+            return user_type['id_participant'], None
+        user_type = conn.execute('''
+        SELECT Office.id_employee
+        FROM Office
+        JOIN User ON Office.id_user = User.id_user
+        WHERE User.session_token = ?
+        ''', (str(session_token),)).fetchone()
+        if user_type:
+            return user_type['id_employee'], None
+        return None, "Type utilisateur non trouvé"
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+    
 # Employee functions
 
 def create_employee(lastname, name, email, role):
