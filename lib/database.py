@@ -1871,10 +1871,10 @@ def auth_get_user_type(session_token):
 def auth_get_type_id(session_token):
     """
     Retourne l'id du type utilisateur (employee, candidate, participant) en fonction de son jeton de session.
-    
+
     Args:
         session_token (str): Le jeton de session de l'utilisateur.
-        
+
     Returns:
         tuple: Un tuple contenant l'id du type utilisateur et un message d'erreur si une erreur est survenue.
     """
@@ -1912,7 +1912,67 @@ def auth_get_type_id(session_token):
         return None, "Erreur requête base de données"
     finally:
         conn.close()
-    
+
+def get_user_role(user_id):
+    """
+    Récupère le rôle associé à un identifiant utilisateur donné depuis la base de données.
+
+    Args:
+        user_id (int): L'identifiant de l'utilisateur dont le rôle doit être récupéré.
+
+    Returns:
+        str: Le nom du rôle associé à l'utilisateur, ou None si une erreur est survenue ou si le rôle n'est pas trouvé.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        print("Erreur base de données")
+        return None
+    try:
+        role = conn.execute('''
+        SELECT Role.name_role
+        FROM Role
+        JOIN User_role ON Role.id_role = User_role.id_role
+        WHERE User_role.id_user = ?
+        ''', (user_id,)).fetchone()
+        if role:
+            return role['name_role'], None
+        else:
+            return None, "Rôle non trouvé"
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None
+    finally:
+        conn.close()
+
+def update_user_role(user_id, role_name):
+    """
+    Met à jour le rôle d'un utilisateur dans la base de données.
+
+    Args:
+        user_id (int): L'identifiant de l'utilisateur.
+        role_name (str): Le nouveau rôle de l'utilisateur.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        cursor = conn.cursor()
+        cursor.execute('''
+        UPDATE User_role
+        SET id_role = (SELECT id_role FROM Role WHERE name_role = ?)
+        WHERE id_user = ?
+        ''', (role_name, user_id))
+        conn.commit()
+        return None
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la mise à jour du rôle de l'utilisateur: {e}")
+        return "Erreur lors de la mise à jour du rôle de l'utilisateur"
+    finally:
+        conn.close()
+
 # Employee functions
 
 def create_employee(lastname, name, email, role):
