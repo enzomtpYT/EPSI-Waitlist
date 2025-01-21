@@ -5,13 +5,19 @@ participant_dashboard_bp = Blueprint('participant_dashboard', __name__)
 
 @participant_dashboard_bp.route('/participant/dashboard')
 def dashboard():
-    user_role = database.get_user_role_with_token(session.get('token'))
-    if user_role not in ['participant', 'employee', 'admin', 'superadmin']:
-        flash('Access denied', 'danger')
+    if 'token' not in session:
         return redirect(url_for('auth.login'))
-
-    participant_id = session.get('participant_id')
-    if not participant_id:
+    session_token = session['token']
+    
+    participant_id, error = database.auth_get_type_id(session_token)
+    if error:
+        flash(error, 'danger')
+        return redirect(url_for('auth.login'))
+    
+    usertype = database.auth_get_user_type(session_token)
+    
+    if usertype != 'participant':
+        flash('You do not have permission to access this page.', 'danger')
         return redirect(url_for('auth.login'))
 
     participant, error = database.get_participant(participant_id)
