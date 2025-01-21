@@ -18,9 +18,10 @@
             <label for="employee_email">E-mail :</label>
             <input type="email" id="employee_email" name="employee_email" value="{{ employee.email_employee }}">
 
-            <button type="button" onclick="newuser({{ employee.id_employee }}, '{{ rpassword }}')">Générer un mot de passe</button>
-
-            <button type="submit">Enregistrer</button>
+            <div>
+                <button type="button" onclick="newuser({{ employee.id_employee }}, '{{ rpassword }}')">Générer un mot de passe</button>
+                <button type="submit">Enregistrer</button>
+            </div>
         </form>
     </div>
 
