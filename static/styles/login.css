@@ -1,12 +1,20 @@
+.formcontainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .loginform {
-    margin: 0 40vw;
     background-color: #ececec;
-    border-radius: 20px;
-    padding: 24px;
+    border-radius: 1rem;
+    padding: 1.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
+    min-width: fit-content;
+    max-width:calc(100% - 2rem);
+    width:26rem
 }
 
 .loginform > .iconified-input {
