@@ -1991,9 +1991,14 @@ def create_employee(lastname, name, email, role):
     if conn is None:
         return "Erreur base de données"
     try:
-        # Insere l'employé dans la base de données
         cursor = conn.cursor()
-        cursor.execute('INSERT INTO Office (lastname_employee, name_employee, email_employee) VALUES (?, ?, ?)', (lastname, name, email))
+
+        # Insère l'utilisateur dans la table User
+        cursor.execute('INSERT INTO User (username) VALUES (?)', (email,))
+        user_id = cursor.lastrowid
+
+        # Insere l'employé dans la base de données
+        cursor.execute('INSERT INTO Office (lastname_employee, name_employee, email_employee, id_user) VALUES (?, ?, ?, ?)', (lastname, name, email, user_id))
         employee_id = cursor.lastrowid
 
        # Récupère l'id_role correspondant au nom du rôle
@@ -2002,7 +2007,7 @@ def create_employee(lastname, name, email, role):
             return None, "Rôle non trouvé"
 
         # Insere l'association de l'employé avec le rôle dans la table User_role
-        cursor.execute('INSERT INTO User_role (id_user, id_role) VALUES (?, ?)', (employee_id, role_id[0]))
+        cursor.execute('INSERT INTO User_role (id_user, id_role) VALUES (?, ?)', (user_id, role_id[0]))
 
         # Sauvegarde les modifications
         conn.commit()
