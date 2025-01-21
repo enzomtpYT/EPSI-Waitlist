@@ -67,10 +67,9 @@ def handleMessage(msg):
 
 @app.context_processor
 def inject_routes():
+    user_role = None
     if 'token' in session:
         user_role = database.get_user_role_with_token(session['token'])
-    else:
-        user_role = None
     return dict(parameters=request.args.to_dict(), session=session, user_role=user_role)
 
 if __name__ == "__main__":
