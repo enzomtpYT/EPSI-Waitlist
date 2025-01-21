@@ -50,10 +50,7 @@ def get_event_participants(id_event):
     
     return datas, None
 
-def api_interviews(session):
-    if 'token' not in session:
-        return {"error": "Unauthorized"}, 401
-    session_token = session['token']
+def api_interviews(session_token):
     interviews, error = database.get_user_past_interviews(session_token)
     events = {}
     for interview in interviews:
