@@ -27,8 +27,8 @@ from routes.participant_dashboard import participant_dashboard_bp
 from routes.candidate_dashboard import candidate_dashboard_bp
 from routes.interviews import interviews_bp
 
-# Set the secret key to a random value
-app.secret_key = os.urandom(24)
+# Secret key for session (temporary hard coded for development)
+app.secret_key = 'TempSecretKey'
 
 # Register the blueprints
 app.register_blueprint(auth_bp)
