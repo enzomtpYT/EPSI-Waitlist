@@ -1691,7 +1691,11 @@ def get_user_role_with_token(session_token):
         JOIN User ON User_role.id_user = User.id_user
         WHERE User.session_token = ?
         ''', (session_token,)).fetchone()
-        return role, None
+        if role:
+            return role['name_role']
+        else:
+            print("Rôle non trouvé")
+            return None
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"

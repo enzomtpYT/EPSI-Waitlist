@@ -6,7 +6,10 @@ create_employee_bp = Blueprint('create_employee', __name__)
 @create_employee_bp.route('/admin/create_employee', methods=('GET', 'POST'))
 def create_employee():
     user_role = database.get_user_role_with_token(session.get('token'))
-    print(user_role)
+    if not user_role:
+        flash('User role not found', 'danger')
+        return redirect(url_for('auth.login'))
+
     if request.method == 'POST':
         lastname = request.form['employee_lastname']
         name = request.form['employee_name']
@@ -45,4 +48,4 @@ def create_employee():
         else:
             flash(f"Erreur lors de la création de l'employé: {error}", "danger")
 
-    return render_template('create_employee.html')
+    return render_template('create_employee.html', user_role=user_role)
