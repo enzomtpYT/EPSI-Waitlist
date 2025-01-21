@@ -1760,6 +1760,41 @@ def auth_is_superuser(session_token):
     finally:
         conn.close()
 
+def auth_get_user_type(session_token):
+    """
+    Retourne le type d'utilisateur en fonction de son jeton de session.
+
+    Args:
+        session_token (str): Le jeton de session de l'utilisateur.
+
+    Returns:
+        str: Le type d'utilisateur ("candidat" ou "participant"), ou None si non trouvé.
+    """
+    conn = get_db_connection()
+    try:
+        user_type = conn.execute('''
+        SELECT Candidate.id_candidate
+        FROM Candidate
+        JOIN User ON Candidate.id_user = User.id_user
+        WHERE User.session_token = ?
+        ''', (str(session_token),)).fetchone()
+        if user_type:
+            return "candidat"
+        user_type = conn.execute('''
+        SELECT Participant.id_participant
+        FROM Participant
+        JOIN User ON Participant.id_user = User.id_user
+        WHERE User.session_token = ?
+        ''', (str(session_token),)).fetchone()
+        if user_type:
+            return "participant"
+        return None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None
+    finally:
+        conn.close()
+
 # Employee functions
 
 def create_employee(lastname, name, email, role):
@@ -1936,3 +1971,34 @@ def delete_employee(id_employee):
     return None
 
 # Feedback functions
+
+def update_feedback(id_interview, feedback, type):
+    """
+    Met à jour le feedback d'un entretien dans la base de données.
+
+    Args:
+        id_interview (int): L'identifiant de l'entretien.
+        feedback (str): Le feedback de l'entretien.
+        type (str): Le type de feedback (candidat ou participant).
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+
+    try:
+        if type == "candidat":
+            conn.execute('UPDATE Interview SET feedback_candidate = ? WHERE id_interview = ?', (feedback, id_interview))
+        elif type == "participant":
+            conn.execute('UPDATE Interview SET feedback_participant = ? WHERE id_interview = ?', (feedback, id_interview))
+        else:
+            return "Type de feedback incorrect"
+        conn.commit()
+    except sqlite3.Error as e:
+        print(f"Erreur lors de la mise à jour du feedback: {e}")
+        return "Erreur lors de la mise à jour du feedback"
+    finally:
+        conn.close()
+    return None
