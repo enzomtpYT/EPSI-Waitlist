@@ -5,7 +5,10 @@ create_employee_bp = Blueprint('create_employee', __name__)
 
 @create_employee_bp.route('/admin/create_employee', methods=('GET', 'POST'))
 def create_employee():
-    user_role = database.get_user_role_with_token(session.get('token'))
+    if 'token' not in session:
+        return redirect(url_for('auth.login'))
+    session_token = session['token']
+    user_role = database.get_user_role_with_token(session_token)
     if not user_role:
         flash('User role not found', 'danger')
         return redirect(url_for('auth.login'))
