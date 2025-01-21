@@ -447,6 +447,37 @@ def delete_candidate(id_candidate):
         conn.close()
     return None
 
+def get_candidate_events(id_candidate):
+    """
+    Récupère les événements associés à un candidat.
+
+    Args:
+        id_candidate (int): L'identifiant du candidat.
+
+    Returns:
+        tuple: Un tuple contenant une liste d'événements et un message d'erreur si une erreur est survenue.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+
+    try:
+        # Renvoie les événements du candidat
+        events = conn.execute('''
+        SELECT Event.id_event, Event.name_event, Event.date_event
+        FROM Event
+        JOIN Participates ON Event.id_event = Participates.id_event
+        WHERE Participates.id_candidate = ?
+        ''', (id_candidate,)).fetchall()
+
+        return events, None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        # Ferme la connexion à la base de données
+        conn.close()
+
 def get_candidate_interviews(id_candidate):
     """
     Récupère les interviews associées à un candidat.
@@ -743,6 +774,33 @@ def delete_participant(id_participant):
     finally:
         conn.close()
     return None
+
+def get_participant_events(id_participant):
+    """
+    Récupère les événements associés à un participant.
+
+    Args:
+        id_participant (int): L'identifiant du participant.
+
+    Returns:
+        tuple: Un tuple contenant une liste d'événements et un message d'erreur si une erreur est survenue.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+    try:
+        events = conn.execute('''
+        SELECT Event.id_event, Event.name_event, Event.date_event
+        FROM Event
+        JOIN Attends ON Event.id_event = Attends.id_event
+        WHERE Attends.id_participant = ?
+        ''', (id_participant,)).fetchall()
+        return events, None
+    except sqlite3.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
 
 def get_participant_interviews(id_participant):
     """

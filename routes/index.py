@@ -6,6 +6,7 @@ index_bp = Blueprint('index', __name__)
 @index_bp.route("/")
 def index():
     user_role = database.get_user_role_with_token(session.get('token'))
+    print(f"User role: {user_role}")
     if user_role == 'candidate':
         return redirect(url_for('candidate_dashboard.dashboard'))
     elif user_role == 'participant':

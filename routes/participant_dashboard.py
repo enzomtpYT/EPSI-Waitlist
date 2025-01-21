@@ -5,6 +5,11 @@ participant_dashboard_bp = Blueprint('participant_dashboard', __name__)
 
 @participant_dashboard_bp.route('/participant/dashboard')
 def dashboard():
+    user_role = database.get_user_role_with_token(session.get('token'))
+    if user_role not in ['participant', 'employee', 'admin', 'superadmin']:
+        flash('Access denied', 'danger')
+        return redirect(url_for('auth.login'))
+
     participant_id = session.get('participant_id')
     if not participant_id:
         return redirect(url_for('auth.login'))
