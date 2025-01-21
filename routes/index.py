@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, session
+from flask import Blueprint, redirect, url_for, session
 from lib import database
 
 index_bp = Blueprint('index', __name__)
@@ -18,5 +18,3 @@ def index():
         return redirect(url_for('admin.admin'))
     else:
         return redirect(url_for('auth.login'))
-
-    # $`m1n#=9 mdp chadeg@email.net

@@ -37,24 +37,6 @@ def register_employee(id_employee, password):
     error = database.update_user_password(username, genpassword(password), session_token)
     return error
 
-# def register_candidate(id_candidate, password):
-#     username = database.get_candidate_email(id_candidate)
-#     session_token = hashlib.md5(random.randbytes(random.randint(8,32))).hexdigest()
-#     error = database.auth_register_candidate(id_candidate, username, genpassword(password), session_token)
-#     return error
-
-# def register_participant(id_participant, password):
-#     username = database.get_participant_email(id_participant)
-#     session_token = hashlib.md5(random.randbytes(random.randint(8,32))).hexdigest()
-#     error = database.auth_register_participant(id_participant, username, genpassword(password), session_token)
-#     return error
-
-# def register_employee(id_employee, password):
-#     username = database.get_employee_email(id_employee)
-#     session_token = hashlib.md5(random.randbytes(random.randint(8,32))).hexdigest()
-#     error = database.auth_register_employee(id_employee, username, genpassword(password), session_token)
-#     return error
-
 def user_has_permission(user_id, permission_name):
     permissions, error = database.get_user_permissions(user_id)
     if error:

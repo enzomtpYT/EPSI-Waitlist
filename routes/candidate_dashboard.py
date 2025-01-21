@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, redirect, url_for, flash, session
 from lib import database
 
 candidate_dashboard_bp = Blueprint('candidate_dashboard', __name__)
@@ -8,14 +8,14 @@ def dashboard():
     if 'token' not in session:
         return redirect(url_for('auth.login'))
     session_token = session['token']
-    
+
     candidate_id, error = database.auth_get_type_id(session_token)
     if error:
         flash(error, 'danger')
         return redirect(url_for('auth.login'))
-    
+
     usertype = database.auth_get_user_type(session_token)
-    
+
     if usertype != 'candidate':
         flash('You do not have permission to access this page.', 'danger')
         return redirect(url_for('auth.login'))
