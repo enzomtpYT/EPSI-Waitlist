@@ -5,7 +5,7 @@
 }
 
 .loginform {
-    background-color: #ececec;
+    background-color: var(--main-color);
     border-radius: 1rem;
     padding: 1.5rem;
     display: flex;
