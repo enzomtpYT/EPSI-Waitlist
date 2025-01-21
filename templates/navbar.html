@@ -1,16 +1,14 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='styles/navbar.css') }}">
 <nav>
     <ul class="navul">
-        <li class="navli"><a class="navbtn" href="{{ url_for('index.index') }}">Accueil</a></li>
-    </ul>
-    <ul class="navul">
+        <li class="navli"><a class="navelm" href="{{ url_for('index.index') }}">Accueil</a></li>
         {% if session.token %}
             {% if user_role == 'employee' or user_role == 'admin' or user_role == 'superadmin' %}
-                <li class="navli"><a class="navbtn" href="{{ url_for('admin.admin') }}">Admin</a></li>
+                <li class="navli"><a class="navelm" href="{{ url_for('admin.admin') }}">Admin</a></li>
             {% elif user_role == 'candidate' %}
-                <li class="navli"><a class="navbtn" href="{{ url_for('candidate_dashboard.dashboard') }}">Candidat</a></li>
+                <li class="navli"><a class="navelm" href="{{ url_for('candidate_dashboard.dashboard') }}">Candidat</a></li>
             {% elif user_role == 'participant' %}
-                <li class="navli"><a class="navbtn" href="{{ url_for('participant_dashboard.dashboard') }}">Intervenant</a></li>
+                <li class="navli"><a class="navelm" href="{{ url_for('participant_dashboard.dashboard') }}">Intervenant</a></li>
             {% endif %}
         {% endif %}
     </ul>

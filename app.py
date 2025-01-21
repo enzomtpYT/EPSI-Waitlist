@@ -55,12 +55,6 @@ app.register_blueprint(participant_dashboard_bp)
 app.register_blueprint(candidate_dashboard_bp)
 app.register_blueprint(interviews_bp)
 
-custom_route_names = {
-    "/": "Accueil",
-    "/admin": "Admin",
-    "/list": "List"
-}
-
 @app.before_request
 def checkroutes():
     return permission.checkroutes(session)
@@ -73,24 +67,11 @@ def handleMessage(msg):
 
 @app.context_processor
 def inject_routes():
-    return dict(custom_route_names=custom_route_names, parameters=request.args.to_dict(), session=session)
-
-def inject_user_role():
-    token = session.get('token')
-    if token:
-        role, error = database.get_user_role_with_token(token)
-        if error:
-            role = None
+    if 'token' in session:
+        user_role = database.get_user_role_with_token(session['token'])
     else:
-        role = None
-    return dict(user_role=role)
-
-@app.template_filter('get_user_role_with_token')
-def get_user_role_with_token(token):
-    role, error = database.get_user_role_with_token(token)
-    if error:
-        return None
-    return role
+        user_role = None
+    return dict(parameters=request.args.to_dict(), session=session, user_role=user_role)
 
 if __name__ == "__main__":
     debug_mode = os.getenv('FLASK_ENV') == 'development'
