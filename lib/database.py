@@ -2049,8 +2049,13 @@ def get_all_employees():
 
     try:
         # Renvoie tous les employés de la base de données
-        employees = conn.execute('SELECT * FROM Office').fetchall()
-
+        employees = conn.execute('''
+        SELECT User.id_user, User.username, Office.*, Role.name_role
+        FROM Office
+        JOIN User ON Office.id_user = User.id_user
+        JOIN User_role ON User.id_user = User_role.id_user
+        JOIN Role ON User_role.id_role = Role.id_role
+        ''').fetchall()
         if employees:
             return employees, None
         else:
