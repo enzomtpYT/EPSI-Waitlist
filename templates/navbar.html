@@ -1,9 +1,18 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='styles/navbar.css') }}">
 <nav>
     <ul class="navul">
-        {% for route, name in custom_route_names.items() %}
-        <li class="navli"><a class="navelm" href="{{ route }}">{{ name }}</a></li>
-        {% endfor %}
+        <li class="navli"><a class="navbtn" href="{{ url_for('index.index') }}">Accueil</a></li>
+    </ul>
+    <ul class="navul">
+        {% if session.token %}
+            {% if user_role == 'employee' or user_role == 'admin' or user_role == 'superadmin' %}
+                <li class="navli"><a class="navbtn" href="{{ url_for('admin.admin') }}">Admin</a></li>
+            {% elif user_role == 'candidate' %}
+                <li class="navli"><a class="navbtn" href="{{ url_for('candidate_dashboard.dashboard') }}">Candidat</a></li>
+            {% elif user_role == 'participant' %}
+                <li class="navli"><a class="navbtn" href="{{ url_for('participant_dashboard.dashboard') }}">Intervenant</a></li>
+            {% endif %}
+        {% endif %}
     </ul>
     <ul class="navul">
         {% if session.token %}

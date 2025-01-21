@@ -1,7 +1,7 @@
 from flask import request, session
 from flask_socketio import send
 from sock import socketio, app
-from lib import permission
+from lib import permission, database
 import os, time
 from routes.auth import auth_bp
 from routes.api_router import api_bp
@@ -74,6 +74,23 @@ def handleMessage(msg):
 @app.context_processor
 def inject_routes():
     return dict(custom_route_names=custom_route_names, parameters=request.args.to_dict(), session=session)
+
+def inject_user_role():
+    token = session.get('token')
+    if token:
+        role, error = database.get_user_role_with_token(token)
+        if error:
+            role = None
+    else:
+        role = None
+    return dict(user_role=role)
+
+@app.template_filter('get_user_role_with_token')
+def get_user_role_with_token(token):
+    role, error = database.get_user_role_with_token(token)
+    if error:
+        return None
+    return role
 
 if __name__ == "__main__":
     debug_mode = os.getenv('FLASK_ENV') == 'development'
