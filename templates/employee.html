@@ -35,16 +35,12 @@
             <div>
                 <button type="button" onclick="newuser({{ employee.id_employee }}, '{{ rpassword }}')">Générer un mot de passe</button>
                 <button type="submit">Enregistrer</button>
+                    <form action="/admin/manage_employee/{{ employee.id_employee }}/delete" method="post">
+                        <button class="delete" type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce candidat ?');">Supprimer</button>
+                    </form>
             </div>
         </form>
     </div>
-
-<div class="admin-section">
-    <h2>Supprimer l'employé.e</h2>
-    <form action="/admin/manage_employee/{{ employee.id_employee }}/delete" method="post">
-        <button class="delete" type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce candidat ?');">Supprimer</button>
-    </form>
-</div>
 
 <script>
 // When button is clicked generate new password for user
