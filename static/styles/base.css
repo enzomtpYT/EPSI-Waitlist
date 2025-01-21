@@ -216,10 +216,12 @@ h1 {
     flex-shrink: 0;
 }
 
-.tagform {
-    display: flex;
-    flex-direction: column;
-    width: auto;
+.tagform > button {
+    margin-bottom: 5px;
+}
+
+.tagform > button > svg {
+    margin: 0;
 }
 
 .display-tag {
