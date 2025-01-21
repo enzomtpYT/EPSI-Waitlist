@@ -5,7 +5,10 @@ index_bp = Blueprint('index', __name__)
 
 @index_bp.route("/")
 def index():
-    user_role = database.get_user_role_with_token(session.get('token'))
+    if 'token' not in session:
+        return redirect(url_for('auth.login'))
+    session_token = session['token']
+    user_role = database.get_user_role_with_token(session_token)
     print(f"User role: {user_role}")
     if user_role == 'candidate':
         return redirect(url_for('candidate_dashboard.dashboard'))
