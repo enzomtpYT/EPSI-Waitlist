@@ -35,6 +35,10 @@
     {% else %}
     <p>Aucun entretien trouvé pour cet événement.</p>
     {% endif %}
+
+    <a href="{{ url_for('event.edit_event', id_event=event_id) }}">
+        <button style="margin-top: 1rem;" type="button">Retour</button>
+    </a>
 </div>
 
 <div id="feedbackModal" class="modal">
@@ -47,10 +51,6 @@
         <p id="candidateFeedback"></p>
     </div>
 </div>
-
-<a href="{{ url_for('event.edit_event', id_event=event_id) }}">
-    <button type="button">Retour</button>
-</a>
 
 <script>
 // Get the modal

@@ -2,14 +2,14 @@
 <nav>
     <ul class="navul">
         {% for route, name in custom_route_names.items() %}
-        <li class="navli"><a href="{{ route }}">{{ name }}</a></li>
+        <li class="navli"><a class="navelm" href="{{ route }}">{{ name }}</a></li>
         {% endfor %}
     </ul>
     <ul class="navul">
         {% if session.token %}
-        <li class="navli"><a href="{{ url_for('auth.logout') }}"><button class="authbtn">Se Déconnecter</button></a></li>
+        <li class="navli"><a class="navbtn" href="{{ url_for('auth.logout') }}"><button class="authbtn">Se Déconnecter</button></a></li>
         {% else %}
-        <li class="navli"><a href="{{ url_for('auth.login') }}"><button class="authbtn">Se Connecter</button></a></li>
+        <li class="navli"><a class="navbtn" href="{{ url_for('auth.login') }}"><button class="authbtn">Se Connecter</button></a></li>
         {% endif %}
     </ul>
 </nav>
