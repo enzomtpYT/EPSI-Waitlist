@@ -300,6 +300,9 @@ def create_candidate(lastname, name, email):
         cursor.execute('INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate, id_user) VALUES (?, ?, ?, ?)', (lastname, name, email, user_id))
         candidate_id = cursor.lastrowid
 
+        # Assigne le rôle "candidate" à l'utilisateur
+        cursor.execute('INSERT INTO User_role (id_user, id_role) VALUES (?, (SELECT id_role FROM Role WHERE name_role = ?))', (user_id, 'candidate'))
+
         # Sauvegarde les modifications
         conn.commit()
         return candidate_id, None
@@ -613,6 +616,9 @@ def create_participant(name, email):
         # Insere l'intervenant dans la base de données
         cursor.execute('INSERT INTO Participant (name_participant, email_participant, id_user) VALUES (?, ?, ?)', (name, email, user_id))
         participant_id = cursor.lastrowid
+
+        # Assigne le rôle "participant" à l'utilisateur
+        cursor.execute('INSERT INTO User_role (id_user, id_role) VALUES (?, (SELECT id_role FROM Role WHERE name_role = ?))', (user_id, 'participant'))
 
         # Sauvegarde les modifications
         conn.commit()
