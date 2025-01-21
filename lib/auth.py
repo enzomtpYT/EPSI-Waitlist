@@ -72,7 +72,7 @@ def check_turnstile(response):
         return True
     else:
         return False
-    
+
 def check_permission(session, permission_name):
     if database.auth_is_superuser(session):
         return True

@@ -300,6 +300,9 @@ def create_candidate(lastname, name, email):
         cursor.execute('INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate, id_user) VALUES (?, ?, ?, ?)', (lastname, name, email, user_id))
         candidate_id = cursor.lastrowid
 
+        # Assigne le rôle "candidate" à l'utilisateur
+        cursor.execute('INSERT INTO User_role (id_user, id_role) VALUES (?, (SELECT id_role FROM Role WHERE name_role = ?))', (user_id, 'candidate'))
+
         # Sauvegarde les modifications
         conn.commit()
         return candidate_id, None
@@ -613,6 +616,9 @@ def create_participant(name, email):
         # Insere l'intervenant dans la base de données
         cursor.execute('INSERT INTO Participant (name_participant, email_participant, id_user) VALUES (?, ?, ?)', (name, email, user_id))
         participant_id = cursor.lastrowid
+
+        # Assigne le rôle "participant" à l'utilisateur
+        cursor.execute('INSERT INTO User_role (id_user, id_role) VALUES (?, (SELECT id_role FROM Role WHERE name_role = ?))', (user_id, 'participant'))
 
         # Sauvegarde les modifications
         conn.commit()
@@ -1670,27 +1676,27 @@ def get_user_permissions(user_id):
     finally:
         conn.close()
 
-def get_user_role(user_id):
+def get_user_role_with_token(session_token):
     """
-    Récupère le rôle associé à un identifiant utilisateur donné depuis la base de données.
+    Récupère le rôle d'un utilisateur en utilisant son jeton de session.
 
     Args:
-        user_id (int): L'identifiant de l'utilisateur dont le rôle doit être récupéré.
+        session_token (str): Le jeton de session de l'utilisateur.
 
     Returns:
-        str: Le nom du rôle associé à l'utilisateur, ou None si une erreur est survenue ou si le rôle n'est pas trouvé.
+        tuple: Un tuple contenant le rôle et un message d'erreur si une erreur est survenue.
     """
     conn = get_db_connection()
     if conn is None:
-        print("Erreur base de données")
-        return None
+        return None, "Erreur base de données"
     try:
         role = conn.execute('''
         SELECT Role.name_role
         FROM Role
         JOIN User_role ON Role.id_role = User_role.id_role
-        WHERE User_role.id_user = ?
-        ''', (user_id,)).fetchone()
+        JOIN User ON User_role.id_user = User.id_user
+        WHERE User.session_token = ?
+        ''', (session_token,)).fetchone()
         if role:
             return role['name_role']
         else:
@@ -1698,7 +1704,7 @@ def get_user_role(user_id):
             return None
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
-        return None
+        return None, "Erreur requête base de données"
     finally:
         conn.close()
 
