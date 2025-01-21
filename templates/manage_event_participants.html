@@ -11,13 +11,13 @@
         <h2>Filtrer par tags</h2>
         <div class="tag-selector">
             {% for tag in data.tags %}
-            <div class="tag">
+            <div class="tagfilter">
+                <label for="tag-{{ tag.id_tag }}">{{ tag.name_tag }}</label>
                 {% if tag.id_tag in data.event.tags %}
                     <input type="checkbox" name="tags[]" value="{{ tag.id_tag }}" id="tag-{{ tag.id_tag }}" checked>
                 {% else %}
                     <input type="checkbox" name="tags[]" value="{{ tag.id_tag }}" id="tag-{{ tag.id_tag }}">
                 {% endif %}
-                <label for="tag-{{ tag.id_tag }}">{{ tag.name_tag }}</label>
             </div>
             {% endfor %}
         </div>
