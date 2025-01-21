@@ -1,8 +1,7 @@
-from flask import Blueprint, request, render_template, flash, jsonify, redirect, session, url_for
-from flask_socketio import SocketIO, join_room, send
+from flask import Blueprint, request, render_template, flash, redirect, url_for
+from flask_socketio import join_room, send
 from sock import socketio
 from lib import database
-import time, json
 
 list_bp = Blueprint('list', __name__)
 

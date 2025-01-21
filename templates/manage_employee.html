@@ -25,11 +25,9 @@
                 <td>{{ employee.name_employee }}</td>
                 <td>{{ employee.email_employee }}</td>
                 <td>
-                    {% for role in employee.role %}
-                        {% if role.name_role %}
-                            <p class="display-tag">{{ role.name_role }}</p>
-                        {% endif %}
-                    {% endfor %}
+                    {% if employee.name_role %}
+                        <p class="display-tag">{{ employee.name_role }}</p>
+                    {% endif %}
                 </td>
                 <td class="actionbtn">
                     <a href="/admin/manage_employee/employee/{{ employee.id_employee }}">
