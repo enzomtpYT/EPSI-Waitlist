@@ -320,3 +320,23 @@ h1 {
 .iconified-input > .icon {
     padding-left: 0.5rem;
 }
+
+.section {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    background-color: var(--main-color);
+    border-radius: 20px;
+    margin: 1rem;
+    color: var(--accent-color);
+}
+
+.section-separator {
+    display: flex;
+    width: 100%;
+    min-height: 80vh;
+}
+
+.section-stacker {
+    width: 100%;
+}
