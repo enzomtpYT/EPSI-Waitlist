@@ -42,7 +42,7 @@
                             <td>{{ participant.name_participant }}</td>
                             <td>{{ participant.email_participant }}</td>
                             <td>
-                                {% if participant.tags|selectattr('id_tag', 'in', data.event.tags|map(attribute='id_tag'))|list or participant.attends == true %}
+                                {% if participant.attends == true %}
                                     <input class="checkbox" type="checkbox" name="participants" value="{{ participant.id_participant }}" checked>
                                 {% else %}
                                     <input class="checkbox" type="checkbox" name="participants" value="{{ participant.id_participant }}">
@@ -72,10 +72,10 @@
                             <td>{{ candidate.name_candidate }}</td>
                             <td>{{ candidate.email_candidate }}</td>
                             <td>
-                                <input type="number" name="priority_{{ candidate.id_candidate }}" value="{{ candidate.priority }}" min="0" max="100">
+                                <input type="number" name="priority_{{ candidate.id_candidate }}" value="{{ candidate.priority }}" min="1" max="100">
                             </td>
                             <td>
-                                {% if candidate.tags|selectattr('id_tag', 'in', data.event.tags|map(attribute='id_tag'))|list or candidate.attends == true %}
+                                {% if candidate.attends == true %}
                                     <input class="checkbox" type="checkbox" name="candidates" value="{{ candidate.id_candidate }}" checked>
                                 {% else %}
                                     <input class="checkbox" type="checkbox" name="candidates" value="{{ candidate.id_candidate }}">
@@ -91,9 +91,5 @@
         </form>
     </div>
 </div>
-
-<script>
-
-</script>
 
 {% endblock %}

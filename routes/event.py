@@ -76,7 +76,7 @@ def delete_event(id_event):
     database.delete_event(id_event)
     return redirect(url_for('manage_event.manage_event'))
 
-@event_bp.route('/admin/manage_event/event/<int:id_event>/manage_event_participants', methods=['GET', 'POST'])
+@event_bp.route('/admin/manage_event/event/<int:id_event>/manage_event_participants', methods=['GET', 'POST', 'HEAD'])
 def manage_event_participants(id_event):
     datas, error = api.get_event_participants(id_event)
     if error:
@@ -96,7 +96,7 @@ def manage_event_participants(id_event):
         for fcandidate in request.form.getlist('candidates'):
             prio = request.form[f"priority_{fcandidate}"]
             if prio == '':
-                prio = '0'
+                prio = '1'
             form['candidates'].append({"id_candidate": int(fcandidate), "priority": int(prio)})
         for fparticipant in request.form.getlist('participants'):
             form['participants'].append({"id_participant": int(fparticipant)})
@@ -105,10 +105,9 @@ def manage_event_participants(id_event):
             for candid in dbcandidates:
                 if formcandidates['id_candidate'] == candid['id_candidate']:
                     if formcandidates['priority'] != candid['priority']:
-                        changes['candidates']['edited'] = {formcandidates['id_candidate'] : formcandidates['priority']}
-                    break
-            else:
-                changes['candidates']['added'].append(formcandidates['id_candidate'])
+                        changes['candidates']['edited'].append({formcandidates['id_candidate'] : formcandidates['priority']})
+                    if candid['attends'] == False:
+                        changes['candidates']['added'].append({formcandidates['id_candidate'] : formcandidates['priority']})
         
         for dbcandid in dbcandidates:
             if dbcandid['id_candidate'] not in [formcandidate['id_candidate'] for formcandidate in form['candidates']] and dbcandid['attends'] == True:
@@ -117,40 +116,46 @@ def manage_event_participants(id_event):
         for formparticipants in form['participants']:
             for part in dbparticipants:
                 if formparticipants['id_participant'] == part['id_participant']:
+                    if part['attends'] == False:
+                        changes['participants']['added'].append(formparticipants['id_participant'])
                     break
-            else:
-                changes['participants']['added'].append(formparticipants['id_participant'])
+                
+        print(changes)
         
         for dbpart in dbparticipants:
             if dbpart['id_participant'] not in [formparticipant['id_participant'] for formparticipant in form['participants']] and dbpart['attends'] == True:
                 changes['participants']['removed'].append(dbpart['id_participant'])
-                    
+        
         for candidate in changes['candidates']['added']:
-            error = database.create_participates(id_event, candidate)
-            if error:
-                flash(error, "danger")
-                return redirect(url_for('event.manage_event_participants', id_event=id_event))
+            for item in changes['candidates']['added']:
+                candidate, priority = list(item.items())[0]
+                error = database.create_participates(candidate, id_event, priority)
+                if error:
+                    flash(error, "danger")
+                    return redirect(url_for('event.manage_event_participants', id_event=id_event))
             
         for candidate in changes['candidates']['removed']:
-            error = database.delete_participates(id_event, candidate)
+            error = database.delete_participates(candidate, id_event)
             if error:
                 flash(error, "danger")
                 return redirect(url_for('event.manage_event_participants', id_event=id_event))
         
-        for candidate, priority in changes['candidates']['edited'].items():
-            error = database.edit_participates(id_event, candidate, priority)
-            if error:
-                flash(error, "danger")
-                return redirect(url_for('event.manage_event_participants', id_event=id_event))
+        if changes['candidates']['edited']:
+            for item in changes['candidates']['edited']:
+                candidate, priority = list(item.items())[0]
+                error = database.edit_participates(candidate, id_event, priority)
+                if error:
+                    flash(error, "danger")
+                    return redirect(url_for('event.manage_event_participants', id_event=id_event))
         
         for participant in changes['participants']['added']:
-            error = database.create_attends(id_event, participant)
+            error = database.create_attends(participant, id_event)
             if error:
                 flash(error, "danger")
                 return redirect(url_for('event.manage_event_participants', id_event=id_event))
         
         for participant in changes['participants']['removed']:
-            error = database.delete_attends(id_event, participant)
+            error = database.delete_attends(participant, id_event)
             if error:
                 flash(error, "danger")
                 return redirect(url_for('event.manage_event_participants', id_event=id_event))

@@ -28,13 +28,12 @@ def get_event_participants(id_event):
     for candidate in candidates:
         tags, error = database.get_candidate_tags(candidate["id_candidate"])
         candidate["tags"] = [tag["id_tag"] for tag in tags]
+        candidate["attends"] = False
+        candidate["priority"] = 1
         for cand in eventcandidates:
             if candidate["id_candidate"] == cand["id_candidate"]:
                 candidate["attends"] = True
                 candidate["priority"] = cand["priority"]
-            else:
-                candidate["attends"] = False
-                candidate["priority"] = 0
     
     event["tags"] = [tag["id_tag"] for tag in eventtag]
     
