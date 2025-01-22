@@ -19,6 +19,7 @@ checks = {
     '/admin/manage_employee/employee': 'admin.dashboard.create.office',
     '/participant/dashboard': 'participant.dashboard',
     '/candidate/dashboard': 'candidate.dashboard',
+    '/interviews': 'interviews.view',
 
 }
 
