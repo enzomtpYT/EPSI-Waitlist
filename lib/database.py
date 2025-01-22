@@ -10,6 +10,7 @@ def get_db_connection():
     """
     try:
         conn = sqlite3.connect('BDDStage')
+        conn.execute('PRAGMA foreign_keys = ON')
         conn.row_factory = sqlite3.Row
         return conn
     except sqlite3.Error as e:

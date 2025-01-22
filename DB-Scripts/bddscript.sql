@@ -44,7 +44,7 @@ CREATE TABLE Candidate(
    email_candidate TEXT NOT NULL,
    id_user INTEGER,
    PRIMARY KEY(id_candidate),
-   FOREIGN KEY(id_user) REFERENCES User(id_user)
+   FOREIGN KEY(id_user) REFERENCES User(id_user) ON DELETE CASCADE
 );
 
 CREATE TABLE Participant(
@@ -53,7 +53,7 @@ CREATE TABLE Participant(
    email_participant TEXT,
    id_user INTEGER,
    PRIMARY KEY(id_participant),
-   FOREIGN KEY(id_user) REFERENCES User(id_user)
+   FOREIGN KEY(id_user) REFERENCES User(id_user) ON DELETE CASCADE
 );
 
 CREATE TABLE Interview(
@@ -78,7 +78,7 @@ CREATE TABLE Office(
    email_employee TEXT NOT NULL,
    id_user INTEGER,
    PRIMARY KEY(id_employee),
-   FOREIGN KEY(id_user) REFERENCES User(id_user)
+   FOREIGN KEY(id_user) REFERENCES User(id_user) ON DELETE CASCADE
 );
 
 CREATE TABLE Participates(
@@ -127,7 +127,7 @@ CREATE TABLE User_role(
    id_user INTEGER,
    PRIMARY KEY(id_role, id_user),
    FOREIGN KEY(id_role) REFERENCES Role(id_role),
-   FOREIGN KEY(id_user) REFERENCES User(id_user)
+   FOREIGN KEY(id_user) REFERENCES User(id_user) ON DELETE CASCADE
 );
 
 CREATE TABLE Role_permission(
