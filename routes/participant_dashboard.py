@@ -14,12 +14,6 @@ def dashboard():
         flash(error, 'danger')
         return redirect(url_for('auth.login'))
 
-    usertype = database.auth_get_user_type(session_token)
-
-    if usertype != 'participant':
-        flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('auth.login'))
-
     participant, error = database.get_participant(participant_id)
     if error:
         flash(error, 'danger')

@@ -1843,7 +1843,7 @@ def auth_get_user_type(session_token):
         WHERE User.session_token = ?
         ''', (str(session_token),)).fetchone()
         if user_type:
-            return "candidat"
+            return "candidate"
         user_type = conn.execute('''
         SELECT Participant.id_participant
         FROM Participant
@@ -2177,7 +2177,7 @@ def update_feedback(id_interview, feedback, type):
         return "Erreur base de données"
 
     try:
-        if type == "candidat":
+        if type == "candidate":
             conn.execute('UPDATE Interview SET feedback_candidate = ? WHERE id_interview = ?', (feedback, id_interview))
         elif type == "participant":
             conn.execute('UPDATE Interview SET feedback_participant = ? WHERE id_interview = ?', (feedback, id_interview))

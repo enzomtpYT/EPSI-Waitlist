@@ -2,7 +2,7 @@ from flask import flash, redirect, request, url_for
 from lib import auth
 
 checks = {
-    '/admin': 'admin.acess',
+    '/admin': 'admin.access',
     '/admin/manage_candidate': 'admin.dashboard.view.candidate',
     '/admin/manage_participant': 'admin.dashboard.view.participant',
     '/admin/manage_event': 'admin.dashboard.view.events',
@@ -19,7 +19,7 @@ checks = {
     '/admin/manage_employee/employee': 'admin.dashboard.create.office',
     '/participant/dashboard': 'participant.dashboard',
     '/candidate/dashboard': 'candidate.dashboard',
-    
+
 }
 
 def checkroutes(session):
