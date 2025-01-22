@@ -6,52 +6,55 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='styles/feedbackinters.css') }}">
 <h1>Entretiens passé</h1>
 
-<div class="eventcontainer">
-    <div class="cards eventselector">
-    {% for event_name, event in events.items() %}
-        <a onclick="display('{{ event_name }}')" class="eventname">{{ event_name }}</a>
-    {% endfor %}
-    </div>
-    {% for event_name, event in events.items() %}
-        <div id="{{ event_name }}" class="cards event">
-            <h2>{{ event.name_event }}</h2>
-            {% if event.interviews %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nom</th>
-                        <th>Durée de l'entretien</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for interview in event.interviews %}
-                    <tr>
-                        {% if interview.name_participant %}
-                            <td>{{ interview.name_participant }}</td>
-                        {% else %}
-                            <td>{{ interview.name_candidate }} {{ interview.lastname_candidate }}</td>
-                        {% endif %}
-                        <td>{% if interview.duration_interview is not none %}{{ interview.duration_interview }}{% else %}&nbsp;{% endif %}</td>
-                        <td class="actionbtn">
-                            <button type="button" class="edit-feedback" interview-id="{{ interview.id_interview }}">
-                                Editer mon feedback
-                            </button>
-                            <button type="button" class="feedback-btn" data-feedback-candidate="{{ interview.feedback_candidate }}" data-feedback-participant="{{ interview.feedback_participant }}">
-                                Voir les feedbacks
-                            </button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <p>Aucun entretien disponible.</p>
-            {% endif %}
+{% if events %}
+    <div class="eventcontainer">
+        <div class="cards eventselector">
+        {% for event_name, event in events.items() %}
+            <a onclick="display('{{ event_name }}')" class="eventname">{{ event_name }}</a>
+        {% endfor %}
         </div>
-    {% endfor %}
-</div>
-
+        {% for event_name, event in events.items() %}
+            <div id="{{ event_name }}" class="cards event">
+                <h2>{{ event.name_event }}</h2>
+                {% if event.interviews %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Durée de l'entretien</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for interview in event.interviews %}
+                        <tr>
+                            {% if interview.name_participant %}
+                                <td>{{ interview.name_participant }}</td>
+                            {% else %}
+                                <td>{{ interview.name_candidate }} {{ interview.lastname_candidate }}</td>
+                            {% endif %}
+                            <td>{% if interview.duration_interview is not none %}{{ interview.duration_interview }}{% else %}&nbsp;{% endif %}</td>
+                            <td class="actionbtn">
+                                <button type="button" class="edit-feedback" interview-id="{{ interview.id_interview }}">
+                                    Editer mon feedback
+                                </button>
+                                <button type="button" class="feedback-btn" data-feedback-candidate="{{ interview.feedback_candidate }}" data-feedback-participant="{{ interview.feedback_participant }}">
+                                    Voir les feedbacks
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>Aucun entretien disponible.</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>Aucun entretien passé.</p>
+{% endif %}
 
 <div id="feedbackModal" class="modal">
     <div class="modal-content">
