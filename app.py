@@ -1,4 +1,4 @@
-from flask import request, session
+from flask import request, session, redirect, url_for
 from flask_socketio import send
 from sock import socketio, app
 from lib import permission, database
@@ -54,6 +54,13 @@ app.register_blueprint(interviews_bp)
 
 @app.before_request
 def checkroutes():
+    session_token = session.get('token')
+    if session_token:
+        user_role = database.get_user_role_with_token(session_token)
+        if not user_role:
+            # If the token is invalid, clear the session and redirect to login
+            session.clear()
+            return redirect(url_for('auth.login'))
     return permission.checkroutes(session)
 
 @socketio.on('message')
