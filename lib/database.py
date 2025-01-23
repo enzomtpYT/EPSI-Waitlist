@@ -1494,8 +1494,8 @@ def create_attends(id_candidate, id_event, priority):
         conn.execute('INSERT INTO Attends (id_candidate, id_event, priority) VALUES (?, ?, ?)', (id_candidate, id_event, priority))
         conn.commit()
     except sqlite3.Error as e:
-        print(f"Erreur lors de la création de la participation: {e}")
-        return "Erreur lors de la création de la participation"
+        print(f"Erreur lors de la création de la participation (Candidat): {e}")
+        return "Erreur lors de la création de la participation (Candidat)"
     finally:
         conn.close()
     return None
@@ -1542,8 +1542,8 @@ def create_participates(id_participant, id_event):
         conn.execute('INSERT INTO Participates (id_participant, id_event) VALUES (?, ?)', (id_participant, id_event))
         conn.commit()
     except sqlite3.Error as e:
-        print(f"Erreur lors de la création de la participation: {e}")
-        return "Erreur lors de la création de la participation"
+        print(f"Erreur lors de la création de la participation (Intervenant): {e}")
+        return "Erreur lors de la création de la participation (Intervenant)"
     finally:
         conn.close()
     return None

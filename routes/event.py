@@ -126,13 +126,12 @@ def manage_event_participants(id_event):
             if dbpart['id_participant'] not in [formparticipant['id_participant'] for formparticipant in form['participants']] and dbpart['attends'] == True:
                 changes['participants']['removed'].append(dbpart['id_participant'])
 
-        for candidate in changes['candidates']['added']:
-            for item in changes['candidates']['added']:
-                candidate, priority = list(item.items())[0]
-                error = database.create_attends(candidate, id_event, priority)
-                if error:
-                    flash(error, "danger")
-                    return redirect(url_for('event.manage_event_participants', id_event=id_event))
+        for item in changes['candidates']['added']:
+            candidate, priority = list(item.items())[0]
+            error = database.create_attends(candidate, id_event, priority)
+            if error:
+                flash(error, "danger")
+                return redirect(url_for('event.manage_event_participants', id_event=id_event))
 
         for candidate in changes['candidates']['removed']:
             error = database.delete_attends(candidate, id_event)
@@ -140,13 +139,12 @@ def manage_event_participants(id_event):
                 flash(error, "danger")
                 return redirect(url_for('event.manage_event_participants', id_event=id_event))
 
-        if changes['candidates']['edited']:
-            for item in changes['candidates']['edited']:
-                candidate, priority = list(item.items())[0]
-                error = database.edit_attends(candidate, id_event, priority)
-                if error:
-                    flash(error, "danger")
-                    return redirect(url_for('event.manage_event_participants', id_event=id_event))
+        for item in changes['candidates']['edited']:
+            candidate, priority = list(item.items())[0]
+            error = database.edit_attends(candidate, id_event, priority)
+            if error:
+                flash(error, "danger")
+                return redirect(url_for('event.manage_event_participants', id_event=id_event))
 
         for participant in changes['participants']['added']:
             error = database.create_participates(participant, id_event)
