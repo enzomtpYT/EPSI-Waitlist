@@ -3,7 +3,7 @@ import bcrypt, hashlib, random, requests
 
 def verify_login(username, password):
     dbhashed_password, error = database.auth_get_hashedpassword(username)
-    dbhashed_password = dbhashed_password[0]
+    dbhashed_password = dbhashed_password[0].encode('utf-8')
     if error:
         return False, error
     if bcrypt.checkpw(password.encode('utf-8'), dbhashed_password):
