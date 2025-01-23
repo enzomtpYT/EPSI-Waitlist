@@ -27,9 +27,6 @@ from routes.participant_dashboard import participant_dashboard_bp
 from routes.candidate_dashboard import candidate_dashboard_bp
 from routes.interviews import interviews_bp
 
-# Secret key for session (temporary hard coded for development)
-app.secret_key = 'TempSecretKey'
-
 # Register the blueprints
 app.register_blueprint(auth_bp)
 app.register_blueprint(api_bp)
@@ -74,4 +71,4 @@ def inject_routes():
 
 if __name__ == "__main__":
     debug_mode = os.getenv('FLASK_ENV') == 'development'
-    socketio.run(app, host="127.0.0.1", port=8080, debug=debug_mode)
+    socketio.run(app, host="0.0.0.0", port=os.getenv('SERVER_PORT'), debug=debug_mode)
