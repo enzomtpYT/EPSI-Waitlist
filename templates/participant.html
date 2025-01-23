@@ -16,8 +16,16 @@
             <label for="participant_email">E-mail :</label>
             <input type="email" id="participant_email" name="participant_email" value="{{ participant.email_participant }}">
 
+            <label for="password">Mot de passe :</label>
+            <div class="editpass">
+                <div class="iconified-input">
+                    <input type="password" id="password" name="password" value="">
+                    <i onclick="showpass()" id="showpass" class="fa-regular fa-eye icon showpass"></i>
+                </div>
+                <button type="button" onclick="generatepass()">Générer un mot de passe</button>
+            </div>
+
             <div>
-                <button type="button" onclick="newuser({{ participant.id_participant }}, '{{ rpassword }}')">Générer un mot de passe</button>
                 <button type="submit">Enregistrer</button>
                 <form action="/admin/manage_participant/{{ participant.id_participant }}/delete" method="post">
                     <button class="delete" type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet intervenant ?');">Supprimer</button>
@@ -106,6 +114,9 @@
 </div>
 
 <script>
+// Get password input element
+var passwordInput = document.getElementById('password');
+
 // Get the modal
 var modal = document.getElementById("feedbackModal");
 
@@ -155,6 +166,35 @@ function newuser(id, password){
         }, 1000);
     })
 }
+
+function generatepass() {
+    // Generate random password min 12 characters max 24 characters with at least one uppercase letter, one lowercase letter, one number and one special character
+    var password = '';
+    var uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    var lowercase = 'abcdefghijklmnopqrstuvwxyz';
+    var numbers = '0123456789';
+    var special = '!@#$%^&*()_+~`|}{[]\\:;?><,./-=';
+    var all = uppercase + lowercase + numbers + special;
+    var length = Math.floor(Math.random() * (24 - 8 + 1)) + 12;
+    for (var i = 0; i < length; i++) {
+        password += all.charAt(Math.floor(Math.random() * all.length));
+    }
+    passwordInput.value = password;
+}
+
+// Toggle password visibility
+function showpass() {
+    var icon = document.getElementById('showpass');
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+};
 </script>
 
 {% endblock %}
