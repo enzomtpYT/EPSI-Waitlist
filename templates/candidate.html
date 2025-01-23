@@ -18,8 +18,16 @@
             <label for="candidate_email">E-mail :</label>
             <input type="email" id="candidate_email" name="candidate_email" value="{{ candidate.email_candidate }}">
 
+            <label for="password">Mot de passe :</label>
+            <div class="editpass">
+                <div class="iconified-input">
+                    <input type="password" id="password" name="password" value="">
+                    <i onclick="showpass()" id="showpass" class="fa-regular fa-eye icon showpass"></i>
+                </div>
+                <button type="button" onclick="generatepass()">Générer un mot de passe</button>
+            </div>
+
             <div>
-                <button type="button" onclick="newuser({{ candidate.id_candidate }}, '{{ rpassword }}')">Générer un mot de passe</button>
                 <button type="submit">Enregistrer</button>
                 <form action="/admin/manage_candidate/{{ candidate.id_candidate }}/delete" method="post">
                     <button class="delete" type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce candidat ?');">Supprimer</button>
@@ -108,6 +116,9 @@
 </div>
 
 <script>
+// Get password input element
+var passwordInput = document.getElementById('password');
+
 // Get the modal
 var modal = document.getElementById("feedbackModal");
 
@@ -137,26 +148,34 @@ window.onclick = function(event) {
     }
 }
 
-// When button is clicked generate new password for user
-function newuser(id, password){
-    fetch(`/register/candidate/${id}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-            'password': password
-        })
-    })
-    .then(() => {
-        navigator.clipboard.writeText(password)
-        .then(() => alert('Le nouveau mot de passe a été copié dans le presse-papiers.'))
-        .catch(err => console.error('Erreur lors de la copie du mot de passe : ', err));
-        setTimeout(() => {
-            window.location.reload();
-        }, 1000);
-    })
+function generatepass() {
+    // Generate random password min 12 characters max 24 characters with at least one uppercase letter, one lowercase letter, one number and one special character
+    var password = '';
+    var uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    var lowercase = 'abcdefghijklmnopqrstuvwxyz';
+    var numbers = '0123456789';
+    var special = '!@#$%^&*()_+~`|}{[]\\:;?><,./-=';
+    var all = uppercase + lowercase + numbers + special;
+    var length = Math.floor(Math.random() * (24 - 8 + 1)) + 12;
+    for (var i = 0; i < length; i++) {
+        password += all.charAt(Math.floor(Math.random() * all.length));
+    }
+    passwordInput.value = password;
 }
+
+// Toggle password visibility
+function showpass() {
+    var icon = document.getElementById('showpass');
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+};
 </script>
 
 {% endblock %}

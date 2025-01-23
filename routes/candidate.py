@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from lib import database
+from lib import database, auth
 import random, string
 
 candidate_bp = Blueprint('candidate', __name__)
@@ -19,6 +19,7 @@ def edit_candidate(id_candidate):
         lastname = request.form['candidate_lastname']
         name = request.form['candidate_name']
         email = request.form['candidate_email']
+        password = request.form['password']
         tags = request.form.getlist('tags')
         error = None
 
@@ -31,6 +32,8 @@ def edit_candidate(id_candidate):
 
         if error is None:
             error = database.edit_candidate(lastname, name, email, id_candidate)
+            if password:
+                error = auth.update_candidate(id_candidate, password)
             if error is None:
                 flash("Candidat mis à jour avec succès!", "success")
                 return redirect(url_for('candidate.edit_candidate', id_candidate=id_candidate))
@@ -38,9 +41,7 @@ def edit_candidate(id_candidate):
                 flash(f"Erreur lors de la mise à jour du candidat: {error}", "danger")
                 return redirect(url_for('candidate.edit_candidate', id_candidate=id_candidate))
 
-    # Generate random password min 8 characters max 16 characters with at least one uppercase letter, one lowercase letter, one number and one special character
-    password = ''.join(random.choice(string.ascii_letters + string.digits + string.punctuation.replace("'", "\\'")) for i in range(random.randint(8, 16)))
-    return render_template('candidate.html', candidate=candidate, tags=tags, interviews=interviews, candidate_tags=candidate_tags, rpassword=password)
+    return render_template('candidate.html', candidate=candidate, tags=tags, interviews=interviews, candidate_tags=candidate_tags)
 
 @candidate_bp.route("/admin/manage_candidate/candidate/<int:id_candidate>/add_tag_candidate", methods=['POST'])
 def add_tag_candidate(id_candidate):

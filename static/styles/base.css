@@ -86,7 +86,6 @@ button {
     background-color: var(--btn-color);
     color: #fff;
     cursor: pointer;
-    width: fit-content;
     margin-inline: auto;
     border-radius: 10px;
     padding: .5rem 1rem;
@@ -287,11 +286,12 @@ h1 {
 .iconified-input {
     display: flex;
     align-items: center;
+    padding: 0.5rem;
     gap: .5rem;
     width: 100%;
     border-radius: 5px;
     border: 2px solid var(--accent-color);
-    background-color: var(--btn-color);
+    background-color: var(--alt1);
     color: #fff;
 }
 
@@ -301,7 +301,7 @@ h1 {
 
 .iconified-input > input {
     margin: 0;
-    padding: 0.5rem 0;
+    padding: 0;
     border: 0;
     border-radius: 0;
     width: 100%;
@@ -315,10 +315,6 @@ h1 {
 
 .iconified-input > input:focus {
     outline: none;
-}
-
-.iconified-input > .icon {
-    padding-left: 0.5rem;
 }
 
 .section {
@@ -339,4 +335,21 @@ h1 {
 
 .section-stacker {
     width: 100%;
+}
+
+.editpass {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    padding-bottom: .5rem;
+}
+
+.editpass > .iconified-input {
+    flex-basis: min-content;
+    flex-grow: 2;
+    flex-shrink: 1;
+}
+
+.showpass {
+    cursor: pointer;
 }
