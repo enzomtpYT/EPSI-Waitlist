@@ -65,9 +65,11 @@ def handleMessage(msg):
 @app.context_processor
 def inject_routes():
     user_role = None
+    permissions = None
     if 'token' in session:
         user_role = database.get_user_role_with_token(session['token'])
-    return dict(parameters=request.args.to_dict(), session=session, user_role=user_role)
+        permissions, error = database.auth_get_perms_from_session(session['token'])
+    return dict(parameters=request.args.to_dict(), session=session, user_role=user_role, perms=permissions)
 
 if __name__ == "__main__":
     debug_mode = os.getenv('FLASK_ENV') == 'development'

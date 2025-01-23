@@ -56,16 +56,16 @@ def edit_employee(id_employee):
         if error is None:
             # Update the employee in the database
             if password:
-                error = auth.update_participant(id_employee, password)
+                error = auth.update_employee(id_employee, password)
             error = database.edit_employee(lastname, name, email, id_employee)
             if error is None:
                 # Update the employee's role
                 error = database.update_user_role(employee['id_user'], role)
                 if error is None:
-                    flash("Candidat mis à jour avec succès!", "success")
+                    flash("Employé.e mis à jour avec succès!", "success")
                     return redirect(url_for('employee.edit_employee', id_employee=id_employee))
                 else:
-                    flash(f"Erreur lors de la mise à jour du candidat: {error}", "danger")
+                    flash(f"Erreur lors de la mise à jour du Employé.e: {error}", "danger")
                     return redirect(url_for('employee.edit_employee', id_employee=id_employee))
 
     return render_template('employee.html', employee=employee, employee_role=employee_role, user_role=user_role)

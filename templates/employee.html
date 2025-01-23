@@ -32,14 +32,16 @@
                 {% endif %}
             </select>
 
-            <label for="password">Mot de passe :</label>
-            <div class="editpass">
-                <div class="iconified-input">
-                    <input type="password" id="password" name="password" value="">
-                    <i onclick="showpass()" id="showpass" class="fa-regular fa-eye icon showpass"></i>
+            {% if 'admin.edit.employee.password' in perms %}
+                <label for="password">Mot de passe :</label>
+                <div class="editpass">
+                    <div class="iconified-input">
+                        <input type="password" id="password" name="password" value="">
+                        <i onclick="showpass()" id="showpass" class="fa-regular fa-eye icon showpass"></i>
+                    </div>
+                    <button type="button" onclick="generatepass()">Générer un mot de passe</button>
                 </div>
-                <button type="button" onclick="generatepass()">Générer un mot de passe</button>
-            </div>
+            {% endif %}
 
             <div>
                 <button type="submit">Enregistrer</button>
