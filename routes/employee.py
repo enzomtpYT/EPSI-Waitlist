@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from lib import database
+from lib import database, auth
 import random, string
 
 employee_bp = Blueprint('employee', __name__)
@@ -28,6 +28,7 @@ def edit_employee(id_employee):
         lastname = request.form['employee_lastname']
         name = request.form['employee_name']
         email = request.form['employee_email']
+        password = request.form['password']
         role = request.form['role']
         error = None
 
@@ -55,6 +56,8 @@ def edit_employee(id_employee):
 
         if error is None:
             # Update the employee in the database
+            if password:
+                error = auth.update_participant(id_employee, password)
             error = database.edit_employee(lastname, name, email, id_employee)
             if error is None:
                 # Update the employee's role
@@ -66,8 +69,6 @@ def edit_employee(id_employee):
                     flash(f"Erreur lors de la mise à jour du candidat: {error}", "danger")
                     return redirect(url_for('employee.edit_employee', id_employee=id_employee))
 
-    # Generate random password min 8 characters max 16 characters with at least one uppercase letter, one lowercase letter, one number and one special character
-    password = ''.join(random.choice(string.ascii_letters + string.digits + string.punctuation) for i in range(random.randint(8, 16)))
     return render_template('employee.html', employee=employee, employee_role=employee_role, rpassword=password, user_role=user_role)
 
 @employee_bp.route("/admin/manage_employee/employee/<int:id_employee>/delete", methods=['POST'])
