@@ -1,4 +1,4 @@
-INSERT INTO Attends (id_participant,id_event) VALUES
+INSERT INTO Participates (id_participant,id_event) VALUES
 	 (1,1),
 	 (2,2),
 	 (3,3),
@@ -133,7 +133,7 @@ INSERT INTO Participant_tag (id_participant,id_tag) VALUES
 	 (7,2),
 	 (7,3),
 	 (7,7);
-INSERT INTO Participates (id_candidate,id_event,priority) VALUES
+INSERT INTO Attends (id_candidate,id_event,priority) VALUES
 	 (1,1,NULL),
 	 (2,2,NULL),
 	 (3,1,NULL),

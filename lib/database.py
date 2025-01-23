@@ -208,10 +208,10 @@ def get_event_candidates(id):
         return None, "Erreur base de données"
     try:
         candidates = conn.execute('''
-        SELECT Candidate.*, Participates.priority
+        SELECT Candidate.*, Attends.priority
         FROM Candidate
-        JOIN Participates ON Candidate.id_candidate = Participates.id_candidate
-        WHERE Participates.id_event = ?
+        JOIN Attends ON Candidate.id_candidate = Attends.id_candidate
+        WHERE Attends.id_event = ?
         ''', (id,)).fetchall()
         return candidates, None
     except sqlite3.Error as e:
@@ -237,8 +237,8 @@ def get_event_participant(id):
         inter = conn.execute('''
         SELECT Participant.*
         FROM Participant
-        JOIN Attends ON Participant.id_participant = Attends.id_participant
-        WHERE Attends.id_event = ?
+        JOIN Participates ON Participant.id_participant = Participates.id_participant
+        WHERE Participates.id_event = ?
         ''', (id,)).fetchall()
         return inter, None
     except sqlite3.Error as e:
@@ -467,8 +467,8 @@ def get_candidate_events(id_candidate):
         events = conn.execute('''
         SELECT Event.id_event, Event.name_event, Event.date_event
         FROM Event
-        JOIN Participates ON Event.id_event = Participates.id_event
-        WHERE Participates.id_candidate = ?
+        JOIN Attends ON Event.id_event = Attends.id_event
+        WHERE Attends.id_candidate = ?
         ''', (id_candidate,)).fetchall()
 
         return events, None
@@ -581,7 +581,7 @@ def add_candidate_to_event(id_event, id_candidate):
         return "Erreur base de données"
     try:
         # Exécute la requête pour ajouter le candidat à l'événement
-        conn.execute('INSERT INTO Participates (id_event, id_candidate) VALUES (?, ?)', (id_event, id_candidate))
+        conn.execute('INSERT INTO Attends (id_event, id_candidate) VALUES (?, ?)', (id_event, id_candidate))
         # Sauvegarde les modifications
         conn.commit()
     except sqlite3.Error as e:
@@ -610,7 +610,7 @@ def delete_candidate_from_event(id_event, id_candidate):
         return "Erreur base de données"
     try:
         # Exécute la requête pour supprimer le candidat de l'événement
-        conn.execute("DELETE FROM Participates WHERE id_event = ? AND id_candidate = ?", (id_event, id_candidate))
+        conn.execute("DELETE FROM Attends WHERE id_event = ? AND id_candidate = ?", (id_event, id_candidate))
         # Sauvegarde les modifications
         conn.commit()
     except sqlite3.Error as e:
@@ -793,8 +793,8 @@ def get_participant_events(id_participant):
         events = conn.execute('''
         SELECT Event.id_event, Event.name_event, Event.date_event
         FROM Event
-        JOIN Attends ON Event.id_event = Attends.id_event
-        WHERE Attends.id_participant = ?
+        JOIN Participates ON Event.id_event = Participates.id_event
+        WHERE Participates.id_participant = ?
         ''', (id_participant,)).fetchall()
         return events, None
     except sqlite3.Error as e:
@@ -866,7 +866,7 @@ def delete_participant_from_event(id_event, id_participant):
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute("DELETE FROM Attends WHERE id_event = ? AND id_participant = ?", (id_event, id_participant))
+        conn.execute("DELETE FROM Participates WHERE id_event = ? AND id_participant = ?", (id_event, id_participant))
         conn.commit()
     except sqlite3.Error as e:
         print(f"Erreur lors de la suppression de l'intervenant: {e}")
@@ -890,7 +890,7 @@ def add_participant_to_event(id_event, id_participant):
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute('INSERT INTO Attends (id_event, id_participant) VALUES (?, ?)', (id_event, id_participant))
+        conn.execute('INSERT INTO Participates (id_event, id_participant) VALUES (?, ?)', (id_event, id_participant))
         conn.commit()
     except sqlite3.Error as e:
         print(f"Erreur lors de l'ajout de l'intervenant à l'événement: {e}")
@@ -1450,7 +1450,7 @@ def get_last_added_event():
 
 # Attends and Participates functions
 
-def edit_participates(id_candidat, id_event, priority):
+def edit_attends(id_candidat, id_event, priority):
     """
     Met à jour la priorité d'un candidat pour un événement.
 
@@ -1466,7 +1466,7 @@ def edit_participates(id_candidat, id_event, priority):
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute('UPDATE Participates SET priority = ? WHERE id_candidate = ? AND id_event = ?', (priority, id_candidat, id_event))
+        conn.execute('UPDATE Attends SET priority = ? WHERE id_candidate = ? AND id_event = ?', (priority, id_candidat, id_event))
         conn.commit()
     except sqlite3.Error as e:
         print(f"Erreur lors de la mise à jour de la priorité du candidat: {e}")
@@ -1475,7 +1475,7 @@ def edit_participates(id_candidat, id_event, priority):
         conn.close()
     return None
 
-def create_participates(id_candidate, id_event, priority):
+def create_attends(id_candidate, id_event, priority):
     """
     Crée une nouvelle participation dans la base de données.
 
@@ -1491,7 +1491,7 @@ def create_participates(id_candidate, id_event, priority):
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute('INSERT INTO Participates (id_candidate, id_event, priority) VALUES (?, ?, ?)', (id_candidate, id_event, priority))
+        conn.execute('INSERT INTO Attends (id_candidate, id_event, priority) VALUES (?, ?, ?)', (id_candidate, id_event, priority))
         conn.commit()
     except sqlite3.Error as e:
         print(f"Erreur lors de la création de la participation: {e}")
@@ -1500,7 +1500,7 @@ def create_participates(id_candidate, id_event, priority):
         conn.close()
     return None
 
-def delete_participates(id_candidate, id_event):
+def delete_attends(id_candidate, id_event):
     """
     Supprime une participation de la base de données en utilisant l'identifiant du candidat et de l'événement.
 
@@ -1515,7 +1515,7 @@ def delete_participates(id_candidate, id_event):
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute("DELETE FROM Participates WHERE id_candidate = ? AND id_event = ?", (id_candidate, id_event))
+        conn.execute("DELETE FROM Attends WHERE id_candidate = ? AND id_event = ?", (id_candidate, id_event))
         conn.commit()
     except sqlite3.Error as e:
         print(f"Erreur lors de la suppression de la participation: {e}")
@@ -1524,7 +1524,7 @@ def delete_participates(id_candidate, id_event):
         conn.close()
     return None
 
-def create_attends(id_participant, id_event):
+def create_participates(id_participant, id_event):
     """
     Crée une nouvelle participation dans la base de données.
 
@@ -1539,7 +1539,7 @@ def create_attends(id_participant, id_event):
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute('INSERT INTO Attends (id_participant, id_event) VALUES (?, ?)', (id_participant, id_event))
+        conn.execute('INSERT INTO Participates (id_participant, id_event) VALUES (?, ?)', (id_participant, id_event))
         conn.commit()
     except sqlite3.Error as e:
         print(f"Erreur lors de la création de la participation: {e}")
@@ -1548,7 +1548,7 @@ def create_attends(id_participant, id_event):
         conn.close()
     return None
 
-def delete_attends(id_participant, id_event):
+def delete_participates(id_participant, id_event):
     """
     Supprime une participation de la base de données en utilisant l'identifiant du participant et de l'événement.
 
@@ -1563,7 +1563,7 @@ def delete_attends(id_participant, id_event):
     if conn is None:
         return "Erreur base de données"
     try:
-        conn.execute("DELETE FROM Attends WHERE id_participant = ? AND id_event = ?", (id_participant, id_event))
+        conn.execute("DELETE FROM Participates WHERE id_participant = ? AND id_event = ?", (id_participant, id_event))
         conn.commit()
     except sqlite3.Error as e:
         print(f"Erreur lors de la suppression de la participation: {e}")
@@ -1696,7 +1696,7 @@ def auth_register_employee(id_employee, username, password_user, session_token):
         # get latest user id
         user_id = conn.execute('SELECT id_user FROM User WHERE username = ?', (username,)).fetchone()
         # add user to employee table
-        conn.execute('UPDATE Office SET id_user = ? WHERE id_employee = ?', (user_id[0], id_employee))
+        conn.execute('UPDATE Employee SET id_user = ? WHERE id_employee = ?', (user_id[0], id_employee))
         return None
     except sqlite3.Error as e:
         print(f"Erreur lors de l'enregistrement de l'employé: {e}")
@@ -1854,9 +1854,9 @@ def auth_get_user_type(session_token):
         if user_type:
             return "participant"
         user_type = conn.execute('''
-        SELECT Office.id_employee
-        FROM Office
-        JOIN User ON Office.id_user = User.id_user
+        SELECT Employee.id_employee
+        FROM Employee
+        JOIN User ON Employee.id_user = User.id_user
         WHERE User.session_token = ?
         ''', (str(session_token),)).fetchone()
         if user_type:
@@ -1900,9 +1900,9 @@ def auth_get_type_id(session_token):
         if user_type:
             return user_type['id_participant'], None
         user_type = conn.execute('''
-        SELECT Office.id_employee
-        FROM Office
-        JOIN User ON Office.id_user = User.id_user
+        SELECT Employee.id_employee
+        FROM Employee
+        JOIN User ON Employee.id_user = User.id_user
         WHERE User.session_token = ?
         ''', (str(session_token),)).fetchone()
         if user_type:
@@ -1999,7 +1999,7 @@ def create_employee(lastname, name, email, role):
         user_id = cursor.lastrowid
 
         # Insere l'employé dans la base de données
-        cursor.execute('INSERT INTO Office (lastname_employee, name_employee, email_employee, id_user) VALUES (?, ?, ?, ?)', (lastname, name, email, user_id))
+        cursor.execute('INSERT INTO Employee (lastname_employee, name_employee, email_employee, id_user) VALUES (?, ?, ?, ?)', (lastname, name, email, user_id))
         employee_id = cursor.lastrowid
 
        # Récupère l'id_role correspondant au nom du rôle
@@ -2034,7 +2034,7 @@ def get_employee_email(id_employee):
     if conn is None:
         return None
     try:
-        employee = conn.execute('SELECT email_employee FROM Office WHERE id_employee = ?', (id_employee,)).fetchone()
+        employee = conn.execute('SELECT email_employee FROM Employee WHERE id_employee = ?', (id_employee,)).fetchone()
         return employee['email_employee']
     except sqlite3.Error as e:
         print(f"Erreur requête base de données: {e}")
@@ -2056,9 +2056,9 @@ def get_all_employees():
     try:
         # Renvoie tous les employés de la base de données
         employees = conn.execute('''
-        SELECT User.id_user, User.username, Office.*, Role.name_role
-        FROM Office
-        JOIN User ON Office.id_user = User.id_user
+        SELECT User.id_user, User.username, Employee.*, Role.name_role
+        FROM Employee
+        JOIN User ON Employee.id_user = User.id_user
         JOIN User_role ON User.id_user = User_role.id_user
         JOIN Role ON User_role.id_role = Role.id_role
         ''').fetchall()
@@ -2091,7 +2091,7 @@ def get_employee(employee_id):
         return None, "Erreur base de données"
     try:
         # Exécute la requête pour récupérer l'employé
-        employee = conn.execute('SELECT * FROM Office WHERE id_employee = ?', (employee_id,)).fetchone()
+        employee = conn.execute('SELECT * FROM Employee WHERE id_employee = ?', (employee_id,)).fetchone()
         return employee, None
     except sqlite3.Error as e:
         # Gère les erreurs de requête SQL
@@ -2120,7 +2120,7 @@ def edit_employee(lastname, name, email, id_employee):
 
     try:
         # Met à jour l'employé dans la base de données
-        conn.execute('UPDATE Office SET lastname_employee = ?, name_employee = ?, email_employee = ? WHERE id_employee = ?', (lastname, name, email, id_employee))
+        conn.execute('UPDATE Employee SET lastname_employee = ?, name_employee = ?, email_employee = ? WHERE id_employee = ?', (lastname, name, email, id_employee))
         # Sauvegarde les modifications
         conn.commit()
     except sqlite3.Error as e:
@@ -2147,7 +2147,7 @@ def delete_employee(id_employee):
         return "Erreur base de données"
     try:
         # Exécute la requête pour supprimer l'employé
-        conn.execute("DELETE FROM Office WHERE id_employee = ?", (id_employee,))
+        conn.execute("DELETE FROM Employee WHERE id_employee = ?", (id_employee,))
         # Sauvegarde les modifications
         conn.commit()
     except sqlite3.Error as e:
