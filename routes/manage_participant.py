@@ -8,6 +8,7 @@ def manage_participant():
     participants, error = database.get_all_participants()
     if error:
         flash("Erreur lors de la récupération des participants", "danger")
+        return render_template('manage_participant.html', participants=[])
 
     participants_with_tags = []
     for participant in participants:

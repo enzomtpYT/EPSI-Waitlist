@@ -8,6 +8,7 @@ def manage_employee():
     employees, error = database.get_all_employees()
     if error:
         flash("Erreur lors de la récupération des employés", "danger")
+        return render_template('manage_employee.html', employees=[])
     return render_template('manage_employee.html', employees=employees)
 
 @manage_employee_bp.route("/admin/manage_employee/<int:id_employee>/delete", methods=['POST'])

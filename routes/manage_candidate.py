@@ -8,6 +8,7 @@ def manage_candidate():
     candidates, error = database.get_all_candidates()
     if error:
         flash("Erreur lors de la récupération des candidats", "danger")
+        return render_template('manage_candidate.html', candidates=[])
 
     candidates_with_tags = []
     for candidate in candidates:
