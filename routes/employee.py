@@ -68,7 +68,7 @@ def edit_employee(id_employee):
                     flash(f"Erreur lors de la mise à jour du candidat: {error}", "danger")
                     return redirect(url_for('employee.edit_employee', id_employee=id_employee))
 
-    return render_template('employee.html', employee=employee, employee_role=employee_role, rpassword=password, user_role=user_role)
+    return render_template('employee.html', employee=employee, employee_role=employee_role, user_role=user_role)
 
 @employee_bp.route("/admin/manage_employee/employee/<int:id_employee>/delete", methods=['POST'])
 def delete_employee(id_employee):
