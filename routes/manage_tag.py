@@ -25,6 +25,7 @@ def manage_tag():
     tags, error = database.get_all_tags()
     if error:
         flash("Erreur lors de la récupération des tags", "danger")
+        return render_template('manage_tag.html', tags=[])
     return render_template('manage_tag.html', tags=tags)
 
 @manage_tag_bp.route("/admin/manage_tag/<int:id_tag>/delete", methods=['POST'])
