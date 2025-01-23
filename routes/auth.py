@@ -32,12 +32,12 @@ def logout():
     return redirect(url_for('auth.login'))
 
 @auth_bp.route('/register/candidate/<int:id_candidate>', methods=['POST', 'GET'])
-def register_candidate(id_candidate):
+def update_candidate(id_candidate):
     if request.method == 'POST':
         password = request.form.get('password')
         if not password:
             flash('Password is required', 'error')
-        error = auth.register_candidate(id_candidate, password)
+        error = auth.update_candidate(id_candidate, password)
         if error:
             flash(f'Registration failed: {error}', 'error')
         else:
@@ -45,12 +45,12 @@ def register_candidate(id_candidate):
     return redirect(request.referrer)
 
 @auth_bp.route('/register/participant/<int:id_participant>', methods=['POST', 'GET'])
-def register_participant(id_participant):
+def update_participant(id_participant):
     if request.method == 'POST':
         password = request.form.get('password')
         if not password:
             flash('Password is required', 'error')
-        error = auth.register_participant(id_participant, password)
+        error = auth.update_participant(id_participant, password)
         if error:
             flash(f'Registration failed: {error}', 'error')
         else:
@@ -58,12 +58,12 @@ def register_participant(id_participant):
     return redirect(request.referrer)
 
 @auth_bp.route('/register/employee/<int:id_employee>', methods=['POST', 'GET'])
-def register_employee(id_employee):
+def update_employee(id_employee):
     if request.method == 'POST':
         password = request.form.get('password')
         if not password:
             flash('Password is required', 'error')
-        error = auth.register_employee(id_employee, password)
+        error = auth.update_employee(id_employee, password)
         if error:
             flash(f'Registration failed: {error}', 'error')
         else:
