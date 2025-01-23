@@ -18,7 +18,7 @@ def login():
         # Check if credentials are correct
         vsession, error = auth.verify_login(username, password)
         if vsession:
-            session['token'] = vsession['session_token']
+            session['token'] = vsession
             flash('Login successful', 'success')
             return redirect(url_for('index.index'))
         else:

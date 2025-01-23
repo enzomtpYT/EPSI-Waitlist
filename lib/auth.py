@@ -3,7 +3,7 @@ import bcrypt, hashlib, random, requests
 
 def verify_login(username, password):
     dbhashed_password, error = database.auth_get_hashedpassword(username)
-    dbhashed_password = dbhashed_password[0]
+    dbhashed_password = dbhashed_password[0].encode('utf-8')
     if error:
         return False, error
     if bcrypt.checkpw(password.encode('utf-8'), dbhashed_password):
@@ -16,7 +16,7 @@ def verify_login(username, password):
 
 def genpassword(password):
     salt = bcrypt.gensalt(random.randint(12,16))
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
     return hashed_password
 
 def update_candidate(id_candidate, password):

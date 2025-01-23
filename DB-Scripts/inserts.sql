@@ -1,171 +1,105 @@
-INSERT INTO Participates (id_participant,id_event) VALUES
+INSERT INTO public."User" (id_user,username,password_user,session_token) VALUES
+	 (2,'laval@email.fr','$2b$12$19nrk22vpp0sD7T39nOkE.16/OtJQpEGJ3Dvad/WM5/Yqd7xE3LKS','ccc48c36fb8fbcc21ed3951ab2afcb1f'),
+	 (3,'hebdo@email.fr',NULL,NULL),
+	 (4,'lailis@email.fr',NULL,NULL),
+	 (5,'sep@email.fr','$2b$14$GCWVsMn/324u0rgv4ul1oeijfnKYJ/PNkM1wrB/6zjzgaF7Nl5yMG','90629bc4fe048455301f678d6c9d55a4'),
+	 (6,'alibox@mail.fr','$2b$13$VOOd0S5WX.XBwJVOSchm8.pS1WOXwX8OF7nQKIdcbiRHjYrE03wVi','513b17974641a3f3db521c344e17916a'),
+	 (7,'marinedup@email.fr','$2b$13$8h/k0U9jzQInSovKM4E8WOXYMlHYG/aqrsdQJZ2BnmySvmIfnCL3i','d9bfc7783f5035d21e063f11dc340193'),
+	 (1,'superuser@mail.fr','$2y$10$3Lhk/.DzcxiMDHqPkshyhObEsBixnUrXXkL367jVoZEQ3UBz7ZG8W','ce3903a8cc204d85856b06b89264bbbe');
+INSERT INTO public.attends (id_candidate,id_event,priority) VALUES
+	 (1,1,1),
+	 (2,1,8),
+	 (1,2,1),
+	 (2,2,9),
+	 (3,2,1);
+INSERT INTO public.candidate (id_candidate,lastname_candidate,name_candidate,email_candidate,id_user) VALUES
+	 (1,'Laval','Bernard','laval@email.fr',2),
+	 (2,'Hebdo','Charlie','hebdo@email.fr',3),
+	 (3,'Doeya','Lailis','lailis@email.fr',4);
+INSERT INTO public.candidate_tag (id_candidate,id_tag) VALUES
 	 (1,1),
-	 (2,2),
-	 (3,3),
-	 (4,4),
-	 (5,5),
-	 (6,6),
+	 (2,1),
+	 (3,4);
+INSERT INTO public.employee (id_employee,lastname_employee,name_employee,email_employee,id_user) VALUES
+	 (1,'User','Super','superuser@mail.fr',1),
+	 (2,'Dupont','Marine','marinedup@email.fr',7);
+INSERT INTO public."event" (id_event,name_event,date_event,start_time_event,end_time_event,has_timeslots) VALUES
+	 (1,'Forum Stage','2025-01-23',NULL,NULL,false),
+	 (2,'Forum S1','2025-01-31',NULL,NULL,false);
+INSERT INTO public.event_tag (id_event,id_tag) VALUES
+	 (1,1),
+	 (1,2),
 	 (1,3),
 	 (2,4),
-	 (3,5),
-	 (4,1),
-	 (5,2),
-	 (6,3),
-	 (1,4),
 	 (2,5),
-	 (3,6),
-	 (4,2),
-	 (5,3),
-	 (6,4),
-	 (1,5),
-	 (2,6),
-	 (3,1),
-	 (4,3),
-	 (5,4),
-	 (6,5),
-	 (1,6),
+	 (2,6);
+INSERT INTO public.interview (id_interview,happened,feedback_candidate,feedback_participant,duration_interview,id_participant,id_event,id_candidate) VALUES
+	 (1,false,NULL,NULL,NULL,1,2,1),
+	 (2,false,NULL,NULL,NULL,2,2,2),
+	 (3,false,NULL,NULL,NULL,2,2,3);
+INSERT INTO public.participant (id_participant,name_participant,email_participant,location_participant,id_user) VALUES
+	 (1,'Septeo','sep@email.fr',NULL,5),
+	 (2,'Alibox','alibox@mail.fr',NULL,6);
+INSERT INTO public.participant_tag (id_participant,id_tag) VALUES
+	 (1,7),
+	 (2,7);
+INSERT INTO public.participates (id_participant,id_event,start_date_offer,end_date_offer,job_description_participant,nbr_position_participant,pdf_job_offer) VALUES
+	 (1,1,NULL,NULL,NULL,NULL,NULL),
+	 (2,1,NULL,NULL,NULL,NULL,NULL),
+	 (1,2,NULL,NULL,NULL,NULL,NULL),
+	 (2,2,NULL,NULL,NULL,NULL,NULL);
+INSERT INTO public."permission" (id_permission,name_permission) VALUES
+	 (1,'admin.access'),
+	 (2,'admin.dashboard.view.*'),
+	 (3,'admin.dashboard.view.candidate'),
+	 (4,'admin.dashboard.view.participant'),
+	 (5,'admin.dashboard.view.tags'),
+	 (6,'admin.dashboard.view.events'),
+	 (7,'admin.dashboard.view.office'),
+	 (8,'admin.dashboard.create.*'),
+	 (9,'admin.dashboard.create.candidate'),
+	 (11,'admin.dashboard.create.participant');
+INSERT INTO public."permission" (id_permission,name_permission) VALUES
+	 (12,'admin.dashboard.create.event'),
+	 (13,'admin.dashboard.create.tag'),
+	 (14,'admin.dashboard.create.office'),
+	 (15,'*'),
+	 (16,'candidate.dashboard'),
+	 (17,'participant.dashboard'),
+	 (18,'interviews.view'),
+	 (19,'admin.edit.employee.password');
+INSERT INTO public."role" (id_role,name_role) VALUES
+	 (1,'superadmin'),
+	 (2,'admin'),
+	 (3,'employee'),
+	 (4,'participant'),
+	 (5,'candidate');
+INSERT INTO public.role_permission (id_role,id_permission) VALUES
+	 (1,15),
 	 (2,1),
+	 (2,2),
+	 (2,8),
+	 (3,1),
 	 (3,2),
-	 (4,5),
-	 (5,6),
-	 (6,1);
-INSERT INTO Candidate (id_candidate,lastname_candidate,name_candidate,email_candidate,id_user) VALUES
-	 (1,'Doey','John','john.doey@example.com',NULL),
-	 (2,'Smith','Jane','jane.smith@example.com',NULL),
-	 (3,'Brown','Charlie','charlie.brown@example.com',NULL),
-	 (4,'Taylor','Chris','chris.taylor@example.com',NULL),
-	 (5,'Lee','Alex','alex.lee@example.com',NULL),
-	 (6,'White','Sam','sam.white@example.com',NULL),
-	 (7,'Green','Pat','pat.green@example.com',NULL),
-	 (8,'Parker','Mayday','maydayparker@gmail.com',NULL),
-	 (9,'Parker','Peter','peterparker@test.com',NULL),
-	 (10,'Watson','Mary-Jane','mjwatson@gmail.com',NULL);
-INSERT INTO Candidate_tag (id_candidate,id_tag) VALUES
-	 (1,1);
-INSERT INTO Event (id_event,name_event,date_event) VALUES
-	 (1,'Tech Conference',2011),
-	 (2,'Job Fair',2017),
-	 (3,'Hackathon',2016),
-	 (4,'Workshop',2014),
-	 (5,'Networking Event',2013),
-	 (6,'Seminar',2012);
-INSERT INTO Event_tag (id_event,id_tag) VALUES
-	 (1,1);
-INSERT INTO Interview (id_interview,happened,feedback_candidate,feedback_participant,duration_interview,id_participant,id_event,id_candidate) VALUES
-	 (1,0,'Feedback candidat','Feedback participant',NULL,1,1,1),
-	 (2,0,'Feedback candidat','Feedback participant',NULL,1,1,3),
-	 (3,0,'Feedback candidat','Feedback participant',NULL,1,1,4),
-	 (4,1,'Feedback candidat','Feedback participant',NULL,4,1,3),
-	 (5,1,'Feedback candidat','Feedback participant',NULL,4,1,4),
-	 (6,0,'Feedback candidat','Feedback participant',NULL,4,1,5),
-	 (7,0,'Feedback candidat','Feedback participant',NULL,3,1,1),
-	 (8,0,'Feedback candidat','Feedback participant',NULL,3,1,5),
-	 (9,0,'Feedback candidat','Feedback participant',NULL,3,1,2),
-	 (10,0,'Feedback candidat','Feedback participant',NULL,2,1,1),
-	 (11,0,'Feedback candidat','Feedback participant',NULL,2,1,4),
-	 (12,1,'Feedback candidat','Feedback participant',NULL,6,1,3),
-	 (13,0,'Feedback candidat','Feedback participant',NULL,6,1,4),
-	 (14,0,'Feedback candidat','Feedback participant',NULL,6,1,5),
-	 (15,0,'Feedback candidat','Feedback participant',NULL,2,2,1),
-	 (16,0,'Feedback candidat','Feedback participant',NULL,2,2,6),
-	 (17,0,'Feedback candidat','Feedback participant',NULL,5,2,6),
-	 (18,0,'Feedback candidat','Feedback participant',NULL,4,2,1),
-	 (19,0,'Feedback candidat','Feedback participant',NULL,4,2,6),
-	 (20,0,'Feedback candidat','Feedback participant',NULL,4,2,3),
-	 (21,0,'Feedback candidat','Feedback participant',NULL,3,2,5),
-	 (22,0,'Feedback candidat','Feedback participant',NULL,3,2,4),
-	 (23,0,'Feedback candidat','Feedback participant',NULL,3,3,2),
-	 (24,0,'Feedback candidat','Feedback participant',NULL,1,3,2),
-	 (25,0,'Feedback candidat','Feedback participant',NULL,1,3,7),
-	 (26,0,'Feedback candidat','Feedback participant',NULL,6,3,2),
-	 (27,0,'Feedback candidat','Feedback participant',NULL,6,3,1),
-	 (28,0,'Feedback candidat','Feedback participant',NULL,6,3,5),
-	 (29,0,'Feedback candidat','Feedback participant',NULL,5,3,6),
-	 (30,0,'Feedback candidat','Feedback participant',NULL,5,3,7),
-	 (31,0,'Feedback candidat','Feedback participant',NULL,4,3,4),
-	 (32,0,'Feedback candidat','Feedback participant',NULL,4,3,6),
-	 (33,0,'Feedback candidat','Feedback participant',NULL,4,3,1),
-	 (34,0,'Feedback candidat','Feedback participant',NULL,4,3,5),
-	 (35,0,'Feedback candidat','Feedback participant',NULL,4,4,5),
-	 (36,0,'Feedback candidat','Feedback participant',NULL,4,4,2),
-	 (37,0,'Feedback candidat','Feedback participant',NULL,4,4,1),
-	 (38,0,'Feedback candidat','Feedback participant',NULL,2,4,3),
-	 (39,0,'Feedback candidat','Feedback participant',NULL,2,4,7),
-	 (40,0,'Feedback candidat','Feedback participant',NULL,1,4,2),
-	 (41,0,'Feedback candidat','Feedback participant',NULL,6,4,3),
-	 (42,0,'Feedback candidat','Feedback participant',NULL,6,4,2),
-	 (43,0,'Feedback candidat','Feedback participant',NULL,5,4,5),
-	 (44,0,'Feedback candidat','Feedback participant',NULL,5,4,2),
-	 (45,0,'Feedback candidat','Feedback participant',NULL,5,5,6),
-	 (46,0,'Feedback candidat','Feedback participant',NULL,5,5,2),
-	 (47,0,'Feedback candidat','Feedback participant',NULL,3,5,6),
-	 (48,0,'Feedback candidat','Feedback participant',NULL,3,5,2),
-	 (49,0,'Feedback candidat','Feedback participant',NULL,3,5,7),
-	 (50,0,'Feedback candidat','Feedback participant',NULL,2,5,3),
-	 (51,0,'Feedback candidat','Feedback participant',NULL,2,5,2),
-	 (52,0,'Feedback candidat','Feedback participant',NULL,2,5,7),
-	 (53,0,'Feedback candidat','Feedback participant',NULL,1,5,6),
-	 (54,0,'Feedback candidat','Feedback participant',NULL,6,5,3),
-	 (55,0,'Feedback candidat','Feedback participant',NULL,6,5,2),
-	 (56,0,'Feedback candidat','Feedback participant',NULL,6,5,7),
-	 (57,0,'Feedback candidat','Feedback participant',NULL,4,5,6),
-	 (58,0,'Feedback candidat','Feedback participant',NULL,4,5,3),
-	 (59,0,'Feedback candidat','Feedback participant',NULL,6,6,4),
-	 (60,0,'Feedback candidat','Feedback participant',NULL,6,6,3),
-	 (61,0,'Feedback candidat','Feedback participant',NULL,6,6,1),
-	 (62,0,'Feedback candidat','Feedback participant',NULL,3,6,4),
-	 (63,0,'Feedback candidat','Feedback participant',NULL,3,6,3),
-	 (64,0,'Feedback candidat','Feedback participant',NULL,2,6,7),
-	 (65,0,'Feedback candidat','Feedback participant',NULL,1,6,7),
-	 (66,0,'Feedback candidat','Feedback participant',NULL,1,6,4),
-	 (67,0,'Feedback candidat','Feedback participant',NULL,5,6,7),
-	 (68,0,'Feedback candidat','Feedback participant',NULL,5,6,4);
-INSERT INTO Participant (id_participant,name_participant,email_participant,id_user) VALUES
-	 (1,'Williams','williams@example.com',NULL),
-	 (2,'Johnson','johnson@example.com',NULL),
-	 (3,'Brown','brown@example.com',NULL),
-	 (4,'Davis','davis@example.com',NULL),
-	 (5,'Miller','miller@example.com',NULL),
-	 (6,'Wilson','wilson@example.com',NULL),
-	 (7,'awawawawawawaa','auwuawauwuwuwawaawwa@yaooooooooooooo.fr',NULL);
-INSERT INTO Participant_tag (id_participant,id_tag) VALUES
-	 (7,1),
-	 (7,2),
-	 (7,3),
-	 (7,7);
-INSERT INTO Attends (id_candidate,id_event,priority) VALUES
-	 (1,1,NULL),
-	 (2,2,NULL),
-	 (3,1,NULL),
-	 (4,3,NULL),
-	 (5,4,NULL),
-	 (6,5,NULL),
-	 (7,6,NULL),
-	 (1,2,NULL),
-	 (2,3,NULL),
-	 (3,4,NULL),
-	 (4,1,NULL),
-	 (5,2,NULL),
-	 (6,3,NULL),
-	 (7,4,NULL),
-	 (1,3,NULL),
-	 (2,4,NULL),
-	 (3,5,NULL),
-	 (4,6,NULL),
-	 (5,1,NULL),
-	 (6,2,NULL),
-	 (7,3,NULL),
-	 (1,4,NULL),
-	 (2,5,NULL),
-	 (3,6,NULL),
-	 (4,2,NULL),
-	 (5,3,NULL),
-	 (6,4,NULL),
-	 (7,5,NULL),
-	 (1,6,NULL),
-	 (2,1,NULL),
-	 (3,2,NULL);
-INSERT INTO Tag (id_tag,name_tag) VALUES
+	 (3,9),
+	 (3,11),
+	 (3,12),
+	 (3,13);
+INSERT INTO public.role_permission (id_role,id_permission) VALUES
+	 (1,17),
+	 (2,17),
+	 (3,17),
+	 (4,17),
+	 (1,16),
+	 (2,16),
+	 (3,16),
+	 (5,16),
+	 (5,18),
+	 (4,18);
+INSERT INTO public.role_permission (id_role,id_permission) VALUES
+	 (1,19),
+	 (2,19);
+INSERT INTO public.tag (id_tag,name_tag) VALUES
 	 (1,'SN2'),
 	 (2,'SN2-C1'),
 	 (3,'SN2-C2'),
@@ -173,3 +107,11 @@ INSERT INTO Tag (id_tag,name_tag) VALUES
 	 (5,'SN1-C1'),
 	 (6,'SN1-C2'),
 	 (7,'M1');
+INSERT INTO public.user_role (id_role,id_user) VALUES
+	 (1,1),
+	 (5,2),
+	 (5,3),
+	 (5,4),
+	 (4,5),
+	 (4,6),
+	 (3,7);
