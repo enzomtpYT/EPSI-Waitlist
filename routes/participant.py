@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from lib import database, auth
-import random, string
 
 participant_bp = Blueprint('participant', __name__)
 
