@@ -14,6 +14,20 @@
         <label for="date_event">Date :</label>
         <input type="date" id="date_event" name="date_event">
 
+        <label>A crénaux horaires?</label>
+        <input onchange="enableschedules()" id="enabletimeslots" class="enabletimeslots" type="checkbox" id="has_time_slots" name="has_time_slots">
+
+        <div class="schedules">
+            <div>
+                <label for="start_time">Heure de début :</label>
+                <input type="time" id="start_time_event" name="start_time_event">
+            </div>
+            <div>
+                <label for="end_time">Heure de fin :</label>
+                <input type="time" id="end_time_event" name="end_time_event">
+            </div>
+        </div>
+
         <label for="event_tags">Tags de l'événement :</label>
         <div id="event_tags" class="taglist">
             <!-- Tags will be dynamically added here -->
@@ -102,6 +116,16 @@ document.addEventListener('DOMContentLoaded', function() {
         selectedTagsInput.value = selectedTags.join(',');
     });
 });
+
+function enableschedules() {
+    var enabletimeslots = document.getElementById('enabletimeslots');
+    var schedules = document.querySelector('.schedules');
+    if (enabletimeslots.checked) {
+        schedules.style.display = 'flex';
+    } else {
+        schedules.style.display = 'none';
+    }
+}
 </script>
 
 {% endblock %}

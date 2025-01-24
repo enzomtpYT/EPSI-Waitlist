@@ -108,3 +108,12 @@
 .manageinfos > .admin-section > * > button {
     max-width: 100%;
 }
+
+.schedules {
+    display: none;
+    gap: 1rem;
+}
+
+.enabletimeslots {
+    width: fit-content;
+}
