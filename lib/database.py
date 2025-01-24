@@ -160,7 +160,7 @@ def get_event_interviews(id_event):
     """
     conn = get_db_connection()
     if conn is None:
-        return None, "Erreur base de données"
+        return None, None, "Erreur base de données"
     try:
         cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('SELECT * FROM Event WHERE id_event = %s', (id_event,))
@@ -171,13 +171,13 @@ def get_event_interviews(id_event):
         JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
         JOIN Participant ON Interview.id_participant = Participant.id_participant
         JOIN Event ON Interview.id_event = Event.id_event
-        WHERE Interview.id_event = %s AND Interview.happened = 1
+        WHERE Interview.id_event = %s AND Interview.happened = TRUE
         ''', (id_event,))
         interviews = cursor.fetchall()
         return event, interviews, None
     except psycopg2.Error as e:
         print(f"Erreur requête base de données: {e}")
-        return None, "Erreur requête base de données"
+        return None, None, "Erreur requête base de données"
     finally:
         conn.close()
 
@@ -461,8 +461,8 @@ def delete_candidate(id_candidate):
         return "Erreur base de données"
     try:
         cursor = conn.cursor()
-        # Exécute la requête pour supprimer le candidat
-        cursor.execute("DELETE FROM Candidate WHERE id_candidate = %s", (id_candidate,))
+        # Supprime l'utilisateur associé au candidat (candidat supprimé en cascade)
+        cursor.execute('DELETE FROM "User" WHERE id_user = (SELECT id_user FROM Candidate WHERE id_candidate = %s)', (id_candidate,))
         # Sauvegarde les modifications
         conn.commit()
     except psycopg2.Error as e:
@@ -530,7 +530,7 @@ def get_candidate_interviews(id_candidate):
         JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
         JOIN Participant ON Interview.id_participant = Participant.id_participant
         JOIN Event ON Interview.id_event = Event.id_event
-        WHERE Interview.id_candidate = %s AND Interview.happened = 1
+        WHERE Interview.id_candidate = %s AND Interview.happened = TRUE
         ''', (id_candidate,))
         interviews = cursor.fetchall()
 
@@ -810,7 +810,8 @@ def delete_participant(id_participant):
         return "Erreur base de données"
     try:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM Participant WHERE id_participant = %s", (id_participant,))
+        # Supprime l'utilisateur associé au participant (participant supprimé en cascade)
+        cursor.execute('DELETE FROM "User" WHERE id_user = (SELECT id_user FROM Participant WHERE id_participant = %s)', (id_participant,)) 
         conn.commit()
     except psycopg2.Error as e:
         print(f"Erreur lors de la suppression de l'intervenant: {e}")
@@ -869,7 +870,7 @@ def get_participant_interviews(id_participant):
         JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
         JOIN Participant ON Interview.id_participant = Participant.id_participant
         JOIN Event ON Interview.id_event = Event.id_event
-        WHERE Interview.id_participant = %s AND Interview.happened = 1
+        WHERE Interview.id_participant = %s AND Interview.happened = TRUE
         ''', (id_participant,))
         interviews = cursor.fetchall()
         return interviews, None
@@ -979,7 +980,7 @@ def get_user_past_interviews(session_token):
                 FROM Interview
                 JOIN Participant ON Interview.id_participant = Participant.id_participant
                 JOIN Event ON Interview.id_event = Event.id_event
-                WHERE Interview.id_candidate = %s AND Interview.happened = 1
+                WHERE Interview.id_candidate = %s AND Interview.happened = TRUE
                 ''', (candidate['id_candidate'],))
                 interviews = cursor.fetchall()
                 return interviews, None
@@ -993,7 +994,7 @@ def get_user_past_interviews(session_token):
                 FROM Interview
                 JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
                 JOIN Event ON Interview.id_event = Event.id_event
-                WHERE Interview.id_participant = %s AND Interview.happened = 1
+                WHERE Interview.id_participant = %s AND Interview.happened = TRUE
                 ''', (participant['id_participant'],))
                 interviews = cursor.fetchall()
                 return interviews, None
@@ -2100,7 +2101,7 @@ def create_employee(lastname, name, email, role):
     """
     conn = get_db_connection()
     if conn is None:
-        return "Erreur base de données"
+        return None, "Erreur base de données"
     try:
         cursor = conn.cursor()
 
@@ -2265,8 +2266,8 @@ def delete_employee(id_employee):
         return "Erreur base de données"
     try:
         cursor = conn.cursor()
-        # Exécute la requête pour supprimer l'employé
-        cursor.execute("DELETE FROM Employee WHERE id_employee = %s", (id_employee,))
+        # Supprime l'utilisateur associé à l'employé (employé supprimé en cascade)
+        cursor.execute('DELETE FROM "User" WHERE id_user = (SELECT id_user FROM Employee WHERE id_employee = %s)', (id_employee,))
         # Sauvegarde les modifications
         conn.commit()
     except psycopg2.Error as e:
