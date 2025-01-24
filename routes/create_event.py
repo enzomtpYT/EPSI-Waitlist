@@ -12,7 +12,6 @@ def create_event():
         has_timeslots = request.form.get('has_timeslots') == 'on'
         start_time_event = request.form.get('start_time_event') or None
         end_time_event = request.form.get('end_time_event') or None
-        print(dict(request.form))
         error = None
 
         if not name:
@@ -21,7 +20,6 @@ def create_event():
             error = 'La date est obligatoire.'
 
         if error is None:
-            print(start_time_event, end_time_event)
             event_id, error = database.create_event(name, date, has_timeslots, start_time_event, end_time_event)
             if error is None:
                 for tag_id in selected_tags:

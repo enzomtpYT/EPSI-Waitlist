@@ -15,7 +15,7 @@
         <input type="date" id="date_event" name="date_event">
 
         <label>A crénaux horaires?</label>
-        <input onchange="enableschedules()" id="enabletimeslots" class="enabletimeslots" type="checkbox" id="has_time_slots" name="has_time_slots">
+        <input onchange="enableschedules()" class="enabletimeslots" type="checkbox" id="has_timeslots" name="has_timeslots">
 
         <div class="schedules">
             <div>
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function enableschedules() {
-    var enabletimeslots = document.getElementById('enabletimeslots');
+    var enabletimeslots = document.getElementById('has_timeslots');
     var schedules = document.querySelector('.schedules');
     if (enabletimeslots.checked) {
         schedules.style.display = 'flex';
