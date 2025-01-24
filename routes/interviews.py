@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from lib import database, api
 
 interviews_bp = Blueprint('interviews', __name__)

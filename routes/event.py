@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from lib import database, api
 
 event_bp = Blueprint('event', __name__)
