@@ -162,6 +162,10 @@ button:active {
     border: 3px solid rgb(93, 0, 0);
 }
 
+.ferror > span {
+    color: var(--accent-color);
+}
+
 h1 {
     text-align: center;
     margin: 1rem 0;
