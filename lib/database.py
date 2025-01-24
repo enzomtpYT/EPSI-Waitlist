@@ -103,7 +103,7 @@ def get_event(event_id):
     finally:
         conn.close()
 
-def edit_event(name, date, id_event):
+def edit_event(name, date, id_event, has_timeslots, start_time_event=None, end_time_event=None):
     """
     Met à jour un événement dans la base de données.
 
@@ -111,6 +111,9 @@ def edit_event(name, date, id_event):
         name (str): Le nom de l'événement.
         date (str): La date de l'événement.
         id_event (int): L'identifiant de l'événement.
+        has_timeslots (bool): Si l'événement a des créneaux horaires.
+        start_time_event=None (str): L'heure de début de l'événement.
+        end_time_event=None (str): L'heure de fin de l'événement.
 
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
@@ -120,7 +123,7 @@ def edit_event(name, date, id_event):
         return "Erreur base de données"
     try:
         cursor = conn.cursor()
-        cursor.execute('UPDATE Event SET name_event = %s, date_event = %s WHERE id_event = %s', (name, date, id_event))
+        cursor.execute('UPDATE Event SET name_event = %s, date_event = %s, has_timeslots = %s, start_time_event = %s, end_time_event = %s WHERE id_event = %s', (name, date, has_timeslots, start_time_event, end_time_event, id_event))
     except psycopg2.Error as e:
         print(f"Erreur lors de la mise à jour de l'événnement: {e}")
         return "Erreur lors de la mise à jour de l'événnement"

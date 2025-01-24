@@ -15,6 +15,20 @@
             <label for="date_event">Date :</label>
             <input type="date" id="date_event" name="date_event" value="{{ event.date_event }}">
 
+            <label>A crénaux horaires?</label>
+            <input {% if event.has_timeslots %}checked{% endif %} onchange="enableschedules()" id="has_timeslots" class="enabletimeslots" type="checkbox" name="has_timeslots">
+
+            <div class="schedules">
+                <div>
+                    <label for="start_time">Heure de début :</label>
+                    <input value="{{ event.start_time_event }}" type="time" id="start_time_event" name="start_time_event">
+                </div>
+                <div>
+                    <label for="end_time">Heure de fin :</label>
+                    <input value="{{ event.end_time_event }}" type="time" id="end_time_event" name="end_time_event">
+                </div>
+            </div>
+
             <button type="submit">Enregistrer</button>
 
         </form>
@@ -86,5 +100,21 @@
         </form>
     </div>
 </div>
+
+<script>
+function enableschedules() {
+    var enabletimeslots = document.getElementById('has_timeslots');
+    var schedules = document.querySelector('.schedules');
+    if (enabletimeslots.checked) {
+        schedules.style.display = 'flex';
+    } else {
+        schedules.style.display = 'none';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    enableschedules();
+});
+</script>
 
 {% endblock %}

@@ -20,7 +20,11 @@ def edit_event(id_event):
     if request.method == 'POST':
         name = request.form['name_event']
         date = request.form['date_event']
+        has_timeslots = request.form.get('has_timeslots') == 'on'
+        start_time_event = request.form.get('start_time_event') or None
+        end_time_event = request.form.get('end_time_event') or None
         tags = request.form.getlist('tags')
+        
         error = None
 
         if not name:
@@ -29,7 +33,7 @@ def edit_event(id_event):
             error = 'La date est obligatoire.'
 
         if error is None:
-            error = database.edit_event(name, date, id_event)
+            error = database.edit_event(name, date, id_event, has_timeslots, start_time_event, end_time_event)
             if error is None:
                 flash("Événement mis à jour avec succès!", "success")
                 return redirect(url_for('event.edit_event', id_event=id_event))
