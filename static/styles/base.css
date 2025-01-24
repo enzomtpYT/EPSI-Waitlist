@@ -357,3 +357,8 @@ h1 {
 .showpass {
     cursor: pointer;
 }
+
+.taglist {
+    height: 1.5rem;
+    margin: .25rem 0;
+}
