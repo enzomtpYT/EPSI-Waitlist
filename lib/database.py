@@ -25,13 +25,16 @@ today = datetime.date.today()
 
 # Event functions
 
-def create_event(name, date):
+def create_event(name, date, has_timeslots, start_time_event=None, end_time_event=None):
     """
     Crée un nouvel événement dans la base de données.
 
     Args:
         name (str): Le nom de l'événement.
         date (str): La date de l'événement.
+        has_timeslots (bool): Si l'événement a des créneaux horaires.
+        start_time_event=None (str): L'heure de début de l'événement.
+        end_time_event=None (str): L'heure de fin de l'événement.
 
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
@@ -41,7 +44,7 @@ def create_event(name, date):
         return "Erreur base de données"
     try:
         cursor = conn.cursor()
-        cursor.execute('INSERT INTO Event (name_event, date_event) VALUES (%s, %s) RETURNING id_event', (name, date))
+        cursor.execute('INSERT INTO Event (name_event, date_event, has_timeslots, start_time_event, end_time_event) VALUES (%s, %s, %s, %s, %s) RETURNING id_event', (name, date, has_timeslots, start_time_event, end_time_event))
         event_id = cursor.fetchone()[0]
         return event_id, None
     except psycopg2.Error as e:
