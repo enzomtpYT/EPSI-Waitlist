@@ -72,5 +72,9 @@ def edit_employee(id_employee):
 
 @employee_bp.route("/admin/manage_employee/employee/<int:id_employee>/delete", methods=['POST'])
 def delete_employee(id_employee):
-    database.delete_employee(id_employee)
+    error = database.delete_employee(id_employee)
+    if error:
+        flash(f"Erreur lors de la suppression de l'employé.e: {error}", "danger")
+        return redirect(url_for('employee.edit_employee', id_employee=id_employee))
+    flash("Employé.e supprimé.e avec succès!", "success")
     return redirect(url_for('manage_employee.manage_employee'))

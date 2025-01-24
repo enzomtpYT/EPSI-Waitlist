@@ -67,5 +67,8 @@ def remove_tag_candidate(id_candidate):
 
 @candidate_bp.route("/admin/manage_candidate/candidate/<int:id_candidate>/delete", methods=['POST'])
 def delete_candidate(id_candidate):
-    database.delete_candidate(id_candidate)
+    error = database.delete_candidate(id_candidate)
+    if error:
+        flash(f"Erreur lors de la suppression du candidat: {error}", "danger")
+        return redirect(url_for('candidate.edit_candidate', id_candidate=id_candidate))
     return redirect(url_for('manage_candidate.manage_candidate'))

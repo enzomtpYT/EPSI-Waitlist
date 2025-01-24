@@ -64,5 +64,9 @@ def remove_tag_participant(id_participant):
 
 @participant_bp.route("/admin/manage_participant/participant/<int:id_participant>/delete", methods=['POST'])
 def delete_participant(id_participant):
-    database.delete_participant(id_participant)
+    error = database.delete_participant(id_participant)
+    if error:
+        flash(f"Erreur lors de la suppression du participant: {error}", "danger")
+        return redirect(url_for('participant.edit_participant', id_participant=id_participant))
+    flash("Participant supprimé avec succès!", "success")
     return redirect(url_for('manage_participant.manage_participant'))
