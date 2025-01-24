@@ -16,7 +16,6 @@ def edit_event(id_event):
 
     tags, error = database.get_all_tags()
     event_tags, error = database.get_event_tags(id_event)
-    event, interviews, error = database.get_event_interviews(id_event)
 
     if request.method == 'POST':
         name = request.form['name_event']
@@ -38,7 +37,7 @@ def edit_event(id_event):
                 flash(f"Erreur lors de la mise à jour de l'Événement: {error}", "danger")
                 return redirect(url_for('event.edit_event', id_event=id_event))
 
-    return render_template('event.html', event=event, tags=tags, interviews=interviews, event_tags=event_tags)
+    return render_template('event.html', event=event, tags=tags, event_tags=event_tags)
 
 @event_bp.route("/admin/manage_event/event/<int:id_event>/add_tag_event", methods=['POST'])
 def add_tag_event(id_event):
