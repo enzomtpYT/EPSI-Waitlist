@@ -27,9 +27,7 @@
 
             <div>
                 <button type="submit">Enregistrer</button>
-                <form action="/admin/manage_participant/{{ participant.id_participant }}/delete" method="post">
-                    <button class="delete" type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet intervenant ?');">Supprimer</button>
-                </form>
+                <button class="delete" type="submit" formaction="/admin/manage_participant/{{ participant.id_participant }}/delete" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet intervenant ?');">Supprimer</button>
             </div>
         </form>
     </div>

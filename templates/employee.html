@@ -45,9 +45,7 @@
 
             <div>
                 <button type="submit">Enregistrer</button>
-                <form action="/admin/manage_employee/{{ employee.id_employee }}/delete" method="post">
-                    <button class="delete" type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce candidat ?');">Supprimer</button>
-                </form>
+                <button class="delete" type="submit" formaction="/admin/manage_employee/{{ employee.id_employee }}/delete" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce candidat ?');">Supprimer</button>
             </div>
         </form>
     </div>
@@ -62,7 +60,7 @@ function generatepass() {
     var uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     var lowercase = 'abcdefghijklmnopqrstuvwxyz';
     var numbers = '0123456789';
-    var special = '!@#$%^&*()_+~`|}{[]\\:;?><,./-=';
+    var special = '!@#$%^&*()_+~`|}{[]\\:;?><,./-='; 
     var all = uppercase + lowercase + numbers + special;
     var length = Math.floor(Math.random() * (24 - 8 + 1)) + 12;
     for (var i = 0; i < length; i++) {
