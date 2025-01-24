@@ -45,7 +45,10 @@ def create_employee():
             return redirect(url_for('admin.create_employee'))
 
         if error is None:
-            error = database.create_employee(lastname, name, email, role)
+            void, error = database.create_employee(lastname, name, email, role)
+            if error:
+                flash(f"Erreur lors de la création de l'employé: {error}", "danger")
+                return redirect(url_for('create_employee.create_employee')) 
             flash("Employé créé avec succès!", "success")
             return redirect(url_for('create_employee.create_employee'))
         else:
