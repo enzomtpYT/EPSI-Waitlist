@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Paramètres{% endblock %}
+
+{% block content %}
+<h1>Paramètres</h1>
+<div class="section settings">
+    <form class="settingsform" action="{{ url_for('settings.settings') }}" method="post">
+        <h2>Modifier vos informations</h2>
+        <div class="iconified-input" title="Nom d'utilisateur">
+            <i class="fa-regular fa-user icon"></i>
+            <input type="text" id="username" username="username" placeholder="Nom" value="{{ info.username }}">
+        </div>
+        <div class="iconified-input" title="Email">
+            <i class="fa-regular fa-envelope icon"></i>
+            <input type="email" id="email" name="email" placeholder="Email" value="{{ info.email }}">
+        </div>
+
+        <h2>Modifier votre mot de passe</h2>
+        <div class="iconified-input" title="Nouveau mot de passe">
+            <i class="fa-regular fa-lock icon"></i>
+            <input type="password" id="newpassword" name="newpassword" placeholder="Nouveau mot de passe">
+        </div>
+        <div class="iconified-input" title="Confirmer le nouveau mot de passe">
+            <i class="fa-regular fa-lock icon"></i>
+            <input type="password" id="confirmpassword" name="confirmpassword" placeholder="Confirmer le nouveau mot de passe">
+        </div>
+
+        <h2>Confirmer votre mot de passe actuel</h2>
+        <div class="iconified-input" title="Mot de passe actuel">
+            <i class="fa-regular fa-lock icon"></i>
+            <input type="password" id="password" name="password" placeholder="Mot de passe actuel" required>
+        </div>
+
+        <button type="submit"><i class="fa-regular fa-floppy-disk"></i> Enregistrer</button>
+    </form>
+</div>
+{% endblock %}

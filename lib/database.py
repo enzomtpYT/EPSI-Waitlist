@@ -2091,6 +2091,58 @@ def update_user_role(user_id, role_name):
     finally:
         conn.close()
 
+def get_profile_info(session_token):
+    """
+    Récupère les informations de profil d'un utilisateur
+    
+    Args:
+        session_token (str): Le jeton de session de l'utilisateur.
+    
+    
+    Returns:
+        tuple: Un tuple contenant les informations de profil (nom d'utilisateur, email, (plus tard: CV, biographie), type d'utilisateur (particpant/candidat), tags si c'est participant) et un message d'erreur si une erreur est survenue.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+    try:
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor.execute('''
+        SELECT "User".username, Candidate.email_candidate AS email
+        FROM "User"
+        JOIN Candidate ON "User".id_user = Candidate.id_user
+        WHERE "User".session_token = %s
+        ''', (session_token,))
+        candidate = cursor.fetchone()
+        if candidate:
+            candidate['type'] = "candidate"
+            return candidate, None
+        cursor.execute('''
+        SELECT "User".username, Participant.email_participant AS email, Participant.id_participant
+        FROM "User"
+        JOIN Participant ON "User".id_user = Participant.id_user
+        WHERE "User".session_token = %s
+        ''', (session_token,))
+        participant = cursor.fetchone()
+        if participant:
+            cursor.execute('''
+            SELECT Tag.id_tag, Tag.name_tag
+            FROM Tag
+            JOIN Participant_tag ON Tag.id_tag = Participant_tag.id_tag
+            WHERE Participant_tag.id_participant = %s
+            ''', (participant['id_participant'],))
+            tags = cursor.fetchall()
+            participant['tags'] = tags
+            participant['type'] = "participant"
+            del participant['id_participant']
+            return participant, None
+        return None, "Profil non trouvé"
+    except psycopg2.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
 # Employee functions
 
 def create_employee(lastname, name, email, role):
