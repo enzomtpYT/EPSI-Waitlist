@@ -1031,7 +1031,7 @@ def create_interview(id_event, id_participant, id_candidate):
         return "Erreur base de données"
     try:
         cursor = conn.cursor()
-        cursor.execute('INSERT INTO Interview (id_event, id_participant, id_candidate, happened) VALUES (%s, %s, %s, 0)', (id_event, id_participant, id_candidate))
+        cursor.execute('INSERT INTO Interview (id_event, id_participant, id_candidate, happened) VALUES (%s, %s, %s, FALSE)', (id_event, id_participant, id_candidate))
         conn.commit()
     except psycopg2.Error as e:
         print(f"Erreur lors de la création de l'interview: {e}")
