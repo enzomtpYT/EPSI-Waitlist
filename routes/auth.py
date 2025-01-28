@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from lib import auth
+from lib import auth, database
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -37,7 +37,8 @@ def update_candidate(id_candidate):
         password = request.form.get('password')
         if not password:
             flash('Password is required', 'error')
-        error = auth.update_candidate(id_candidate, password)
+        email = database.get_candidate_email(id_candidate)
+        error = auth.update_user(password, email)
         if error:
             flash(f'Registration failed: {error}', 'error')
         else:
@@ -50,7 +51,8 @@ def update_participant(id_participant):
         password = request.form.get('password')
         if not password:
             flash('Password is required', 'error')
-        error = auth.update_participant(id_participant, password)
+        email = database.get_participant_email(id_participant)
+        error = auth.update_user(password, email)
         if error:
             flash(f'Registration failed: {error}', 'error')
         else:
@@ -63,7 +65,8 @@ def update_employee(id_employee):
         password = request.form.get('password')
         if not password:
             flash('Password is required', 'error')
-        error = auth.update_employee(id_employee, password)
+        email = database.get_employee_email(id_employee)
+        error = auth.update_user(password, email)
         if error:
             flash(f'Registration failed: {error}', 'error')
         else:

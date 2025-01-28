@@ -29,7 +29,7 @@ def edit_participant(id_participant):
         if error is None:
             error = database.edit_participant(name, email, id_participant)
             if password:
-                error = auth.update_participant(id_participant, password)
+                error = auth.update_user(password, email)
             if error is None:
                 flash("Participant mis à jour avec succès!", "success")
                 return redirect(url_for('participant.edit_participant', id_participant=id_participant))

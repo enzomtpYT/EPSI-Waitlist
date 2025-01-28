@@ -32,7 +32,7 @@ def edit_candidate(id_candidate):
         if error is None:
             error = database.edit_candidate(lastname, name, email, id_candidate)
             if password:
-                error = auth.update_candidate(id_candidate, password)
+                error = auth.update_user(password, email)
             if error is None:
                 flash("Candidat mis à jour avec succès!", "success")
                 return redirect(url_for('candidate.edit_candidate', id_candidate=id_candidate))

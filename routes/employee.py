@@ -56,7 +56,7 @@ def edit_employee(id_employee):
         if error is None:
             # Update the employee in the database
             if password:
-                error = auth.update_employee(id_employee, password)
+                error = auth.update_user(password, email)
             error = database.edit_employee(lastname, name, email, id_employee)
             if error is None:
                 # Update the employee's role
