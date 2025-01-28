@@ -15,17 +15,21 @@ tr:nth-child(odd), td {
     justify-content: space-between;
     align-items: center;
     padding: 1rem 2rem;
-    background-color: #424242;
-    color: #fff;
+    background-color: var(--main-color);
+    color: var(--accent-color);
 }
 
 .column {
     display: flex;
     flex-direction: column;
     margin: 0 auto;
-    background-color: #f8f9fa;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-left: 1px solid #e9ecef;
+    background-color: var(--alt2);
     width: 100%;
+}
+
+.listcontainer > .column:first-child{
+    border: 0px;
 }
 
 .candidates {
