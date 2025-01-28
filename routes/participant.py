@@ -3,20 +3,18 @@ from lib import database, auth
 
 participant_bp = Blueprint('participant', __name__)
 
-@participant_bp.route('/admin/participant', methods=('GET', 'POST'))
-def participant():
-    return render_template('participant.html')
-
 @participant_bp.route("/admin/manage_participant/participant/<int:id_participant>", methods=['GET', 'POST'])
 def edit_participant(id_participant):
     participant, error = database.get_participant(id_participant)
     interviews, error = database.get_participant_interviews(id_participant)
     participant_tags, error = database.get_participant_tags(id_participant)
+    user_info, error = database.get_user(participant['id_user'])
     tags, error = database.get_all_tags()
 
     if request.method == 'POST':
         name = request.form['participant_name']
         email = request.form['participant_email']
+        username = request.form['username']
         password = request.form['password']
         tags = request.form.getlist('tags')
         error = None
@@ -29,7 +27,7 @@ def edit_participant(id_participant):
         if error is None:
             error = database.edit_participant(name, email, id_participant)
             if password:
-                error = auth.update_user(password, email)
+                error = auth.update_user(password, username)
             if error is None:
                 flash("Participant mis à jour avec succès!", "success")
                 return redirect(url_for('participant.edit_participant', id_participant=id_participant))
@@ -37,7 +35,7 @@ def edit_participant(id_participant):
                 flash(f"Erreur lors de la mise à jour du participant: {error}", "danger")
                 return redirect(url_for('participant.edit_participant', id_participant=id_participant))
 
-    return render_template('participant.html', participant=participant, tags=tags, interviews=interviews, participant_tags=participant_tags)
+    return render_template('participant.html', participant=participant, tags=tags, interviews=interviews, participant_tags=participant_tags, username=user_info['username'])
 
 @participant_bp.route("/admin/manage_participant/participant/<int:id_participant>/add_tag_participant", methods=['POST'])
 def add_tag_participant(id_participant):
