@@ -14,14 +14,6 @@
     text-align: center;
     min-width: fit-content;
     max-width:calc(100% - 2rem);
-    width:26rem
-}
-
-.loginform > .iconified-input {
-    margin: 0 0 24px 0;
-    width: 100%;
-}
-
-.loginform > button {
-    width: fit-content;
+    min-width: 26vw;
+    gap: .75rem;
 }
