@@ -362,3 +362,16 @@ h1 {
     height: 1.5rem;
     margin: .25rem 0;
 }
+
+.eventel {
+    text-decoration: none;
+    list-style: none;
+}
+.eventel > a {
+    color: var(--accent-color);
+}
+
+.profile {
+    width: fit-content;
+    flex-shrink: 0;
+}

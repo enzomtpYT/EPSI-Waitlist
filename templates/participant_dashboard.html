@@ -6,20 +6,19 @@
 <h1>Bienvenue, {{ participant.name_participant }}</h1>
 
 <div class="section-separator">
-    <div class="section">
+    <div class="section profile">
         <h2>Profil</h2>
         <p>Nom : {{ participant.name_participant }}</p>
         <p>Email : {{ participant.email_participant }}</p>
-        <a href="{{ url_for('participant.edit_participant', id_participant=participant.id_participant) }}">Modifier le profil</a>
     </div>
 
     <div class="section-stacker">
         <div class="section">
-            <h2>Événements</h2>
+            <h2>Événements:</h2>
             {% if events %}
-            <ul>
+            <ul class="eventlist">
                 {% for event in events %}
-                <li>{{ event.name_event }} - {{ event.date_event }}</li>
+                <li class="eventel"><a><i class="fa-solid fa-arrow-right"></i> {{ event.name_event }} - {{ event.date_event }}</a></li>
                 {% endfor %}
             </ul>
             {% else %}
@@ -28,7 +27,7 @@
         </div>
 
         <div class="section">
-            <h2>Entretiens</h2>
+            <h2>Entretiens:</h2>
             {% if interviews %}
             <table>
                 <thead>
