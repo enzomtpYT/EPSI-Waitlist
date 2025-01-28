@@ -2134,6 +2134,48 @@ def get_profile_info(session_token):
     finally:
         conn.close()
 
+def update_profile_info(oldusername, newusername, email):
+    """
+    Met à jour les informations de profil d'un utilisateur
+    
+    Args:
+        oldusername (str): L'ancien nom d'utilisateur de l'utilisateur.
+        newusername (str): Le nouveau nom d'utilisateur de l'utilisateur.
+        email (str): L'email de l'utilisateur.
+    
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        cursor = conn.cursor()
+        cursor.execute('''
+        UPDATE "User"
+        SET username = %s
+        WHERE username = %s
+        ''', (newusername, oldusername))
+        conn.commit()
+        cursor.execute('''
+        UPDATE Candidate
+        SET email_candidate = %s
+        WHERE id_user = (SELECT id_user FROM "User" WHERE username = %s)
+        ''', (email, newusername))
+        conn.commit()
+        cursor.execute('''
+        UPDATE Participant
+        SET email_participant = %s
+        WHERE id_user = (SELECT id_user FROM "User" WHERE username = %s)
+        ''', (email, newusername))
+        conn.commit()
+        return None
+    except psycopg2.Error as e:
+        print(f"Erreur lors de la mise à jour des informations de profil: {e}")
+        return "Erreur lors de la mise à jour des informations de profil"
+    finally:
+        conn.close()
+
 # Employee functions
 
 def create_employee(lastname, name, email, role):
