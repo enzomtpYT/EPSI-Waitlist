@@ -2118,23 +2118,14 @@ def get_profile_info(session_token):
             candidate['type'] = "candidate"
             return candidate, None
         cursor.execute('''
-        SELECT "User".username, Participant.email_participant AS email, Participant.id_participant
+        SELECT "User".username, Participant.email_participant AS email
         FROM "User"
         JOIN Participant ON "User".id_user = Participant.id_user
         WHERE "User".session_token = %s
         ''', (session_token,))
         participant = cursor.fetchone()
         if participant:
-            cursor.execute('''
-            SELECT Tag.id_tag, Tag.name_tag
-            FROM Tag
-            JOIN Participant_tag ON Tag.id_tag = Participant_tag.id_tag
-            WHERE Participant_tag.id_participant = %s
-            ''', (participant['id_participant'],))
-            tags = cursor.fetchall()
-            participant['tags'] = tags
             participant['type'] = "participant"
-            del participant['id_participant']
             return participant, None
         return None, "Profil non trouvé"
     except psycopg2.Error as e:
