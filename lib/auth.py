@@ -19,9 +19,9 @@ def genpassword(password):
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
     return hashed_password
 
-def update_user(password, email):
+def update_user(password, username):
     session_token = hashlib.md5(random.randbytes(random.randint(8,32))).hexdigest()
-    error = database.update_user_password(email, genpassword(password), session_token)
+    error = database.update_user_password(username, genpassword(password), session_token)
     return error
 
 def user_has_permission(user_id, permission_name):
