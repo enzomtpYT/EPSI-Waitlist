@@ -2100,7 +2100,7 @@ def get_profile_info(session_token):
     
     
     Returns:
-        tuple: Un tuple contenant les informations de profil (nom d'utilisateur, email, (plus tard: CV, biographie), type d'utilisateur (particpant/candidat), tags si c'est participant) et un message d'erreur si une erreur est survenue.
+        tuple: Un tuple contenant les informations de profil (nom d'utilisateur, email, (plus tard: CV, biographie), type d'utilisateur (particpant, candidat, etc..) et un message d'erreur si une erreur est survenue.
     """
     conn = get_db_connection()
     if conn is None:
@@ -2127,6 +2127,16 @@ def get_profile_info(session_token):
         if participant:
             participant['type'] = "participant"
             return participant, None
+        cursor.execute('''
+        SELECT "User".username, Employee.email_employee AS email
+        FROM "User"
+        JOIN Employee ON "User".id_user = Employee.id_user
+        WHERE "User".session_token = %s
+        ''', (session_token,))
+        employee = cursor.fetchone()
+        if employee:
+            employee['type'] = "employee"
+            return employee, None
         return None, "Profil non trouvé"
     except psycopg2.Error as e:
         print(f"Erreur requête base de données: {e}")
