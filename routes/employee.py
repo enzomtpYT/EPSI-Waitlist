@@ -3,10 +3,6 @@ from lib import database, auth
 
 employee_bp = Blueprint('employee', __name__)
 
-@employee_bp.route("/admin/employee")
-def employee():
-    return render_template('employee.html')
-
 @employee_bp.route("/admin/manage_employee/employee/<int:id_employee>", methods=['GET', 'POST'])
 def edit_employee(id_employee):
     if 'token' not in session:
@@ -18,6 +14,7 @@ def edit_employee(id_employee):
         return redirect(url_for('auth.login'))
 
     employee, error = database.get_employee(id_employee)
+    user_info, error = database.get_user(employee['id_user'])
     employee_role, error = database.get_user_role(employee['id_user'])
     if error:
         flash(error, 'danger')
@@ -27,6 +24,7 @@ def edit_employee(id_employee):
         lastname = request.form['employee_lastname']
         name = request.form['employee_name']
         email = request.form['employee_email']
+        username = request.form['username']
         password = request.form['password']
         role = request.form['role']
         error = None
@@ -56,7 +54,7 @@ def edit_employee(id_employee):
         if error is None:
             # Update the employee in the database
             if password:
-                error = auth.update_user(password, email)
+                error = auth.update_user(password, username)
             error = database.edit_employee(lastname, name, email, id_employee)
             if error is None:
                 # Update the employee's role
@@ -68,7 +66,7 @@ def edit_employee(id_employee):
                     flash(f"Erreur lors de la mise à jour du Employé.e: {error}", "danger")
                     return redirect(url_for('employee.edit_employee', id_employee=id_employee))
 
-    return render_template('employee.html', employee=employee, employee_role=employee_role, user_role=user_role)
+    return render_template('employee.html', employee=employee, employee_role=employee_role, user_role=user_role, username=user_info['username'])
 
 @employee_bp.route("/admin/manage_employee/employee/<int:id_employee>/delete", methods=['POST'])
 def delete_employee(id_employee):

@@ -18,6 +18,9 @@
             <label for="employee_email">E-mail :</label>
             <input type="email" id="employee_email" name="employee_email" value="{{ employee.email_employee }}">
 
+            <label for="username">Nom d'utilisateur :</label>
+            <input type="text" id="username" name="username" value="{{ username }}">
+
             <label for="employee_role">Rôle de l'employé.e :</label>
             <select id="role" name="role" required>
                 {% if user_role == 'superadmin' %}
@@ -49,6 +52,7 @@
             </div>
         </form>
     </div>
+</div>
 
 <script>
 // Get password input element
