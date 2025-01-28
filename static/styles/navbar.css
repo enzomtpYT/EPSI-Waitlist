@@ -26,21 +26,14 @@ nav {
 }
 
 .navbtn {
-    padding: 0 1rem;
+    margin: 0 0.5rem 0 0;
+}
+
+.navbtn > button > svg {
+    margin: 0;
 }
 
 .navul {
     display: flex;
     align-items: center;
-}
-
-.authbtn {
-    margin: 0;
-    padding: 0.5rem;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    max-width: 100%;
-    border-radius: 10px;
-    transition: 0.1s;
 }

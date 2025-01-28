@@ -14,9 +14,11 @@
     </ul>
     <ul class="navul">
         {% if session.token %}
-        <li class="navli"><a class="navbtn" href="{{ url_for('auth.logout') }}"><button class="authbtn">Se Déconnecter</button></a></li>
+        
+        <li class="navli"><a class="navbtn" href=""><button><i class="fa-regular fa-gear"></i> Paramètres</button></a></li>
+        <li class="navli"><a class="navbtn" href="{{ url_for('auth.logout') }}"><button class="authbtn"><i class="fa-regular fa-left-from-bracket"></i> Se déconnecter</button></a></li>
         {% else %}
-        <li class="navli"><a class="navbtn" href="{{ url_for('auth.login') }}"><button class="authbtn">Se Connecter</button></a></li>
+        <li class="navli"><a class="navbtn" href="{{ url_for('auth.login') }}"><button class="authbtn"><i class="fa-regular fa-right-to-bracket"></i> Se connecter</button></a></li>
         {% endif %}
     </ul>
 </nav>
