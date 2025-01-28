@@ -3,21 +3,19 @@ from lib import database, auth
 
 candidate_bp = Blueprint('candidate', __name__)
 
-@candidate_bp.route("/admin/candidate")
-def candidate():
-    return render_template('candidate.html')
-
 @candidate_bp.route("/admin/manage_candidate/candidate/<int:id_candidate>", methods=['GET', 'POST'])
 def edit_candidate(id_candidate):
     candidate, error = database.get_candidate(id_candidate)
     interviews, error = database.get_candidate_interviews(id_candidate)
     candidate_tags, error = database.get_candidate_tags(id_candidate)
+    user_info, error = database.get_user(candidate['id_user'])
     tags, error = database.get_all_tags()
 
     if request.method == 'POST':
         lastname = request.form['candidate_lastname']
         name = request.form['candidate_name']
         email = request.form['candidate_email']
+        username = request.form['username']
         password = request.form['password']
         tags = request.form.getlist('tags')
         error = None
@@ -32,7 +30,7 @@ def edit_candidate(id_candidate):
         if error is None:
             error = database.edit_candidate(lastname, name, email, id_candidate)
             if password:
-                error = auth.update_user(password, email)
+                error = auth.update_user(password, username)
             if error is None:
                 flash("Candidat mis à jour avec succès!", "success")
                 return redirect(url_for('candidate.edit_candidate', id_candidate=id_candidate))
@@ -40,7 +38,7 @@ def edit_candidate(id_candidate):
                 flash(f"Erreur lors de la mise à jour du candidat: {error}", "danger")
                 return redirect(url_for('candidate.edit_candidate', id_candidate=id_candidate))
 
-    return render_template('candidate.html', candidate=candidate, tags=tags, interviews=interviews, candidate_tags=candidate_tags)
+    return render_template('candidate.html', candidate=candidate, tags=tags, interviews=interviews, candidate_tags=candidate_tags, username=user_info['username'])
 
 @candidate_bp.route("/admin/manage_candidate/candidate/<int:id_candidate>/add_tag_candidate", methods=['POST'])
 def add_tag_candidate(id_candidate):

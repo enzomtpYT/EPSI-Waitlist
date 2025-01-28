@@ -2176,6 +2176,55 @@ def update_profile_info(oldusername, newusername, email):
     finally:
         conn.close()
 
+def get_user(user_id):
+    """
+    Récupère un utilisateur de la base de données en utilisant son identifiant.
+
+    Args:
+        user_id (int): L'identifiant de l'utilisateur.
+
+    Returns:
+        tuple: Un tuple contenant l'utilisateur et un message d'erreur si une erreur est survenue.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+    try:
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor.execute('SELECT * FROM "User" WHERE id_user = %s', (user_id,))
+        user = cursor.fetchone()
+        return user, None
+    except psycopg2.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def update_username_with_id(user_id, username):
+    """
+    Met à jour le nom d'utilisateur d'un utilisateur dans la base de données.
+
+    Args:
+        user_id (int): L'identifiant de l'utilisateur.
+        username (str): Le nouveau nom d'utilisateur de l'utilisateur.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        cursor = conn.cursor()
+        cursor.execute('UPDATE "User" SET username = %s WHERE id_user = %s', (username, user_id))
+        conn.commit()
+        return None
+    except psycopg2.Error as e:
+        print(f"Erreur lors de la mise à jour du nom d'utilisateur de l'utilisateur: {e}")
+        return "Erreur lors de la mise à jour du nom d'utilisateur de l'utilisateur"
+    finally:
+        conn.close()
+
 # Employee functions
 
 def create_employee(lastname, name, email, role):
