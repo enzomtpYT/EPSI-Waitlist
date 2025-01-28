@@ -29,10 +29,6 @@ nav {
     margin: 0 0.5rem 0 0;
 }
 
-.navbtn > button > svg {
-    margin: 0;
-}
-
 .navul {
     display: flex;
     align-items: center;
