@@ -29,6 +29,7 @@ def edit_candidate(id_candidate):
 
         if error is None:
             error = database.edit_candidate(lastname, name, email, id_candidate)
+            error = database.update_username_with_id(candidate['id_user'], username)
             if password:
                 error = auth.update_user(password, username)
             if error is None:

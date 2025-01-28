@@ -26,6 +26,7 @@ def edit_participant(id_participant):
 
         if error is None:
             error = database.edit_participant(name, email, id_participant)
+            error = database.update_username_with_id(participant['id_user'], username)
             if password:
                 error = auth.update_user(password, username)
             if error is None:
