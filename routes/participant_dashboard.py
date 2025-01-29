@@ -24,9 +24,4 @@ def dashboard():
         flash(error, 'danger')
         return redirect(url_for('auth.login'))
 
-    interviews, error = database.get_participant_interviews(participant_id)
-    if error:
-        flash(error, 'danger')
-        return redirect(url_for('auth.login'))
-
-    return render_template('participant_dashboard.html', participant=participant, events=events, interviews=interviews)
+    return render_template('participant_dashboard.html', participant=participant, events=events)
