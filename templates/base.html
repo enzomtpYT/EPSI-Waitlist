@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Waitlist{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/default.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/hltheme.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/base.css') }}">
     {% if request.path.startswith('/admin') %}
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/admin.css') }}">
@@ -11,7 +13,9 @@
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js" defer></script>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <script src="https://kit.fontawesome.com/a07d46abc4.js" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='scripts/purify.js') }}"></script>
     <script src="{{ url_for('static', filename='scripts/base.js') }}" defer></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.js"></script>
 </head>
 <body>
     {% with messages = get_flashed_messages(True) %}
@@ -40,3 +44,14 @@
     </div>
 </body>
 </html>
+<script>
+import('https://cdn.jsdelivr.net/npm/marked/marked.min.js')
+
+function mark(element, text) {
+    let dirty = marked.parse(text);
+    let clean = DOMPurify.sanitize(dirty, {FORBID_TAGS: ['style']});
+    element.innerHTML = clean;
+    element.classList.add('markdown');
+    hljs.highlightAll();
+}
+</script>>
