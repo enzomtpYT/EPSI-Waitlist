@@ -406,3 +406,70 @@ h1 {
     flex-direction: column;
     gap: .75rem;
 }
+
+/* Markdown part */
+
+.markdown > * {
+    margin: 0;
+    padding: 0;
+    text-align: start;
+}
+
+.markdown {
+    display: flex;
+    flex-direction: column;
+    color: var(--accent-color);
+    font-size: 1rem;
+}
+
+.markdown h1 {
+    font-size: 2rem;
+    color: var(--accent-color);
+}
+
+.markdown h2 {
+    font-size: 1.5rem;
+    color: var(--accent-color);
+}
+
+.markdown h3 {
+    font-size: 1.25rem;
+    color: var(--accent-color);
+}
+
+.markdown h4 {
+    font-size: 1.125rem;
+    color: var(--accent-color);
+}
+
+.markdown li {
+    list-style: circle;
+}
+
+.markdown blockquote {
+    background-color: var(--alt2);
+    padding: 0.5rem;
+    border-left: 5px solid var(--accent-color);
+}
+
+.markdown pre {
+    background-color: var(--alt2);
+    padding: 0.5rem;
+    border-left: 5px solid var(--accent-color);
+}
+
+.markdown code {
+    background-color: var(--alt2);
+    padding: 0.5rem;
+    border-left: 5px solid var(--accent-color);
+}
+
+.markdown p {
+    color:  var(--accent-color);
+}
+
+.markdown a {
+    color: var(--btn-color);
+}
+
+/* End markdown */
