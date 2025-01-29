@@ -35,10 +35,10 @@
                             {% endif %}
                             <td>{% if interview.duration_interview is not none %}{{ interview.duration_interview }}{% else %}&nbsp;{% endif %} minutes</td>
                             <td class="actionbtn">
-                                <button type="button" class="edit-feedback" interview-id="{{ interview.id_interview }}">
+                                <button data-text="{% if type == 'candidate' %}{{ interview.feedback_candidate }}{% else %}{{ interview.feedback_participant }}{% endif %}" type="button" onclick="openedit(this)" class="edit-feedback" interview-id="{{ interview.id_interview }}">
                                     Editer mon feedback
                                 </button>
-                                <button type="button" class="feedback-btn" data-feedback-candidate="{{ interview.feedback_candidate }}" data-feedback-participant="{{ interview.feedback_participant }}">
+                                <button type="button" onclick="openfeedbacks(this)" class="feedback-btn" data-feedback-candidate="{{ interview.feedback_candidate }}" data-feedback-participant="{{ interview.feedback_participant }}">
                                     Voir les feedbacks
                                 </button>
                             </td>
@@ -60,9 +60,9 @@
     <div class="modal-content">
         <i class="fa-solid fa-x close" onclick="toggleElement(this.parentElement.parentElement)"></i>
         <h2>Feedback de l'entretien</h2>
-        <h3>Feedback de l'intervenant :</h3>
+        <h3 id="partfeedtitle">Feedback de l'intervenant :</h3>
         <p class="feedb" id="participantFeedback"></p>
-        <h3>Feedback du candidat :</h3>
+        <h3 id="candfeedtitle">Feedback du candidat :</h3>
         <p class="feedb" id="candidateFeedback"></p>
     </div>
 </div>
@@ -116,6 +116,48 @@ function toggleElement(element) {
     }
 }
 
+function openfeedbacks(el) {
+    var participantFeedbackEl = document.getElementById('participantFeedback');
+    var candidateFeedbackEl = document.getElementById('candidateFeedback');
+    var partfeedtitle = document.getElementById('partfeedtitle');
+    var candfeedtitle = document.getElementById('candfeedtitle');
+    var participantFeedback = el.getAttribute('data-feedback-participant');
+    var candidateFeedback = el.getAttribute('data-feedback-candidate');
+
+    if (participantFeedback === 'None') {
+        participantFeedbackEl.style.display = 'none';
+        partfeedtitle.style.display = 'none';
+    } else {
+        participantFeedbackEl.style.display = 'block';
+        partfeedtitle.style.display = 'block';
+        participantFeedbackEl.innerText = participantFeedback;
+    }
+
+    if (candidateFeedback === 'None') {
+        candidateFeedbackEl.style.display = 'none';
+        candfeedtitle.style.display = 'none';
+    } else {
+        candidateFeedbackEl.style.display = 'block';
+        candfeedtitle.style.display = 'block';
+        candidateFeedbackEl.innerText = candidateFeedback;
+    }
+    
+    toggleElement(modal);
+}
+
+function openedit(el) {
+    var interviewId = el.getAttribute('interview-id');
+    var id_interview = document.getElementById('id_interview');
+    var text = el.getAttribute('data-text');
+    var farea = document.getElementById('feedbackarea');
+    if (text !== 'None') {
+        farea.value = text;
+        charcount(farea);
+    }
+    id_interview.value = interviewId;
+    toggleElement(editmodal);
+}
+
 function display(event_name) {
     var todisplay = document.getElementById(event_name);
     var events = document.getElementsByClassName('event');
@@ -132,27 +174,6 @@ if (events.length > 0) {
 
 var editmodal = document.getElementById('editmodel');
 var modal = document.getElementById("feedbackModal");
-
-// When the user clicks on the button, open the modal
-document.querySelectorAll('.feedback-btn').forEach(button => {
-    button.onclick = function() {
-        var participantFeedback = this.getAttribute('data-feedback-participant');
-        var candidateFeedback = this.getAttribute('data-feedback-candidate');
-        document.getElementById('participantFeedback').innerText = participantFeedback;
-        document.getElementById('candidateFeedback').innerText = candidateFeedback;
-        toggleElement(modal);
-    }
-});
-
-// When user click on the edit feedback button
-document.querySelectorAll('.edit-feedback').forEach(button => {
-    button.onclick = function() {
-        var interviewId = this.getAttribute('interview-id');
-        var id_interview = document.getElementById('id_interview');
-        id_interview.value = interviewId;
-        toggleElement(editmodal);
-    }
-});
 
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {

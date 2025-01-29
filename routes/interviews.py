@@ -29,7 +29,7 @@ def interviews():
                     else:
                         flash('Feedback updated', "success")
                     return redirect(url_for('interviews.interviews'))
-    return render_template('FeedbackInterviews.html', events=events)
+    return render_template('FeedbackInterviews.html', events=events, type=type)
 
 @interviews_bp.route("/api/interviews")
 def api_interviews():
