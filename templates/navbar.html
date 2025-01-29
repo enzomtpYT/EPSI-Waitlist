@@ -7,14 +7,15 @@
                 <li class="navli"><a class="navelm" href="{{ url_for('admin.admin') }}">Admin</a></li>
             {% elif user_role == 'candidate' %}
                 <li class="navli"><a class="navelm" href="{{ url_for('candidate_dashboard.dashboard') }}">Candidat</a></li>
+                <li class="navli"><a class="navelm" href="{{ url_for('interviews.interviews') }}">Interviews</a></li>
             {% elif user_role == 'participant' %}
                 <li class="navli"><a class="navelm" href="{{ url_for('participant_dashboard.dashboard') }}">Intervenant</a></li>
+                <li class="navli"><a class="navelm" href="{{ url_for('interviews.interviews') }}">Interviews</a></li>
             {% endif %}
         {% endif %}
     </ul>
     <ul class="navul">
         {% if session.token %}
-        
         <li class="navli"><a class="navbtn" href="{{ url_for('settings.settings') }}"><button><i class="fa-regular fa-gear"></i> Paramètres</button></a></li>
         <li class="navli"><a class="navbtn" href="{{ url_for('auth.logout') }}"><button class="authbtn"><i class="fa-regular fa-left-from-bracket"></i> Se déconnecter</button></a></li>
         {% else %}
