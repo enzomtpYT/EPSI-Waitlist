@@ -8,13 +8,13 @@
 
 {% if events %}
     <div class="eventcontainer">
-        <div class="cards eventselector">
+        <div class="section eventselector">
         {% for event_name, event in events.items() %}
             <a onclick="display('{{ event_name }}')" class="eventname">{{ event_name }}</a>
         {% endfor %}
         </div>
         {% for event_name, event in events.items() %}
-            <div id="{{ event_name }}" class="cards event">
+            <div id="{{ event_name }}" class="section event">
                 <h2>{{ event.name_event }}</h2>
                 {% if event.interviews %}
                 <table>
@@ -33,7 +33,7 @@
                             {% else %}
                                 <td>{{ interview.name_candidate }} {{ interview.lastname_candidate }}</td>
                             {% endif %}
-                            <td>{% if interview.duration_interview is not none %}{{ interview.duration_interview }}{% else %}&nbsp;{% endif %}</td>
+                            <td>{% if interview.duration_interview is not none %}{{ interview.duration_interview }}{% else %}&nbsp;{% endif %} minutes</td>
                             <td class="actionbtn">
                                 <button type="button" class="edit-feedback" interview-id="{{ interview.id_interview }}">
                                     Editer mon feedback
@@ -58,20 +58,25 @@
 
 <div id="feedbackModal" class="modal">
     <div class="modal-content">
-        <span class="close">&times;</span>
+        <i class="fa-solid fa-x close" onclick="toggleElement(this.parentElement.parentElement)"></i>
         <h2>Feedback de l'entretien</h2>
-        <p><strong>Feedback de l'intervenant :</strong></p>
-        <p id="participantFeedback"></p>
-        <p><strong>Feedback du candidat :</strong></p>
-        <p id="candidateFeedback"></p>
+        <h3>Feedback de l'intervenant :</h3>
+        <p class="feedb" id="participantFeedback"></p>
+        <h3>Feedback du candidat :</h3>
+        <p class="feedb" id="candidateFeedback"></p>
     </div>
 </div>
 
 <div id="editmodel" class="modal">
-    <div class="modal-content editfed">
-        <span class="close">&times;</span>
+    <div class="modal-content">
+        <i class="fa-solid fa-x close" onclick="toggleElement(this.parentElement.parentElement)"></i>
+        <h2>Editer le feedback</h2>
         <form action="" method="post">
-            <textarea class="feedbackarea" name="feedback" id="feedbackarea" placeholder="Détails du feedback"></textarea>
+            <textarea onkeyup="charcount(this)" class="feedbackarea" name="feedback" id="feedbackarea" placeholder="Description du feedback (limité à 2500 caractères)" maxlength="2500"></textarea>
+            <div id="the-count">
+              <span id="current">0</span>
+              <span id="maximum">/ 2500</span>
+            </div>
             <input type="hidden" id="id_interview" name="id_interview" value="">
             <button type="submit">Envoyer</button>
         </form>
@@ -79,9 +84,39 @@
 </div>
 
 <script>
+function charcount(el) {
+    var current = document.getElementById('current');
+    var maximum = document.getElementById('maximum');
+    var feedback = el.value;
+    var feedbackLength = feedback.length;
+    current.innerText = feedbackLength;
+    if (feedbackLength > 2300) {
+        current.style.color = 'red';
+        current.style.fontWeight = '900';
+    } else if (feedbackLength > 2000) {
+        current.style.color = 'orange';
+        current.style.fontWeight = '700';
+    } else {
+        current.style.color = 'var(--accent-color)';
+        current.style.fontWeight = '400';
+    }
+}
+
+function toggleElement(element) {
+    if (getComputedStyle(element).display === 'none') {
+        element.style.display = 'flex';
+        setTimeout(() => {
+            element.style.opacity = 1;
+        }, 5);
+    } else {
+        element.style.opacity = 0;
+        setTimeout(() => {
+            element.style.display = 'none';
+        }, 200);
+    }
+}
 
 function display(event_name) {
-    console.log(event_name);
     var todisplay = document.getElementById(event_name);
     var events = document.getElementsByClassName('event');
     for (var i = 0; i < events.length; i++) {
@@ -96,12 +131,7 @@ if (events.length > 0) {
 }
 
 var editmodal = document.getElementById('editmodel');
-
-// Get the modal
 var modal = document.getElementById("feedbackModal");
-
-// Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close");
 
 // When the user clicks on the button, open the modal
 document.querySelectorAll('.feedback-btn').forEach(button => {
@@ -110,7 +140,7 @@ document.querySelectorAll('.feedback-btn').forEach(button => {
         var candidateFeedback = this.getAttribute('data-feedback-candidate');
         document.getElementById('participantFeedback').innerText = participantFeedback;
         document.getElementById('candidateFeedback').innerText = candidateFeedback;
-        modal.style.display = "flex";
+        toggleElement(modal);
     }
 });
 
@@ -120,25 +150,17 @@ document.querySelectorAll('.edit-feedback').forEach(button => {
         var interviewId = this.getAttribute('interview-id');
         var id_interview = document.getElementById('id_interview');
         id_interview.value = interviewId;
-        editmodal.style.display = "flex";
-    }
-});
-
-// When the user clicks on <span> (x), close the modal
-Array.from(span).forEach(element => {
-    element.onclick = function() {
-        modal.style.display = "none";
-        editmodal.style.display = "none";
+        toggleElement(editmodal);
     }
 });
 
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
     if (event.target == modal) {
-        modal.style.display = "none";
+        toggleElement(modal);
     }
     if (event.target == editmodal) {
-        editmodal.style.display = "none";
+        toggleElement(editmodal);
     }
 }
 </script>

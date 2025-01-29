@@ -2,32 +2,28 @@
     display: flex;
 }
 
-.cards > table > thead > tr > th {
+.section > table > thead > tr > th {
     border-right: 1px solid #4f4f4f;
     border-bottom: 1px solid #4f4f4f;
     align-items: center;
     text-align: center;
 }
 
-.cards > table > tbody > tr > td {
+.section > table > tbody > tr > td {
     border-right: 1px solid #4f4f4f;
     align-items: center;
     text-align: center;
 }
 
-.cards > table > tbody > tr > td:last-child, .cards > table > thead > tr > th:last-child {
+.section > table > tbody > tr > td:last-child, .section > table > thead > tr > th:last-child {
     border-right: none;
 }
 
-.cards > table > tbody > tr:nth-child(even) {
-    background-color: #ebebeb;
+.section > table > tbody > tr:nth-child(odd) {
+    background-color: var(--alt1);
 }
 
-.cards > table > tbody > tr:nth-child(odd) {
-    background-color: #fff;
-}
-
-.cards > table {
+.section > table {
     width: 100%;
     border-collapse: collapse;
     border-spacing: 0;
@@ -35,11 +31,10 @@
     overflow: hidden;
 }
 
-.cards {
+.section {
     display: flex;
     flex-direction: column;
     padding: 1rem;
-    background-color: #ececec;
     border-radius: 20px;
     margin: 1rem;
 }
@@ -56,7 +51,7 @@
 }
 
 .eventname {
-    background-color: #4f4f4f;
+    background-color: var(--btn-color);
     color: #fff;
     font-size: 1rem;
     padding: 0.5rem;
@@ -73,13 +68,4 @@
     display: flex;
     justify-content: center;
     gap: 1rem;
-}
-
-.editfed {
-    display: flex;
-    flex-direction: column;
-}
-
-.editfed > span {
-    text-align: end;
 }
