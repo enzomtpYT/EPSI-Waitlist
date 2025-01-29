@@ -26,41 +26,6 @@
             <p>Aucun événement trouvé.</p>
             {% endif %}
         </div>
-
-        <div class="section">
-            <h2>Entretiens:</h2>
-            {% if interviews %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Événement</th>
-                        <th>Date</th>
-                        <th>Intervenant</th>
-                        <th>Durée</th>
-                        <th>Feedback</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for interview in interviews %}
-                    <tr>
-                        <td>{{ interview.name_event }}</td>
-                        <td>{{ interview.date_event }}</td>
-                        <td>{{ interview.name_candidate }} {{ interview.lastname_candidate }}</td>
-                        <td>{{ interview.duration_interview }}</td>
-                        <td>
-                            <form action="{{ url_for('candidate.submit_feedback', id_interview=interview.id_interview) }}" method="post">
-                                <textarea name="feedback" placeholder="Entrez votre feedback ici...">{{ interview.feedback_candidate }}</textarea>
-                                <button type="submit">Soumettre</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-            <p>Aucun entretien trouvé.</p>
-            {% endif %}
-        </div>
     </div>
 </div>
 
