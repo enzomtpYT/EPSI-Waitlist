@@ -36,3 +36,10 @@ def delete_api(type):
     if error:
         return jsonify({"error": error}), 400
     return jsonify({"success": True})
+
+@api_bp.route("/api/get_candidates", methods=['GET'])
+def get_candidates():
+    datas, error = api.get_candidates()
+    if error:
+        return jsonify({"error": error}), 400
+    return jsonify(datas)

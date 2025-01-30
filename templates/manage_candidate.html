@@ -7,7 +7,6 @@
 
 <div class="admin-section">
     <h2>Liste des candidats</h2>
-    {% if candidates %}
     <table>
         <thead>
             <tr>
@@ -19,30 +18,46 @@
             </tr>
         </thead>
         <tbody>
-            {% for candidate in candidates %}
-            <tr id="deleteElement-{{ candidate.id_candidate }}-candidate">
-                <td>{{ candidate.lastname_candidate }}</td>
-                <td>{{ candidate.name_candidate }}</td>
-                <td>{{ candidate.email_candidate }}</td>
-                <td class="taggrid">
-                    {% for tag in candidate.tags %}
-                        {% if tag.name_tag %}
-                            <p class="display-tag">{{ tag.name_tag }}</p>
-                        {% endif %}
-                    {% endfor %}
-                </td>
-                <td class="actionbtn">
-                    <a href="/admin/manage_candidate/candidate/{{ candidate.id_candidate }}">
-                        <button type="button">Voir</button>
-                    </a>
-                    <button class="delete" type="submit" onclick="deleteType('candidate', {{ candidate.id_candidate }})">Supprimer</button>
-                </td>
-            </tr>
-            {% endfor %}
         </tbody>
     </table>
-    {% else %}
-    <p>Aucun candidat n'existe.</p>
-    {% endif %}
 </div>
+<script>
+fetch('{{ url_for('api.get_candidates') }}')
+    .then(response => {
+        if (!response.ok) {
+            popup('danger', 'Une erreur est survenue lors de la récupération des données');
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(datas => {
+        buildTable(datas);
+    })
+    .catch(error => {
+        popup('danger', 'Une erreur est survenue lors de la récupération des données');
+    });
+function buildTable(datas) {
+    let table = document.querySelector('table tbody');
+    table.innerHTML = '';
+    datas.forEach(candidate => {
+        let tr = document.createElement('tr');
+        tr.id = `deleteElement-${candidate.id_candidate}-candidate`;
+        tr.innerHTML = `
+            <td>${candidate.lastname_candidate}</td>
+            <td>${candidate.name_candidate}</td>
+            <td>${candidate.email_candidate}</td>
+            <td class="taggrid">
+                ${candidate.tags.map(tag => tag.name_tag ? `<p class="display-tag">${tag.name_tag}</p>` : '').join('')}
+            </td>
+            <td class="actionbtn">
+                <a href="/admin/manage_candidate/candidate/${candidate.id_candidate}">
+                    <button type="button">Voir</button>
+                </a>
+                <button class="delete" type="submit" onclick="deleteType('candidate', ${candidate.id_candidate})">Supprimer</button>
+            </td>
+        `;
+        table.appendChild(tr);
+    });
+}
+</script>
 {% endblock %}

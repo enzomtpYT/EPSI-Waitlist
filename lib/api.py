@@ -68,6 +68,23 @@ def api_interviews(session_token):
         events[name]['interviews'].append(interview_dict)
     return events, None
 
+def get_candidates():
+    candidates, error = database.get_all_candidates()
+    if error:
+        return None, error
+
+    candidates_with_tags = []
+    for candidate in candidates:
+        candidate_dict = dict(candidate)
+        candidate_tags, error = database.get_candidate_tags(candidate['id_candidate'])
+        if error:
+            candidate['tags'] = []
+        else:
+            candidate_dict['tags'] = candidate_tags
+        candidates_with_tags.append(candidate_dict)
+    
+    return candidates_with_tags, None
+
 def delete(type, id):
     if type == "event":
         error = database.delete_event(id)
