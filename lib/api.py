@@ -67,3 +67,20 @@ def api_interviews(session_token):
         interview_dict.pop('date_event')
         events[name]['interviews'].append(interview_dict)
     return events, None
+
+def delete(type, id):
+    if type == "event":
+        error = database.delete_event(id)
+    elif type == "participant":
+        error = database.delete_participant(id)
+    elif type == "candidate":
+        error = database.delete_candidate(id)
+    elif type == "employee":
+        error = database.delete_employee(id)
+    elif type == "tag":
+        error = database.delete_tag(id)
+    elif type == "interview":
+        error = database.delete_interview(id)
+    else:
+        return "Unknown type"
+    return error

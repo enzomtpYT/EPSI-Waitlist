@@ -23,3 +23,16 @@ def manage_event_participants_api_args():
         return jsonify({"error": "Missing id_event parameter"}), 400
     datas, error = api.get_event_participants(id_event)
     return jsonify(datas)
+
+@api_bp.route("/api/delete/<string:type>", methods=['POST'])
+def delete_api(type):
+    data = request.get_json()
+    if data:
+        id = data.get('id')
+    if id is None:
+        return jsonify({"error": "Missing id parameter"}), 400
+    error = None
+    error = api.delete(type, id)
+    if error:
+        return jsonify({"error": error}), 400
+    return jsonify({"success": True})
