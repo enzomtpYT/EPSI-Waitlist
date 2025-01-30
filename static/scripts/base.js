@@ -27,7 +27,5 @@ function observeMarkdownLinks() {
 }
 
 updateLinks();
-
-// Call the function to start observing
 observeMarkdownLinks();
 

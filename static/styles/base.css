@@ -136,7 +136,7 @@ button:active {
     align-items: center;
     text-align: center;
     z-index: 1000;
-    animation: pop 3.5s ease;
+    animation: pop 6s ease;
 }
 
 .popuptext {
@@ -149,10 +149,10 @@ button:active {
 
 @keyframes pop {
     0%   {top: -50%;}
-    25% {top: 1.5%;}
-    30% {top: 0.5%;}
-    35% {top: 1%;}
-    50% {top: 1%; opacity: 1;}
+    10% {top: 1.5%;}
+    15% {top: 0.5%;}
+    20% {top: 1%;}
+    80% {top: 1%; opacity: 1;}
     100% {display: none; top: 1%; opacity: 0;}
 }
 

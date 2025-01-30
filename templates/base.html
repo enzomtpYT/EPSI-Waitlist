@@ -15,27 +15,10 @@
     <script src="https://kit.fontawesome.com/a07d46abc4.js" crossorigin="anonymous"></script>
     <script src="{{ url_for('static', filename='scripts/purify.js') }}"></script>
     <script src="{{ url_for('static', filename='scripts/base.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='scripts/library.js') }}" defer></script>
     <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.js"></script>
 </head>
 <body>
-    {% with messages = get_flashed_messages(True) %}
-    {% if messages %}
-        {% for category, message in messages %}
-        <script>
-            console.log("{{ category }}: {{ message }}");
-        </script>
-            {% if category == 'success' %}
-            <div class="popup fsuccess">
-            {% elif category == 'danger' %}
-            <div class="popup ferror">
-            {% else %}
-            <div class="popup">
-            {% endif %}
-                    <span class="popuptext">{{ message }}</span>
-                </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
     {% if parameters.navbar != 'false' %}
         {% include 'navbar.html' %}
     {% endif %}
@@ -43,15 +26,14 @@
         {% block content %}{% endblock %}
     </div>
 </body>
-</html>
-<script>
-import('https://cdn.jsdelivr.net/npm/marked/marked.min.js')
 
-function mark(element, text) {
-    let dirty = marked.parse(text);
-    let clean = DOMPurify.sanitize(dirty, {FORBID_TAGS: ['style']});
-    element.innerHTML = clean;
-    element.classList.add('markdown');
-    hljs.highlightAll();
-}
-</script>>
+<script>
+{% with messages = get_flashed_messages(True) %}
+{% if messages %}
+    {% for category, message in messages %}
+        popup('{{ category }}', '{{ message }}');
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+</script>
+</html>
