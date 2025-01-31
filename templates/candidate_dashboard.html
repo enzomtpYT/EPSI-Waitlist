@@ -3,7 +3,7 @@
 {% block title %}Accueil candidat{% endblock %}
 
 {% block content %}
-<h1>Bienvenue, {{ candidate.name_candidate }} {{ candidate.lastname_candidate }}</h1>
+<h1 class="title">Bienvenue, {{ candidate.name_candidate }} {{ candidate.lastname_candidate }}</h1>
 
 <div class="section-separator">
     <div class="section profile">
@@ -19,7 +19,7 @@
             {% if events %}
             <ul class="eventlist">
                 {% for event in events %}
-                <li class="eventel"><a><i class="fa-solid fa-arrow-right"></i> {{ event.name_event }} - {{ event.date_event }}</a></li>
+                <li class="eventel"><a><i class="fa-regular fa-arrow-right"></i> {{ event.name_event }} - {{ event.date_event }}</a></li>
                 {% endfor %}
             </ul>
             {% else %}
