@@ -145,13 +145,6 @@ button {
     gap: .5rem;
 }
 
-button > svg {
-    box-sizing: border-box;
-    width: 1rem;
-    height: 1rem;
-    margin: 0;
-}
-
 button:hover {
     background-color: var(--btn-hover);
 }
@@ -222,7 +215,7 @@ button:active {
     font-size: 2.5rem;
 }
 
-.remove-tag {
+.remove-tag, .add-tag {
     display: inline-flex;
     cursor: pointer;
     align-items: center;
@@ -236,40 +229,24 @@ button:active {
     width: auto;
 }
 
-.remove-tag:hover {
+.remove-tag:hover, .add-tag:hover {
     text-decoration: underline;
 }
 
-.remove-tag > svg {
-    box-sizing: border-box;
-    width: 1rem;
-    height: 1rem;
-    flex-shrink: 0;
+.remove-tag {
+    background-color: #dc3545;
 }
 
 .add-tag {
-    display: inline-flex;
-    cursor: pointer;
-    align-items: center;
-    gap: .25rem;
-    border-radius: 99999px;
-    padding: .25rem .5rem;
-    font-size: .875rem;
-    font-weight: 600;
-    line-height: 1;
-    overflow: visible;
-    width: auto;
+    background-color: #28a745;
+}
+
+.remove-tag:hover {
+    background-color: #c82333;
 }
 
 .add-tag:hover {
-    text-decoration: underline;
-}
-
-.add-tag > svg {
-    box-sizing: border-box;
-    width: 1rem;
-    height: 1rem;
-    flex-shrink: 0;
+    background-color: #218838;
 }
 
 .tagform > button {
@@ -290,10 +267,6 @@ button:active {
     width: auto;
     background-color: #4f4f4f;
     color: #fff;
-}
-
-.plussvg {
-    transform: rotate(45deg);
 }
 
 .modal {

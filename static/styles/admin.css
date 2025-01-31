@@ -171,9 +171,12 @@
 }
 
 .infoeditor {
-    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
     padding: 1.5rem;
     backdrop-filter: brightness(0.6);
+    gap: 1rem;
 }
 
 .listbtn {
@@ -185,4 +188,30 @@
 .selected {
     border-right: 6px solid var(--accent-color);
     background-color: var(--alt1);
+}
+
+.sectionmanagetag {
+    display: none;
+    flex-direction: row;
+    width: 100%;
+    gap: 5px;
+}
+
+.sectionremovetags, .sectionaddtags {
+    width: 50%;
+    padding: 1rem 1rem;
+    background-color: var(--alt1);
+    border-radius: 5px;
+    min-height: 6rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+    gap: 0.25rem;
+}
+
+.sectionremovetags > *, .sectionaddtags > * {
+    margin-inline: 0;
 }

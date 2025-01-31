@@ -43,3 +43,10 @@ def get_candidates():
     if error:
         return jsonify({"error": error}), 400
     return jsonify(datas)
+
+@api_bp.route("/api/get_tags", methods=['GET'])
+def get_tags():
+    datas, error = api.database.get_all_tags()
+    if error:
+        return jsonify({"error": error}), 400
+    return jsonify(datas)
