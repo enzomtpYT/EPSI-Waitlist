@@ -62,6 +62,7 @@ function generatepass() {
 // Toggle password visibility
 function showpass() {
     var icon = document.getElementById('showpass');
+    var passwordInput = document.getElementById('password');
     if (passwordInput.type === 'password') {
         passwordInput.type = 'text';
         icon.classList.remove('fa-eye');
