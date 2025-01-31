@@ -18,3 +18,37 @@ function deleteType(type, id) {
         });
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    afterLoad();
+});
+
+function afterLoad() {
+    /* Resizer */
+
+    var resize = document.querySelector("#resizer");
+    var left = document.querySelector(".sideItemList");
+    var container = document.querySelector(".tabmanagment");
+    var moveX = left.getBoundingClientRect().width + resize.getBoundingClientRect().width / 2;
+    var drag = false;
+
+    resize.addEventListener("mousedown", function (e) {
+       drag = true;
+       moveX = e.x;
+    });
+
+    container.addEventListener("mousemove", function (e) {
+       moveX = e.x;
+       if (drag) {
+          left.style.width =
+             moveX - resize.getBoundingClientRect().width / 2 + "px";
+          e.preventDefault();
+       }
+    });
+
+    container.addEventListener("mouseup", function (e) {
+       drag = false;
+    });
+
+    /* End Resizer */
+}

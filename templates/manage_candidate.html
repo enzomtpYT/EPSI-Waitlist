@@ -43,30 +43,8 @@
                 <input type="hidden" id="id_candidate" name="id_candidate" value="">
             </form>
             <div class="sectionmanagetag">
-                <div class="sectionremovetags">
-                    <button class="remove-tag" data-tagid="1"><i class="fa-regular fa-xmark"></i> TagName</button>
-                    <button class="remove-tag" data-tagid="2"><i class="fa-regular fa-xmark"></i> TagName</button>
-                    <button class="remove-tag" data-tagid="3"><i class="fa-regular fa-xmark"></i> TagName</button>
-                    <button class="remove-tag" data-tagid="4"><i class="fa-regular fa-xmark"></i> TagName</button>
-                    <button class="remove-tag" data-tagid="5"><i class="fa-regular fa-xmark"></i> VerySuperDuperMassiveLongTagName</button>
-                    <button class="remove-tag" data-tagid="6"><i class="fa-regular fa-xmark"></i> TagName</button>
-                    <button class="remove-tag" data-tagid="7"><i class="fa-regular fa-xmark"></i> TagName</button>
-                    <button class="remove-tag" data-tagid="8"><i class="fa-regular fa-xmark"></i> TagName</button>
-                    <button class="remove-tag" data-tagid="9"><i class="fa-regular fa-xmark"></i> TagName</button>
-                    <button class="remove-tag" data-tagid="10"><i class="fa-regular fa-xmark"></i> TagName</button>
-                </div>
-                <div class="sectionaddtags">
-                    <button class="add-tag" data-tagid="1"><i class="fa-regular fa-plus"></i> TagName</button>
-                    <button class="add-tag" data-tagid="2"><i class="fa-regular fa-plus"></i> TagName</button>
-                    <button class="add-tag" data-tagid="3"><i class="fa-regular fa-plus"></i> TagName</button>
-                    <button class="add-tag" data-tagid="4"><i class="fa-regular fa-plus"></i> TagName</button>
-                    <button class="add-tag" data-tagid="5"><i class="fa-regular fa-plus"></i> VerySuperDuperMassiveLongTagName</button>
-                    <button class="add-tag" data-tagid="6"><i class="fa-regular fa-plus"></i> TagName</button>
-                    <button class="add-tag" data-tagid="7"><i class="fa-regular fa-plus"></i> TagName</button>
-                    <button class="add-tag" data-tagid="8"><i class="fa-regular fa-plus"></i> TagName</button>
-                    <button class="add-tag" data-tagid="9"><i class="fa-regular fa-plus"></i> TagName</button>
-                    <button class="add-tag" data-tagid="10"><i class="fa-regular fa-plus"></i> TagName</button>
-                </div>
+                <div class="sectionremovetags"></div>
+                <div class="sectionaddtags"></div>
             </div>
         </div>
     </div>
@@ -195,35 +173,5 @@ function buildManagement(datas, tags) {
     document.querySelector('.infoeditor').appendChild(pre); #}
 }
 loadData();
-
-
-/* Resizer */
-
-var resize = document.querySelector("#resizer");
-var left = document.querySelector(".sideItemList");
-var container = document.querySelector(".tabmanagment");
-var moveX = left.getBoundingClientRect().width + resize.getBoundingClientRect().width / 2;
-var drag = false;
-
-resize.addEventListener("mousedown", function (e) {
-   drag = true;
-   moveX = e.x;
-});
-
-container.addEventListener("mousemove", function (e) {
-   moveX = e.x;
-   if (drag) {
-      left.style.width =
-         moveX - resize.getBoundingClientRect().width / 2 + "px";
-      e.preventDefault();
-   }
-});
-
-container.addEventListener("mouseup", function (e) {
-   drag = false;
-});
-
-/* End Resizer */
-
 </script>
 {% endblock %}
