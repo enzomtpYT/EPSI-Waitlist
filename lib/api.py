@@ -78,9 +78,14 @@ def get_candidates():
         candidate_dict = dict(candidate)
         candidate_tags, error = database.get_candidate_tags(candidate['id_candidate'])
         if error:
-            candidate['tags'] = []
+            candidate_dict['tags'] = []
         else:
             candidate_dict['tags'] = candidate_tags
+        user_info, error = database.get_user(candidate['id_user'])
+        if error:
+            candidate_dict["username"] = ''
+        else:
+            candidate_dict["username"] = user_info["username"]
         candidates_with_tags.append(candidate_dict)
     
     return candidates_with_tags, None
