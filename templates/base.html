@@ -20,11 +20,13 @@
     <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.js"></script>
 </head>
 <body>
-    {% if parameters.navbar != 'false' %}
-        {% include 'navbar.html' %}
-    {% endif %}
     <div class="content">
-        {% block content %}{% endblock %}
+        {% if parameters.navbar != 'false' %}
+            {% include 'navbar.html' %}
+        {% endif %}
+        <div class="page">
+            {% block content %}{% endblock %}
+        </div>
     </div>
 </body>
 
