@@ -41,6 +41,7 @@
                 </div>
 
                 <input type="hidden" id="id_candidate" name="id_candidate" value="">
+                <input type="hidden" id="tags" name="tags" value="">
             </form>
             <div class="sectionmanagetag">
                 <div class="sectionremovetags"></div>
@@ -96,6 +97,7 @@ function showInfos(infos) {
     document.querySelector('#username').value = infos.username;
     document.querySelector('#id_candidate').value = infos.id_candidate;
     document.querySelector('#password').value = '';
+    document.querySelector('#tags').value = JSON.stringify(infos.tags);
     document.querySelector('#confirmbtn').innerHTML = '<i class="fa-regular fa-save"></i> Enregistrer';
     document.querySelector('#candform').style.display = 'flex';
     document.querySelector('.sectionmanagetag').style.display = 'flex';
@@ -111,7 +113,7 @@ function showInfos(infos) {
         tagButton.dataset.tagid = tag.id_tag;
         tagButton.innerHTML = `<i class="fa-regular fa-xmark"></i> ${tag.name_tag}`;
         tagButton.onclick = function() {
-            removeTag(infos.id_candidate, tag.id_tag);
+            removeTag(tag, this);
         };
         document.querySelector('.sectionremovetags').appendChild(tagButton);
     });
@@ -122,7 +124,7 @@ function showInfos(infos) {
             tagButton.dataset.tagid = tag.id_tag;
             tagButton.innerHTML = `<i class="fa-regular fa-plus"></i> ${tag.name_tag}`;
             tagButton.onclick = function() {
-                addTag(infos.id_candidate, tag.id_tag);
+                addTag(tag, this);
             };
             document.querySelector('.sectionaddtags').appendChild(tagButton);
         }
@@ -137,6 +139,7 @@ function showNew() {
     document.querySelector('#username').value = '';
     document.querySelector('#id_candidate').value = '';
     document.querySelector('#password').value = '';
+    document.querySelector('#tags').value = json.stringify([]);
     document.querySelector('#confirmbtn').innerHTML = '<i class="fa-regular fa-save"></i> Enregistrer';
     document.querySelector('#candform').style.display = 'flex';
     document.querySelector('.delete').style.display = 'none';
@@ -148,7 +151,7 @@ function showNew() {
         tagButton.dataset.tagid = tag.id_tag;
         tagButton.innerHTML = `<i class="fa-regular fa-plus"></i> ${tag.name_tag}`;
         tagButton.onclick = function() {
-            addTag(null, tag.id_tag);
+            addTag(tag, this);
         };
         document.querySelector('.sectionaddtags').appendChild(tagButton);
     });
@@ -166,12 +169,38 @@ function buildManagement(datas, tags) {
     });
     document.querySelector('#loading').style.display = 'none';
     document.querySelector('.tabmanagment').style.display = 'flex';
-    {# let pre = document.createElement('pre');
-    let code = document.createElement('code');
-    mark(code, JSON.stringify({tags: tags, datas: datas}, null, 2));
-    pre.appendChild(code);
-    document.querySelector('.infoeditor').appendChild(pre); #}
 }
+
+function addTag(tag, button) {
+    let tags = JSON.parse(document.querySelector('#tags').value);
+    tags.push(tag);
+    document.querySelector('#tags').value = JSON.stringify(tags);
+    let tagButton = document.createElement('button');
+    tagButton.classList.add('remove-tag');
+    tagButton.dataset.tagid = tag.id_tag;
+    tagButton.innerHTML = `<i class="fa-regular fa-xmark"></i> ${tag.name_tag}`;
+    tagButton.onclick = function() {
+        removeTag(tag, this);
+    };
+    document.querySelector('.sectionremovetags').appendChild(tagButton);
+    if (button) button.remove();
+}
+
+function removeTag(tag, button) {
+    let tags = JSON.parse(document.querySelector('#tags').value);
+    tags = tags.filter(t => t.id_tag !== tag.id_tag);
+    document.querySelector('#tags').value = JSON.stringify(tags);
+    let tagButton = document.createElement('button');
+    tagButton.classList.add('add-tag');
+    tagButton.dataset.tagid = tag.id_tag;
+    tagButton.innerHTML = `<i class="fa-regular fa-plus"></i> ${tag.name_tag}`;
+    tagButton.onclick = function() {
+        addTag(tag, this);
+    };
+    document.querySelector('.sectionaddtags').appendChild(tagButton);
+    if (button) button.remove();
+}
+
 loadData();
 </script>
 {% endblock %}
