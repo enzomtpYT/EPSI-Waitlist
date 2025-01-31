@@ -1,26 +1,21 @@
-<link rel="stylesheet" href="{{ url_for('static', filename='styles/navbar.css') }}">
-<nav>
-    <ul class="navul">
-        <li class="navli"><a class="navelm" href="{{ url_for('index.index') }}">Accueil</a></li>
-        {% if session.token %}
-            {% if user_role == 'employee' or user_role == 'admin' or user_role == 'superadmin' %}
-                <li class="navli"><a class="navelm" href="{{ url_for('admin.admin') }}">Admin</a></li>
-            {% elif user_role == 'candidate' %}
-                <li class="navli"><a class="navelm" href="{{ url_for('candidate_dashboard.dashboard') }}">Candidat</a></li>
-                <li class="navli"><a class="navelm" href="{{ url_for('interviews.interviews') }}">Entretiens</a></li>
-            {% elif user_role == 'participant' %}
-                <li class="navli"><a class="navelm" href="{{ url_for('participant_dashboard.dashboard') }}">Intervenant</a></li>
-                <li class="navli"><a class="navelm" href="{{ url_for('interviews.interviews') }}">Entretiens</a></li>
+{% if session.token %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/navbar.css') }}">
+    <nav>
+        <ul class="navul">
+            <li class="navli"><a class="navbtn" href="{{ url_for('settings.settings') }}"><i class="fa-regular fa-user"></i>{{ username }}</a></li>
+            <li class="navli"><a class="navelm" href="{{ url_for('index.index') }}">Accueil</a></li>
+            {% if session.token %}
+                {% if user_role == 'employee' or user_role == 'admin' or user_role == 'superadmin' %}
+                    <li class="navli"><a class="navelm" href="{{ url_for('admin.admin') }}">Admin</a></li>
+                {% elif user_role == 'candidate' %}
+                    <li class="navli"><a class="navelm" href="{{ url_for('candidate_dashboard.dashboard') }}">Candidat</a></li>
+                    <li class="navli"><a class="navelm" href="{{ url_for('interviews.interviews') }}">Entretiens</a></li>
+                {% elif user_role == 'participant' %}
+                    <li class="navli"><a class="navelm" href="{{ url_for('participant_dashboard.dashboard') }}">Intervenant</a></li>
+                    <li class="navli"><a class="navelm" href="{{ url_for('interviews.interviews') }}">Entretiens</a></li>
+                {% endif %}
             {% endif %}
-        {% endif %}
-    </ul>
-    <ul class="navul">
-        {% if session.token %}
-        <li class="navli"><a class="navbtn" href="{{ url_for('settings.settings') }}"><button><i class="fa-regular fa-gear"></i> Paramètres</button></a></li>
-        <li class="navli"><a class="navbtn" href="{{ url_for('auth.logout') }}"><button class="authbtn"><i class="fa-regular fa-left-from-bracket"></i> Se déconnecter</button></a></li>
-        {% else %}
-        <li class="navli"><a class="navbtn" href="{{ url_for('auth.login') }}"><button class="authbtn"><i class="fa-regular fa-right-to-bracket"></i> Se connecter</button></a></li>
-        {% endif %}
-    </ul>
-</nav>
-<div class="divider"></div>
+        </ul>
+    </nav>
+    <div class="vdivider"></div>
+{% endif %}
