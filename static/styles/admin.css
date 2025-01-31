@@ -121,9 +121,10 @@
 }
 
 .tableContent {
+    display: flex;
+    flex-direction: column;
     height: 100%;
     color: var(--accent-color);
-    overflow: hidden;
 }
 
 .tabmanagment {
@@ -138,8 +139,15 @@
 
 .sideItemList {
     width: 12vw;
-    border-right: 3px solid var(--alt1);
+    min-width: 12vw;
     background-color: #2e2456cc;
+    overflow: scroll;
+} 
+
+.resizer {
+    background-color: var(--alt1);
+    width: 6px;
+    cursor: col-resize;
 }
 
 .itemlist {
