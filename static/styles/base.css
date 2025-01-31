@@ -17,9 +17,17 @@
     font-family: 'Roboto';  
 }
 
-body {
-    background-color: #8d85c1; 
-    background-image: url('https://files.catbox.moe/foa83u.webp');
+.background {
+    z-index: -1;
+    position: fixed;
+    aspect-ratio: attr(width) / attr(height);
+    min-width: 100vw;
+    min-height: 100vh;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1.1);
+    background-color: #8d85c1;
+    filter: brightness(60%) blur(6px);
 }
 
 html, body {
@@ -27,11 +35,26 @@ html, body {
     min-height: 100vh;
 }
 
+h1 {
+    font-size: 2rem;
+}
+
+h2 {
+    font-size: 1.75rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+h4 {
+    font-size: 1.25rem;
+}
+
 .content {
     display: flex;
     flex-direction: row;
     min-height: 100%;
-    backdrop-filter: brightness(60%) blur(6px);
 }
 
 .page {
