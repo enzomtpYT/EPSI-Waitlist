@@ -1,4 +1,4 @@
-from lib import database
+from lib import database, auth
 
 def get_event_participants(id_event):
     event, error = database.get_event(id_event)
@@ -106,3 +106,59 @@ def delete(type, id):
     else:
         return "Unknown type"
     return error
+
+def add(type, data):
+    if type == "event":
+        error = database.add_event(data)
+    elif type == "participant":
+        error = database.add_participant(data)
+    elif type == "candidate":
+        error = database.add_candidate(data)
+    elif type == "employee":
+        error = database.add_employee(data)
+    elif type == "tag":
+        error = database.add_tag(data)
+    elif type == "interview":
+        error = database.add_interview(data)
+    else:
+        return None, "Unknown type"
+    return None, error
+
+def update(type, data):
+    if type == "event":
+        error = database.update_event(data)
+    elif type == "participant":
+        error = database.update_participant(data)
+    elif type == "candidate":
+        
+        id_candidate = data.get("id_candidate")
+        lastname_candidate = data.get("lastname_candidate")
+        name_candidate = data.get("name_candidate")
+        email_candidate = data.get("email_candidate")
+        if lastname_candidate is None or name_candidate is None or email_candidate is None:
+            return "Champs manquants"
+        error = database.edit_candidate(lastname_candidate, name_candidate, email_candidate, id_candidate)
+        if error:
+            return error
+        id_user = data.get("id_user")
+        username = data.get("username")
+        password = data.get("password")
+        if error is None:
+            if username is not None:
+                error = database.auth_update_username(username, id_user)
+                if error:
+                    return error
+            if password is not None:
+                error = auth.update_user_pass(password, id_user)
+                if error:
+                    return error
+                
+    elif type == "employee":
+        error = database.update_employee(data)
+    elif type == "tag":
+        error = database.update_tag(data)
+    elif type == "interview":
+        error = database.update_interview(data)
+    else:
+        return "Unknown type"
+    return None

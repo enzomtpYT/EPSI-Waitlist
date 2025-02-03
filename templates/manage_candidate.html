@@ -36,11 +36,12 @@
                 </div>
     
                 <div>
-                    <button id="confirmbtn" disabled></button>
+                    <button id="confirmbtn" onclick="done(event)"><i class="fa-regular fa-save"></i> Enregistrer</button>
                     <button class="delete" type="submit"><i class="fa-regular fa-trash"></i> Supprimer</button>
                 </div>
 
                 <input type="hidden" id="id_candidate" name="id_candidate" value="">
+                <input type="hidden" id="id_user" name="id_user" value="">
                 <input type="hidden" id="tags" name="tags" value="">
             </form>
             <div class="sectionmanagetag">
@@ -55,6 +56,8 @@
 let AllTags = null;
 
 function loadData() {
+    document.querySelector('#candform').style.display = 'none';
+    document.querySelector('.sectionmanagetag').style.display = 'none';
     document.querySelectorAll('.itemlist').forEach(item => item.remove());
     document.querySelectorAll('.sectionaddtags button').forEach(tag => tag.remove());
     document.querySelectorAll('.sectionremovetags button').forEach(tag => tag.remove());
@@ -97,6 +100,7 @@ function showInfos(infos) {
     document.querySelector('#username').value = infos.username;
     document.querySelector('#id_candidate').value = infos.id_candidate;
     document.querySelector('#password').value = '';
+    document.querySelector('#id_user').value = infos.id_user;
     document.querySelector('#tags').value = JSON.stringify(infos.tags);
     document.querySelector('#confirmbtn').innerHTML = '<i class="fa-regular fa-save"></i> Enregistrer';
     document.querySelector('#candform').style.display = 'flex';
@@ -139,9 +143,11 @@ function showNew() {
     document.querySelector('#username').value = '';
     document.querySelector('#id_candidate').value = '';
     document.querySelector('#password').value = '';
-    document.querySelector('#tags').value = json.stringify([]);
+    document.querySelector('#tags').value = JSON.stringify([]);
+    document.querySelector('#id_user').value = '';
     document.querySelector('#confirmbtn').innerHTML = '<i class="fa-regular fa-save"></i> Enregistrer';
     document.querySelector('#candform').style.display = 'flex';
+    document.querySelector('.sectionmanagetag').style.display = 'flex';
     document.querySelector('.delete').style.display = 'none';
     document.querySelector('.sectionremovetags').innerHTML = '';
     document.querySelector('.sectionaddtags').innerHTML = '';
@@ -159,6 +165,7 @@ function showNew() {
 
 function buildManagement(datas, tags) {
     let sideItemList = document.querySelector('.sideItemList');
+    num = 0;
     datas.forEach(candidate => {
         let item = document.createElement('div');
         item.classList.add('itemlist');
@@ -166,6 +173,8 @@ function buildManagement(datas, tags) {
         item.id = `deleteElement-${candidate.id_candidate}-candidate`;
         item.innerHTML = `<i class="fa-regular fa-user"></i><p>${candidate.name_candidate} ${candidate.lastname_candidate}</p>`;
         sideItemList.appendChild(item);
+        if (num === 0) showInfos(candidate);
+        num++;
     });
     document.querySelector('#loading').style.display = 'none';
     document.querySelector('.tabmanagment').style.display = 'flex';
@@ -199,6 +208,51 @@ function removeTag(tag, button) {
     };
     document.querySelector('.sectionaddtags').appendChild(tagButton);
     if (button) button.remove();
+}
+
+function done(event) {
+    event.preventDefault();
+    let candidate = {
+        id_candidate: document.querySelector('#id_candidate').value,
+        id_user: document.querySelector('#id_user').value,
+        lastname_candidate: document.querySelector('#candidate_lastname').value,
+        name_candidate: document.querySelector('#candidate_name').value,
+        email_candidate: document.querySelector('#candidate_email').value,
+        username: document.querySelector('#username').value,
+        password: document.querySelector('#password').value,
+        tags: JSON.parse(document.querySelector('#tags').value)
+    };
+
+    if (document.querySelector('#id_candidate').value != '') {
+        url = '{{ url_for('api.update_api', type='candidate') }}';
+    } else {
+        url = '{{ url_for('api.add_api', type='candidate') }}';
+    }
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(candidate)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                popup('danger', 'Une erreur est survenue lors de l\'enregistrement des données: ' + (data.message || 'Erreur inconnue'));
+            });
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        popup('success', 'Candidat enregistré avec succès');
+        loadData();
+    })
+    .catch(error => {
+        popup('danger', 'Une erreur est survenue lors de l\'enregistrement des données');
+        console.error('Error:', error);
+    });
 }
 
 loadData();

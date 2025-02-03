@@ -1738,6 +1738,57 @@ def update_user_password(username, password, session_token):
     finally:
         conn.close()
 
+def auth_update_password(password, session_token, id_user):
+    """
+    Met à jour le mot de passe d'un utilisateur dans la base de données.
+
+    Args:
+        password (str): Le mot de passe hashé de l'utilisateur.
+        session_token (str): Le jeton de session de l'utilisateur.
+        id_user (int): L'identifiant de l'utilisateur.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        cursor = conn.cursor()
+        cursor.execute('UPDATE "User" SET password_user = %s, session_token = %s WHERE id_user = %s', (password, session_token, id_user))
+        conn.commit()
+        return None
+    except psycopg2.Error as e:
+        print(f"Erreur lors de la mise à jour du mot de passe de l'utilisateur: {e}")
+        return "Erreur lors de la mise à jour du mot de passe de l'utilisateur"
+    finally:
+        conn.close()    
+
+def auth_update_username(username, id_user):
+    """
+    Met à jour le nom d'utilisateur d'un utilisateur dans la base de données.
+
+    Args:
+        username (str): Le nom d'utilisateur de l'utilisateur.
+        id_user (int): L'identifiant de l'utilisateur.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        cursor = conn.cursor()
+        cursor.execute('UPDATE "User" SET username = %s WHERE id_user = %s', (username, id_user))
+        conn.commit()
+        return None
+    except psycopg2.Error as e:
+        print(f"Erreur lors de la mise à jour du nom d'utilisateur de l'utilisateur: {e}")
+        return "Erreur lors de la mise à jour du nom d'utilisateur de l'utilisateur"
+    finally:
+        conn.close()
+
 def auth_register_candidate(id_candidate, username, password_user, session_token):
     """
     Enregistre un candidat dans la base de données.

@@ -37,6 +37,27 @@ def delete_api(type):
         return jsonify({"error": error}), 400
     return jsonify({"success": True})
 
+@api_bp.route("/api/add/<string:type>", methods=['POST'])
+def add_api(type):
+    data = request.get_json()
+    print(data)
+    return jsonify(data)
+    # data = request.get_json()
+    # if data:
+    #     datas, error = api.add(type, data)
+    # if error:
+    #     return jsonify({"error": error}), 400
+    # return jsonify(datas)
+
+@api_bp.route("/api/update/<string:type>", methods=['POST'])
+def update_api(type):
+    data = request.get_json()
+    if data:
+        error = api.update(type, data)
+    if error:
+        return jsonify({"Erreur: ": error}), 400
+    return jsonify({"success": True}), 200
+
 @api_bp.route("/api/get_candidates", methods=['GET'])
 def get_candidates():
     datas, error = api.get_candidates()

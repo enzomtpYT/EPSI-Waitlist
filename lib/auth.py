@@ -19,6 +19,11 @@ def genpassword(password):
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
     return hashed_password
 
+def update_user_pass(password, user_id):
+    session_token = hashlib.md5(random.randbytes(random.randint(8,32))).hexdigest()
+    error = database.auth_update_password(genpassword(password), session_token, user_id)
+    return error
+
 def update_user(password, username):
     session_token = hashlib.md5(random.randbytes(random.randint(8,32))).hexdigest()
     error = database.update_user_password(username, genpassword(password), session_token)
