@@ -1087,6 +1087,7 @@ def start_interview(id_interview):
         WHERE id_interview = %s
         RETURNING id_interview
         ''', (start_time, id_interview))
+        conn.commit()
         updated_id = cursor.fetchone()
         if updated_id:
             return updated_id[0], None
@@ -1098,7 +1099,7 @@ def start_interview(id_interview):
     finally:
         conn.close()
 
-def end_interview(id_interview, status):
+def end_interview(interview_id, status):
     """
     Termine un entretien en enregistrant l'heure de fin et en calculant la durée.
 
@@ -1116,9 +1117,10 @@ def end_interview(id_interview, status):
         end_time = datetime.datetime.now()
         cursor.execute('''
         UPDATE Interview
-        SET end_time_interview = %s, duration = %s - start_time_interview, happened = %s
+        SET happened = %s, end_time_interview = %s, duration_interview = %s - start_time_interview
         WHERE id_interview = %s
-        ''', (end_time, end_time, status, id_interview))
+        ''', (status, end_time, end_time, interview_id))
+        conn.commit()
         return None
     except psycopg2.Error as e:
         print(f"Erreur lors de la fin de l'entretien: {e}")
