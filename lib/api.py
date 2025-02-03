@@ -162,11 +162,22 @@ def update(type, data):
         lastname_candidate = data.get("lastname_candidate")
         name_candidate = data.get("name_candidate")
         email_candidate = data.get("email_candidate")
+        newtags = data.get("tags")
+        currenttags, error = database.get_candidate_tags(id_candidate)
+        currenttags = [dict(tag) for tag in currenttags]
         if lastname_candidate is None or name_candidate is None or email_candidate is None:
             return "Champs manquants"
         error = database.edit_candidate(lastname_candidate, name_candidate, email_candidate, id_candidate)
         if error:
             return error
+        if newtags is not None:
+            print(f'currenttags: {currenttags}\nnwetags: {newtags}')
+            for otag in currenttags:
+                if otag not in newtags:
+                    database.remove_tag_from_candidate(id_candidate, otag['id_tag'])
+            for ntag in newtags:
+                if ntag not in currenttags:
+                    database.add_tag_to_candidate(id_candidate, ntag['id_tag'])
         id_user = data.get("id_user")
         username = data.get("username")
         password = data.get("password")
