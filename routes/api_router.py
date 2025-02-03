@@ -71,26 +71,34 @@ def get_tags():
 
 @api_bp.route("/api/start_interview", methods=['POST'])
 def start_interview():
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "Missing data"}), 400
-    id_interview = data.get('id_interview')
-    if not id_interview:
-        return jsonify({"error": "Missing id_interview parameter"}), 400
-    updated_id, error = database.start_interview(id_interview)
-    if error:
-        return jsonify({"error": error}), 400
-    return ({"success": True})
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Missing data"}), 400
+        id_interview = data.get('id_interview')
+        if not id_interview:
+            return jsonify({"error": "Missing id_interview parameter"}), 400
+        updated_id, error = database.start_interview(id_interview)
+        if error:
+            return jsonify({"error": error}), 400
+        return jsonify({"interview_id": updated_id})
+    except Exception as e:
+        print(f"Erreur dans start_interview: {e}")
+        return jsonify({"error": "Internal server error"}), 500
 
 @api_bp.route("/api/end_interview", methods=['POST'])
 def end_interview():
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "Missing data"}), 400
-    id_interview = data.get('id_interview')
-    if not id_interview:
-        return jsonify({"error": "Missing id_interview parameter"}), 400
-    error = database.end_interview(id_interview, status=True)
-    if error:
-        return jsonify({"error": error}), 400
-    return jsonify({"success": True})
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Missing data"}), 400
+        id_interview = data.get('id_interview')
+        if not id_interview:
+            return jsonify({"error": "Missing id_interview parameter"}), 400
+        error = database.end_interview(id_interview)
+        if error:
+            return jsonify({"error": error}), 400
+        return jsonify({"success": True})
+    except Exception as e:
+        print(f"Erreur dans end_interview: {e}")
+        return jsonify({"error": "Internal server error"}), 500
