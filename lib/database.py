@@ -286,9 +286,9 @@ def get_event_interview_candidate(todayevent, id_participant):
     try:
         cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
-        SELECT Interview.id_candidate, Candidate.lastname_candidate, Candidate.name_candidate, Candidate.email_candidate, Interview.id_interview 
-        FROM Interview 
-        JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate 
+        SELECT Interview.id_candidate, Candidate.lastname_candidate, Candidate.name_candidate, Candidate.email_candidate, Interview.id_interview
+        FROM Interview
+        JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
         WHERE id_event = %s AND id_participant = %s AND happened = %s
         ''', (todayevent, id_participant, False))
         candid = cursor.fetchall()
@@ -817,7 +817,7 @@ def delete_participant(id_participant):
     try:
         cursor = conn.cursor()
         # Supprime l'utilisateur associé au participant (participant supprimé en cascade)
-        cursor.execute('DELETE FROM "User" WHERE id_user = (SELECT id_user FROM Participant WHERE id_participant = %s)', (id_participant,)) 
+        cursor.execute('DELETE FROM "User" WHERE id_user = (SELECT id_user FROM Participant WHERE id_participant = %s)', (id_participant,))
         conn.commit()
     except psycopg2.Error as e:
         print(f"Erreur lors de la suppression de l'intervenant: {e}")
@@ -1061,6 +1061,60 @@ def get_interview(id_interview):
     except psycopg2.Error as e:
         print(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def start_interview(id_candidate, id_participant):
+    """
+    Démarre un entretien en enregistrant l'heure de début.
+
+    Args:
+        id_candidate (int): L'identifiant du candidat.
+        id_participant (int): L'identifiant du participant.
+
+    Returns:
+        tuple: Un tuple contenant l'identifiant de l'entretien et un message d'erreur si une erreur est survenue.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+    try:
+        cursor = conn.cursor()
+        start_time = datetime.datetime.now()
+        cursor.execute('UPDATE Interview SET start_time = %s WHERE id_interview = %s', (start_time, interview_id))
+        interview_id = cursor.fetchone()[0]
+        return interview_id, None
+    except psycopg2.Error as e:
+        print(f"Erreur lors du démarrage de l'entretien: {e}")
+        return None, "Erreur lors du démarrage de l'entretien"
+    finally:
+        conn.close()
+
+def end_interview(id_interview, status):
+    """
+    Termine un entretien en enregistrant l'heure de fin et en calculant la durée.
+
+    Args:
+        id_interview (int): L'identifiant de l'entretien.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        cursor = conn.cursor()
+        end_time = datetime.datetime.now()
+        cursor.execute('''
+        UPDATE Interview
+        SET end_time = %s, duration = %s - start_time, happened = %s
+        WHERE id_interview = %s
+        ''', (end_time, end_time, status, id_interview))
+        return None
+    except psycopg2.Error as e:
+        print(f"Erreur lors de la fin de l'entretien: {e}")
+        return "Erreur lors de la fin de l'entretien"
     finally:
         conn.close()
 
@@ -2094,11 +2148,11 @@ def update_user_role(user_id, role_name):
 def get_profile_info(session_token):
     """
     Récupère les informations de profil d'un utilisateur
-    
+
     Args:
         session_token (str): Le jeton de session de l'utilisateur.
-    
-    
+
+
     Returns:
         tuple: Un tuple contenant les informations de profil (nom d'utilisateur, email, (plus tard: CV, biographie), type d'utilisateur (particpant, candidat, etc..) et un message d'erreur si une erreur est survenue.
     """
@@ -2147,12 +2201,12 @@ def get_profile_info(session_token):
 def update_profile_info(oldusername, newusername, email):
     """
     Met à jour les informations de profil d'un utilisateur
-    
+
     Args:
         oldusername (str): L'ancien nom d'utilisateur de l'utilisateur.
         newusername (str): Le nouveau nom d'utilisateur de l'utilisateur.
         email (str): L'email de l'utilisateur.
-    
+
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """

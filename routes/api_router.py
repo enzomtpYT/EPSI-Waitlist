@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from lib import api
+from lib import api, database
 
 api_bp = Blueprint('api', __name__)
 
@@ -43,3 +43,29 @@ def get_candidates():
     if error:
         return jsonify({"error": error}), 400
     return jsonify(datas)
+
+@api_bp.route("/api/start_interview", methods=['POST'])
+def start_interview():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Missing data"}), 400
+    id_interview = data.get('id_interview')
+    if not id_interview:
+        return jsonify({"error": "Missing id_interview parameter"}), 400
+    updated_id, error = database.start_interview(id_interview)
+    if error:
+        return jsonify({"error": error}), 400
+    return jsonify({"interview_id": updated_id})
+
+@api_bp.route("/api/end_interview", methods=['POST'])
+def end_interview():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Missing data"}), 400
+    id_interview = data.get('id_interview')
+    if not id_interview:
+        return jsonify({"error": "Missing id_interview parameter"}), 400
+    error = database.end_interview(id_interview, status=True)
+    if error:
+        return jsonify({"error": error}), 400
+    return jsonify({"success": True})
