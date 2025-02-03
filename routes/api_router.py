@@ -80,7 +80,7 @@ def start_interview():
     updated_id, error = database.start_interview(id_interview)
     if error:
         return jsonify({"error": error}), 400
-    return jsonify({"interview_id": updated_id})
+    return ({"success": True})
 
 @api_bp.route("/api/end_interview", methods=['POST'])
 def end_interview():

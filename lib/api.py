@@ -81,6 +81,11 @@ def get_candidates():
             candidate_dict['tags'] = []
         else:
             candidate_dict['tags'] = candidate_tags
+        interviews, error = database.get_candidate_interviews(candidate['id_candidate'])
+        if error:
+            candidate_dict['interviews'] = []
+        else:
+            candidate_dict['interviews'] = interviews
         user_info, error = database.get_user(candidate['id_user'])
         if error:
             candidate_dict["username"] = ''
