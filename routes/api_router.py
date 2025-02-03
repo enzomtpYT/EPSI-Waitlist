@@ -24,6 +24,17 @@ def manage_event_participants_api_args():
     datas, error = api.get_event_participants(id_event)
     return jsonify(datas)
 
+@api_bp.route('/api/get_list', methods=['POST'])
+def get_list():
+    data = request.get_json()
+    if data:
+        id = data.get('id')
+    
+    datas, error = api.get_list(id)
+    if error:
+        return jsonify({"error": error}), 400
+    return jsonify(datas)
+
 @api_bp.route("/api/delete/<string:type>", methods=['POST'])
 def delete_api(type):
     data = request.get_json()

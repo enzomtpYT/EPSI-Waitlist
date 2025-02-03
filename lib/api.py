@@ -99,6 +99,28 @@ def get_candidates():
     
     return candidates_with_tags, None
 
+def get_list(id=None):
+    event, error = database.get_event(id)
+    if error:
+        return None, error
+    candid, error = database.get_event_candidates(id)
+    inter, error = database.get_event_participant(id)
+    list = {}
+    if inter:
+        for interv in inter:
+            all, error = database.get_event_interview_candidate(id, interv['id_participant'])
+            if interv['name_participant'] not in list:
+                list[interv['name_participant']] = []
+            for candid in all:
+                list[interv['name_participant']].append(dict(candid))  # Convert Row to dict
+
+    data = {
+        "list": list,
+        "title": event['name_event'],
+        "event_id": id
+    }
+    return data, None
+
 def delete(type, id):
     if type == "event":
         error = database.delete_event(id)
