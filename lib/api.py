@@ -97,8 +97,6 @@ def get_candidates():
             candidate_dict["username"] = user_info["username"]
         candidates_with_tags.append(candidate_dict)
     
-    print(candidates_with_tags)
-    
     return candidates_with_tags, None
 
 def delete(type, id):
