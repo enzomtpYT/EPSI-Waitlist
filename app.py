@@ -75,6 +75,7 @@ def handleMessage(msg):
 def inject_routes():
     user_role = None
     permissions = None
+    username = ''
     if 'token' in session:
         user_role = database.get_user_role_with_token(session['token'])
         permissions, error = database.auth_get_perms_from_session(session['token'])
