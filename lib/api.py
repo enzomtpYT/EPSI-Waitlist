@@ -1,4 +1,5 @@
 from lib import database, auth
+import datetime
 
 def get_event_participants(id_event):
     event, error = database.get_event(id_event)
@@ -85,6 +86,9 @@ def get_candidates():
         if error:
             candidate_dict['interviews'] = []
         else:
+            for interview in interviews:
+                if isinstance(interview['duration_interview'], datetime.time):
+                    interview['duration_interview'] = interview['duration_interview'].strftime('%H:%M:%S')
             candidate_dict['interviews'] = interviews
         user_info, error = database.get_user(candidate['id_user'])
         if error:
@@ -92,6 +96,8 @@ def get_candidates():
         else:
             candidate_dict["username"] = user_info["username"]
         candidates_with_tags.append(candidate_dict)
+    
+    print(candidates_with_tags)
     
     return candidates_with_tags, None
 

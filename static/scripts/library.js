@@ -22,6 +22,18 @@ function toggleElement(element) {
     }
 }
 
+function formatDuration(duration) {
+    const [hours, minutes, seconds] = duration.split(':').map(Number);
+    let formattedDuration = '';
+    if (hours > 0) {
+        formattedDuration += `${hours}h`;
+    }
+    if (minutes > 0 || hours > 0) {
+        formattedDuration += `${minutes}m`;
+    }
+    formattedDuration += `${seconds}s`;
+    return formattedDuration;
+}
 
 function popup(category, message) {
     console.log(`Popup [${category}]: ${message}`);

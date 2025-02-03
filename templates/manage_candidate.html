@@ -179,7 +179,7 @@ function showInfos(infos) {
         document.querySelector('.listsection h3').style.display = 'none';
         infos.interviews.forEach(interview => {
             let tr = document.createElement('tr');
-            tr.innerHTML = `<td>${interview.name_event}</td><td>${interview.date_event}</td><td>${interview.name_participant}</td><td>${interview.duration_interview || '0 Minutes'}</td>`;
+            tr.innerHTML = `<td>${interview.name_event}</td><td>${interview.date_event}</td><td>${interview.name_participant}</td><td>${formatDuration(interview.duration_interview)}</td>`;
             let td = document.createElement('td');
             td.classList.add('actionbtn');
             let button = document.createElement('button');
