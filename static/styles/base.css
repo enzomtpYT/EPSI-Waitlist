@@ -209,6 +209,15 @@ button:active {
     color: var(--accent-color);
 }
 
+.finfo {
+    background-color: rgba(0, 0, 121, 0.75);
+    border: 3px solid rgb(0, 0, 93);
+}
+
+.finfo > span {
+    color: var(--accent-color);
+}
+
 .title {
     text-align: center;
     color: var(--main-color);

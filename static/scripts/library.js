@@ -8,6 +8,21 @@ function mark(element, text) {
     hljs.highlightAll();
 }
 
+function toggleElement(element) {
+    if (getComputedStyle(element).display === 'none') {
+        element.style.display = 'flex';
+        setTimeout(() => {
+            element.style.opacity = 1;
+        }, 5);
+    } else {
+        element.style.opacity = 0;
+        setTimeout(() => {
+            element.style.display = 'none';
+        }, 200);
+    }
+}
+
+
 function popup(category, message) {
     console.log(`Popup [${category}]: ${message}`);
     const popup = document.createElement('div');
@@ -16,6 +31,8 @@ function popup(category, message) {
         popup.classList.add('ferror');
     } else if (category == 'success') {
         popup.classList.add('fsuccess');
+    } else if (category == 'info') {
+        popup.classList.add('finfo');
     }
     const span = document.createElement('span');
     span.classList.add('popuptext');

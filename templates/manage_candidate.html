@@ -76,6 +76,17 @@
     </div>
 </div>
 
+<div id="feedbackModal" class="modal">
+    <div class="modal-content">
+        <i class="fa-regular fa-x close" onclick="toggleElement(this.parentElement.parentElement)"></i>
+        <h2>Feedback de l'entretien</h2>
+        <h3 id="partfeedtitle">Feedback de l'intervenant :</h3>
+        <div class="feedb" id="participantFeedback"></div>
+        <h3 id="candfeedtitle">Feedback du candidat :</h3>
+        <div class="feedb" id="candidateFeedback"></div>
+    </div>
+</div>
+
 <script>
 let AllTags = null;
 
@@ -168,8 +179,17 @@ function showInfos(infos) {
         document.querySelector('.listsection h3').style.display = 'none';
         infos.interviews.forEach(interview => {
             let tr = document.createElement('tr');
-            tr.innerHTML = `<td>${interview.name_event}</td><td>${interview.date_event}</td><td>${interview.name_participant}</td><td>${interview.duration_interview || '0 Minutes'}</td><td class="actionbtn"><button type="button" class="feedback-btn" data-feedback-candidate="${infos.feedback_candidate}" data-feedback-participant="${interview.feedback_participant}">Voir les feedbacks</button></td>`;
+            tr.innerHTML = `<td>${interview.name_event}</td><td>${interview.date_event}</td><td>${interview.name_participant}</td><td>${interview.duration_interview || '0 Minutes'}</td>`;
+            let td = document.createElement('td');
+            td.classList.add('actionbtn');
+            let button = document.createElement('button');
+            button.onclick = function() { openfeedback(this, interview); };
+            button.classList.add('feedback-btn');
+            button.innerHTML = 'Voir les feedbacks';
+            td.appendChild(button);
+            tr.appendChild(td);
             document.querySelector('.listsection table tbody').appendChild(tr);
+            console.log(interview);
         });
     }
     document.querySelector('.listsection').style.display = 'flex';
@@ -203,6 +223,42 @@ function showNew() {
         };
         document.querySelector('.sectionaddtags').appendChild(tagButton);
     });
+}
+
+function openfeedback(btn, inter) {
+    let modal = document.querySelector('#feedbackModal');
+    let participantFeedbackEl = modal.querySelector('#participantFeedback');
+    let candidateFeedbackEl = modal.querySelector('#candidateFeedback');
+    let partfeedtitle = modal.querySelector('#partfeedtitle');
+    let candfeedtitle = modal.querySelector('#candfeedtitle');
+    console.log(inter);
+    let participantFeedback = inter.feedback_participant;
+    let candidateFeedback = inter.feedback_candidate;
+
+
+    if (participantFeedback === null) {
+        participantFeedbackEl.style.display = 'none';
+        partfeedtitle.style.display = 'none';
+    } else {
+        participantFeedbackEl.style.display = 'flex';
+        partfeedtitle.style.display = 'block';
+        mark(participantFeedbackEl, participantFeedback);
+    }
+
+    if (candidateFeedback === null) {
+        candidateFeedbackEl.style.display = 'none';
+        candfeedtitle.style.display = 'none';
+    } else {
+        candidateFeedbackEl.style.display = 'flex';
+        candfeedtitle.style.display = 'block';
+        mark(candidateFeedbackEl, candidateFeedback);
+    }
+
+    if (candidateFeedback === null && participantFeedback === null) {
+        popup('info', 'Aucun feedback n\'a été enregistré pour cet entretien');
+    } else {
+        toggleElement(modal);
+    }
 }
 
 function buildManagement(datas, tags) {
@@ -295,6 +351,14 @@ function done(event) {
         popup('danger', 'Une erreur est survenue lors de l\'enregistrement des données');
         console.error('Error:', error);
     });
+}
+
+modal = document.getElementById('feedbackModal');
+
+window.onclick = function(event) {
+    if (event.target == modal) {
+        toggleElement(modal);
+    }
 }
 
 loadData();

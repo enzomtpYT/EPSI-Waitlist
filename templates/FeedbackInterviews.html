@@ -102,20 +102,6 @@ function charcount(el) {
     }
 }
 
-function toggleElement(element) {
-    if (getComputedStyle(element).display === 'none') {
-        element.style.display = 'flex';
-        setTimeout(() => {
-            element.style.opacity = 1;
-        }, 5);
-    } else {
-        element.style.opacity = 0;
-        setTimeout(() => {
-            element.style.display = 'none';
-        }, 200);
-    }
-}
-
 function openfeedbacks(el) {
     var participantFeedbackEl = document.getElementById('participantFeedback');
     var candidateFeedbackEl = document.getElementById('candidateFeedback');
