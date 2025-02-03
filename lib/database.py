@@ -1064,7 +1064,7 @@ def get_interview(id_interview):
     finally:
         conn.close()
 
-def start_interview(id_candidate, id_participant):
+def start_interview(id_interview):
     """
     Démarre un entretien en enregistrant l'heure de début.
 
@@ -1081,9 +1081,17 @@ def start_interview(id_candidate, id_participant):
     try:
         cursor = conn.cursor()
         start_time = datetime.datetime.now()
-        cursor.execute('UPDATE Interview SET start_time = %s WHERE id_interview = %s', (start_time, interview_id))
-        interview_id = cursor.fetchone()[0]
-        return interview_id, None
+        cursor.execute('''
+        UPDATE Interview
+        SET start_time_interview = %s
+        WHERE id_interview = %s
+        RETURNING id_interview
+        ''', (start_time, id_interview))
+        updated_id = cursor.fetchone()
+        if updated_id:
+            return updated_id[0], None
+        else:
+            return None, "Entretien non trouvé ou déjà démarré"
     except psycopg2.Error as e:
         print(f"Erreur lors du démarrage de l'entretien: {e}")
         return None, "Erreur lors du démarrage de l'entretien"
@@ -1108,7 +1116,7 @@ def end_interview(id_interview, status):
         end_time = datetime.datetime.now()
         cursor.execute('''
         UPDATE Interview
-        SET end_time = %s, duration = %s - start_time, happened = %s
+        SET end_time_interview = %s, duration = %s - start_time_interview, happened = %s
         WHERE id_interview = %s
         ''', (end_time, end_time, status, id_interview))
         return None
@@ -1816,7 +1824,7 @@ def auth_update_password(password, session_token, id_user):
         print(f"Erreur lors de la mise à jour du mot de passe de l'utilisateur: {e}")
         return "Erreur lors de la mise à jour du mot de passe de l'utilisateur"
     finally:
-        conn.close()    
+        conn.close()
 
 def auth_update_username(username, id_user):
     """

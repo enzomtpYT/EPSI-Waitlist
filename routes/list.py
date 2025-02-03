@@ -75,7 +75,7 @@ def manage_list_id(id):
 
 @list_bp.route("/interview_finished/<int:interview_id>", methods=['POST'])
 def interview_finished(interview_id):
-    error = database.update_interview_status(interview_id, True)
+    error = database.end_interview(interview_id, status=True)
     if error:
         flash(f"Erreur lors de la mise à jour de l'entretien: {error}", "danger")
     else:

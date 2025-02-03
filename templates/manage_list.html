@@ -31,6 +31,12 @@
                         <button type="submit" class="dropdown-item">Supprimer tous les entretiens de ce candidat</button>
                       </form>
                     </div></div>
+
+                    <div>
+                      <button class="shy" onclick="startInterview({{ item.id_interview }})">Commencer</button>
+                    </div>
+                    <div id="duration-{{ item.id_interview }}" class="duration">00:00</div>
+
                     <div class="stacked-button">
                       <form action="{{ url_for('list.interview_finished', interview_id=item.id_interview) }}" method="post" style="display:inline;">
                         <button class="shy" type="submit">Entretien terminé</button>
@@ -45,6 +51,7 @@
         {% endfor %}
       {% endfor %}
     </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
             const socket = io('/list/live');
@@ -54,6 +61,67 @@
                 console.log(data);
             });
         });
+
+        let timers = {};
+
+        function startInterview(id_interview) {
+            fetch('/api/start_interview', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id_interview: id_interview })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    startCountdown(id_interview);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while starting the interview.');
+            });
+        }
+
+        function startCountdown(id_interview) {
+            const display = document.getElementById(`duration-${id_interview}`);
+            let startTime = new Date();
+
+            timers[id_interview] = setInterval(() => {
+                let now = new Date();
+                let elapsed = new Date(now - startTime);
+                let minutes = elapsed.getUTCMinutes();
+                let seconds = elapsed.getUTCSeconds();
+
+                display.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            }, 1000);
+        }
+
+        function endInterview(id_interview) {
+            clearInterval(timers[id_interview]);
+            fetch('/api/end_interview', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id_interview: id_interview })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert('Interview ended successfully');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while ending the interview.');
+            });
+        }
     </script>
   {% endif %}
 {% endblock %}
