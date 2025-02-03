@@ -92,10 +92,10 @@ def end_interview():
         data = request.get_json()
         if not data:
             return jsonify({"error": "Missing data"}), 400
-        id_interview = data.get('id_interview')
-        if not id_interview:
+        interview_id = data.get('id_interview')
+        if not interview_id:
             return jsonify({"error": "Missing id_interview parameter"}), 400
-        error = database.end_interview(id_interview)
+        error = database.end_interview(interview_id, status=True)
         if error:
             return jsonify({"error": error}), 400
         return jsonify({"success": True})
