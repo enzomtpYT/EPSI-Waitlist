@@ -113,7 +113,29 @@ def add(type, data):
     elif type == "participant":
         error = database.add_participant(data)
     elif type == "candidate":
-        error = database.add_candidate(data)
+        
+        error = None
+        lastname_candidate = data.get("lastname_candidate")
+        name_candidate = data.get("name_candidate")
+        email_candidate = data.get("email_candidate")
+        selected_tags = data.get("tags")
+        if lastname_candidate is None or name_candidate is None or email_candidate is None:
+            return "Champs manquants"
+        candidate_id, user_id, error = database.create_candidate(lastname_candidate, name_candidate, email_candidate)
+        if error is None:
+            for tag in selected_tags:
+                database.add_tag_to_candidate(candidate_id, tag["id_tag"])
+            username = data.get("username")
+            password = data.get("password")
+            if username is not None:
+                error = database.auth_update_username(username, user_id)
+                if error:
+                    return error
+            if password is not None:
+                error = auth.update_user_pass(password, user_id)
+                if error:
+                    return error
+        
     elif type == "employee":
         error = database.add_employee(data)
     elif type == "tag":
@@ -121,8 +143,8 @@ def add(type, data):
     elif type == "interview":
         error = database.add_interview(data)
     else:
-        return None, "Unknown type"
-    return None, error
+        return "Unknown type"
+    return error
 
 def update(type, data):
     if type == "event":

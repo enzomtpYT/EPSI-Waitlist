@@ -20,7 +20,7 @@ def create_candidate():
             error = 'L\'adresse email est obligatoire.'
 
         if error is None:
-            candidate_id, error = database.create_candidate(lastname, name, email)
+            candidate_id, user_id, error = database.create_candidate(lastname, name, email)
             if error is None:
                 for tag_id in selected_tags:
                     database.add_tag_to_candidate(candidate_id, tag_id)

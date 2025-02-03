@@ -1,4 +1,7 @@
-function deleteType(type, id) {
+function deleteType(type, id, event = null) {
+    if (event) {
+        event.preventDefault();
+    }
     if (confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) {
         fetch('/api/delete/'+type, {
             method: 'POST',

@@ -332,7 +332,7 @@ def create_candidate(lastname, name, email):
 
         # Sauvegarde les modifications
         conn.commit()
-        return candidate_id, None
+        return candidate_id, user_id, None
     except psycopg2.Error as e:
         print(f"Erreur lors de la création du candidat: {e}")
         return None, "Erreur lors de la création du candidat"

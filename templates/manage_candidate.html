@@ -37,7 +37,7 @@
     
                 <div>
                     <button id="confirmbtn" onclick="done(event)"><i class="fa-regular fa-save"></i> Enregistrer</button>
-                    <button class="delete" type="submit"><i class="fa-regular fa-trash"></i> Supprimer</button>
+                    <button class="delete"><i class="fa-regular fa-trash"></i> Supprimer</button>
                 </div>
 
                 <input type="hidden" id="id_candidate" name="id_candidate" value="">
@@ -106,7 +106,8 @@ function showInfos(infos) {
     document.querySelector('#candform').style.display = 'flex';
     document.querySelector('.sectionmanagetag').style.display = 'flex';
     document.querySelector('.delete').onclick = function() {
-        deleteType('candidate', infos.id_candidate);
+        deleteType('candidate', infos.id_candidate, event);
+        showNew();
     };
     document.querySelector('.delete').style.display = 'inline';
     document.querySelector('.sectionremovetags').innerHTML = '';
