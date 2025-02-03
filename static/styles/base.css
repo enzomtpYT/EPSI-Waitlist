@@ -220,7 +220,7 @@ button:active {
 
 .title {
     text-align: center;
-    color: var(--main-color);
+    color: var(--accent-color);
     font-size: 2.5rem;
 }
 

@@ -92,11 +92,8 @@
 }
 
 .admin-buttons {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
     display: grid;
-    grid-template-columns: repeat(2,1fr);
+    grid-template-columns: repeat(auto-fit, minmax(40%, 1fr));
     grid-gap: 10px;
     padding: 0.2rem 1rem;
 }
