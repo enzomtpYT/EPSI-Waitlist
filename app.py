@@ -11,9 +11,7 @@ from routes.create_employee import create_employee_bp
 from routes.manage_employee import manage_employee_bp
 from routes.employee import employee_bp
 from routes.list import list_bp
-from routes.create_candidate import create_candidate_bp
 from routes.manage_candidate import manage_candidate_bp
-from routes.candidate import candidate_bp
 from routes.create_participant import create_participant_bp
 from routes.manage_participant import manage_participant_bp
 from routes.participant import participant_bp
@@ -37,9 +35,7 @@ app.register_blueprint(create_employee_bp)
 app.register_blueprint(manage_employee_bp)
 app.register_blueprint(employee_bp)
 app.register_blueprint(list_bp)
-app.register_blueprint(create_candidate_bp)
 app.register_blueprint(manage_candidate_bp)
-app.register_blueprint(candidate_bp)
 app.register_blueprint(create_participant_bp)
 app.register_blueprint(manage_participant_bp)
 app.register_blueprint(participant_bp)
