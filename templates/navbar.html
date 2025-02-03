@@ -16,6 +16,13 @@
                 {% endif %}
             {% endif %}
         </ul>
+        <ul class="navul">
+        {% if session.token %}
+        <li class="navli"><a class="navbtn" href="{{ url_for('auth.logout') }}"><button class="authbtn">Se Déconnecter</button></a></li>
+        {% else %}
+        <li class="navli"><a class="navbtn" href="{{ url_for('auth.login') }}"><button class="authbtn">Se Connecter</button></a></li>
+        {% endif %}
+    </ul>
     </nav>
     <div class="vdivider"></div>
 {% endif %}
