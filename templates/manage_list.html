@@ -17,9 +17,9 @@
               {% for item in value %}
                 {% if loop.index <= 5 %}
                   {% if loop.index == 1 %}
-                    <div class="managecandidate current">
+                    <div class="managecandidate current" id="interview-{{ item.id_interview }}">
                   {% else %}
-                    <div class="managecandidate">
+                    <div class="managecandidate" id="interview-{{ item.id_interview }}">
                   {% endif %}
                   <div class="dropdown">
                     <button>{{ item.name_candidate }} {{ item.lastname_candidate }}</button>
@@ -38,7 +38,7 @@
                     <div id="duration-{{ item.id_interview }}" class="duration">00:00</div>
 
                     <div class="stacked-button">
-                      <form action="{{ url_for('list.interview_finished', interview_id=item.id_interview) }}" method="post" style="display:inline;">
+                      <form onsubmit="handleEndInterview(event, {{ item.id_interview }})" style="display:inline;">
                         <button class="shy" type="submit">Entretien terminé</button>
                       </form>
                       <button class="shy">Suivant</button>
@@ -115,12 +115,38 @@
                     alert(data.error);
                 } else {
                     alert('Interview ended successfully');
+                    // Remove the interview element from the DOM
+                    const interviewElement = document.getElementById(`interview-${id_interview}`);
+                    if (interviewElement) {
+                        interviewElement.remove();
+                    }
+                    // Update the remaining interviews
+                    updateInterviews();
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 alert('An error occurred while ending the interview.');
             });
+        }
+
+         function handleEndInterview(event, id_interview) {
+            event.preventDefault();
+            endInterview(id_interview);
+        }
+
+        function updateInterviews() {
+            const interviews = document.querySelectorAll('.managecandidate');
+            let currentFound = false;
+            interviews.forEach((interview, index) => {
+                if (interview.classList.contains('current')) {
+                    currentFound = true;
+                }
+                interview.classList.remove('current');
+            });
+            if (!currentFound && interviews.length > 0) {
+                interviews[0].classList.add('current');
+            }
         }
     </script>
   {% endif %}
