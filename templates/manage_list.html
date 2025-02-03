@@ -38,9 +38,7 @@
                     <div id="duration-{{ item.id_interview }}" class="duration">00:00</div>
 
                     <div class="stacked-button">
-                      <form onsubmit="handleEndInterview(event, {{ item.id_interview }})" style="display:inline;">
-                        <button class="shy" type="submit">Entretien terminé</button>
-                      </form>
+                      <button onclick="handleEndInterview(event, {{ item.id_interview }})" class="shy" type="submit">Entretien terminé</button>
                       <button class="shy">Suivant</button>
                     </div>
                   </div>
@@ -52,102 +50,81 @@
       {% endfor %}
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            const socket = io('/list/live');
-            socket.emit('join', { room: `{{ datas.event_id }}` });
-
-            socket.on('message', (data) => {
-                console.log(data);
-            });
-        });
-
-        let timers = {};
-
-        function startInterview(id_interview) {
-            fetch('/api/start_interview', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ id_interview: id_interview })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    alert(data.error);
-                } else {
-                    startCountdown(id_interview);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while starting the interview.');
-            });
+<script>
+let timers = {};
+function startInterview(id_interview) {
+    fetch('/api/start_interview', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id_interview: id_interview })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+        } else {
+            startCountdown(id_interview);
         }
-
-        function startCountdown(id_interview) {
-            const display = document.getElementById(`duration-${id_interview}`);
-            let startTime = new Date();
-
-            timers[id_interview] = setInterval(() => {
-                let now = new Date();
-                let elapsed = new Date(now - startTime);
-                let minutes = elapsed.getUTCMinutes();
-                let seconds = elapsed.getUTCSeconds();
-
-                display.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-            }, 1000);
-        }
-
-        function endInterview(id_interview) {
-            clearInterval(timers[id_interview]);
-            fetch('/api/end_interview', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ id_interview: id_interview })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    alert(data.error);
-                } else {
-                    alert('Interview ended successfully');
-                    // Remove the interview element from the DOM
-                    const interviewElement = document.getElementById(`interview-${id_interview}`);
-                    if (interviewElement) {
-                        interviewElement.remove();
-                    }
-                    // Update the remaining interviews
-                    updateInterviews();
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while ending the interview.');
-            });
-        }
-
-         function handleEndInterview(event, id_interview) {
-            event.preventDefault();
-            endInterview(id_interview);
-        }
-
-        function updateInterviews() {
-            const interviews = document.querySelectorAll('.managecandidate');
-            let currentFound = false;
-            interviews.forEach((interview, index) => {
-                if (interview.classList.contains('current')) {
-                    currentFound = true;
-                }
-                interview.classList.remove('current');
-            });
-            if (!currentFound && interviews.length > 0) {
-                interviews[0].classList.add('current');
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while starting the interview.');
+    });
+}
+function startCountdown(id_interview) {
+    const display = document.getElementById(`duration-${id_interview}`);
+    let startTime = new Date();
+    timers[id_interview] = setInterval(() => {
+        let now = new Date();
+        let elapsed = new Date(now - startTime);
+        let minutes = elapsed.getUTCMinutes();
+        let seconds = elapsed.getUTCSeconds();
+        display.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }, 1000);
+}
+function endInterview(id_interview) {
+    clearInterval(timers[id_interview]);
+    fetch('/api/end_interview', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id_interview: id_interview })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+        } else {
+            alert('Interview ended successfully');
+            // Remove the interview element from the DOM
+            const interviewElement = document.getElementById(`interview-${id_interview}`);
+            if (interviewElement) {
+                interviewElement.remove();
             }
+            // Update the remaining interviews
+            updateInterviews();
         }
-    </script>
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while ending the interview.');
+    });
+}
+function handleEndInterview(event, id_interview) {
+    event.preventDefault();
+    endInterview(id_interview);
+}
+function updateInterviews() {
+    document.querySelectorAll('.candidates').forEach(item => {
+        if (item.firstElementChild) {
+            item.firstElementChild.classList.add('current');
+        }
+    });
+}
+</script>
+
   {% endif %}
 {% endblock %}
