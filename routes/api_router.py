@@ -26,10 +26,23 @@ def manage_event_participants_api_args():
 
 @api_bp.route('/api/get_list', methods=['POST'])
 def get_list():
-    data = request.get_json()
-    if data:
-        id = data.get('id')
-    
+    if request.content_type != 'application/json':
+        id, error = database.get_today_events()
+        if error:
+            return jsonify({"error": error}), 400
+    else:
+        if request.content_length == 0:
+            id, error = database.get_today_events()
+            if error:
+                return jsonify({"error": error}), 400
+        else:
+            data = request.get_json()
+            if data.get('id'):
+                id = data.get('id')
+            else:
+                id, error = database.get_today_events()
+                if error:
+                    return jsonify({"error": error}), 400    
     datas, error = api.get_list(id)
     if error:
         return jsonify({"error": error}), 400

@@ -103,6 +103,8 @@ def get_list(id=None):
     event, error = database.get_event(id)
     if error:
         return None, error
+    elif event is None:
+        return None, "Aucun évenement avec cet id"
     candid, error = database.get_event_candidates(id)
     inter, error = database.get_event_participant(id)
     list = {}
