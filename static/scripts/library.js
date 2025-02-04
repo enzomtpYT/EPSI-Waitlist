@@ -23,6 +23,9 @@ function toggleElement(element) {
 }
 
 function formatDuration(duration) {
+    if (duration == null) {
+        return '0s';
+    }
     const [hours, minutes, seconds] = duration.split(':').map(Number);
     let formattedDuration = '';
     if (hours > 0) {
