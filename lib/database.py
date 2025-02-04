@@ -2521,6 +2521,37 @@ def delete_employee(id_employee):
         conn.close()
     return None
 
+def get_employee_interviews(id_employee):
+    """
+    Récupère les interviews associées à un employée.
+
+    Args:
+        id_employee (int): L'identifiant du employée.
+
+    Returns:
+        tuple: Un tuple contenant une liste d'interviews et un message d'erreur si une erreur est survenue.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+    try:
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor.execute('''
+        SELECT Interview.id_interview, Event.name_event, Event.date_event, Candidate.lastname_candidate, Candidate.name_candidate, Interview.feedback_employee, Interview.feedback_candidate, Interview.duration_interview
+        FROM Interview
+        JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
+        JOIN Employee ON Interview.id_employee = Employee.id_employee
+        JOIN Event ON Interview.id_event = Event.id_event
+        WHERE Interview.id_employee = %s AND Interview.happened = TRUE
+        ''', (id_employee,))
+        interviews = cursor.fetchall()
+        return interviews, None
+    except psycopg2.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
 # Feedback functions
 
 def update_feedback(id_interview, feedback, type):

@@ -129,6 +129,31 @@ def get_participants():
 
     return participants_with_tags, None
 
+def get_employees():
+    employees, error = database.get_all_employees()
+    if error:
+        return None, error
+
+    employees_return = []
+    for employee in employees:
+        employee_dict = dict(employee)
+        interviews, error = database.get_employee_interviews(employee['id_employee'])
+        if error:
+            employee_dict['interviews'] = []
+        else:
+            for interview in interviews:
+                if isinstance(interview['duration_interview'], datetime.time):
+                    interview['duration_interview'] = interview['duration_interview'].strftime('%H:%M:%S')
+            employee_dict['interviews'] = interviews
+        user_info, error = database.get_user(employee['id_user'])
+        if error:
+            employee_dict["username"] = ''
+        else:
+            employee_dict["username"] = user_info["username"]
+        employees_return.append(employee_dict)
+
+    return employees_return, None
+
 def get_list(id=None):
     event, error = database.get_event(id)
     if error:

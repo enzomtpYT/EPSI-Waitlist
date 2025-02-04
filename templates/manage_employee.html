@@ -3,47 +3,283 @@
 {% block title %}Admin - Gérer Employés{% endblock %}
 
 {% block content %}
-<h1 class="title">Gérer les employés</h1>
+<div class="tableContent">
+    <h1 style="margin-left: 1rem;">Gérer les employés</h1>
+    <h2 style="margin-left: 1rem;" id="loading">Chargement...</h2>
+    <div class="tabmanagment" style="display: none;">
 
-<div class="admin-section">
-    <h2>Liste des employés</h2>
-    {% if employees %}
-    <table>
-        <thead>
-            <tr>
-                <th>Nom</th>
-                <th>Prénom</th>
-                <th>E-mail</th>
-                <th>Rôle</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for employee in employees %}
-            <tr>
-                <td>{{ employee.lastname_employee }}</td>
-                <td>{{ employee.name_employee }}</td>
-                <td>{{ employee.email_employee }}</td>
-                <td>
-                    {% if employee.name_role %}
-                        <p class="display-tag">{{ employee.name_role }}</p>
+        <div class="sideItemList">
+            <button class="listbtn" onclick="showNew()"><i class="fa-regular fa-user-plus"></i> Créer un employé</button>
+            <button class="listbtn" onclick="loadData()"><i class="fa-regular fa-rotate-right"></i> Recharger la liste</button>
+        </div>
+
+        <div class="resizer" id="resizer"></div>
+
+        <div class="infoeditor">
+            <form id="candform" style="display: none;">
+                <label for="employee_lastname">Nom :</label>
+                <input type="text" id="employee_lastname" name="employee_lastname" value="">
+
+                <label for="employee_name">Prénom :</label>
+                <input type="text" id="employee_name" name="employee_name" value="">
+
+                <label for="employee_email">E-mail :</label>
+                <input type="email" id="employee_email" name="employee_email" value="">
+
+                <label for="username">Nom d'utilisateur :</label>
+                <input type="text" id="username" name="username" value="">
+
+                <label for="employee_role">Rôle de l'employé.e :</label>
+                <select id="role" name="role" required>
+                    {% if user_role == 'superadmin' %}
+                    <option value="superadmin">Superadmin</option>
+                    <option value="admin">Admin</option>
+                    <option value="employee" selected>Employé</option>
+                    {% elif user_role == 'admin' %}
+                    <option value="admin">Admin</option>
+                    <option value="employee" selected>Employé</option>
+                    {% elif user_role == 'employee' %}
+                    <option value="employee" selected>Employé</option>
                     {% endif %}
-                </td>
-                <td class="actionbtn">
-                    <a href="/admin/manage_employee/employee/{{ employee.id_employee }}">
-                        <button type="button">Voir</button>
-                    </a>
-                    <form action="/admin/manage_employee/{{ employee.id_employee }}/delete" method="post" style="display:inline;">
-                        <button class="delete" type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce candidat ?');">Supprimer</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>Aucun employé n'existe.</p>
-    {% endif %}
+                </select>
+
+                <label for="password">Mot de passe :</label>
+                <div class="editpass">
+                    <div class="iconified-input">
+                        <input type="password" id="password" name="password" value="">
+                        <i onclick="showpass()" id="showpass" class="fa-regular fa-eye icon showpass"></i>
+                    </div>
+                    <button type="button" onclick="generatepass().then(pass => {document.getElementById('password').value = pass})"><i class="fa-regular fa-key"></i> Générer un mot de passe</button>
+                </div>
+
+                <div>
+                    <button id="confirmbtn" onclick="done(event)"><i class="fa-regular fa-save"></i> Enregistrer</button>
+                    <button class="delete"><i class="fa-regular fa-trash"></i> Supprimer</button>
+                </div>
+
+                <input type="hidden" id="id_employee" name="id_employee" value="">
+                <input type="hidden" id="id_user" name="id_user" value="">
+            </form>
+
+            <div class="listsection" display="none">
+                <h2>Liste des entretiens</h2>
+                <h3>Aucun entretiens trouvé</h3>
+                <div class="tablewrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Événement</th>
+                                <th>Date</th>
+                                <th>Candidat</th>
+                                <th>Durée de l'entretien</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
+<div id="feedbackModal" class="modal">
+    <div class="modal-content">
+        <i class="fa-regular fa-x close" onclick="toggleElement(this.parentElement.parentElement)"></i>
+        <h2>Feedback de l'entretien</h2>
+        <h3 id="empfeedtitle">Feedback de l'employé.e :</h3>
+        <div class="feedb" id="employeeFeedback"></div>
+        <h3 id="candfeedtitle">Feedback du candidat :</h3>
+        <div class="feedb" id="candidateFeedback"></div>
+    </div>
+</div>
+
+<script>
+function loadData() {
+    document.querySelector('#candform').style.display = 'none';
+    document.querySelector('.listsection').style.display = 'none';
+    document.querySelectorAll('.itemlist').forEach(item => item.remove());
+    fetch('{{ url_for('api.get_employees') }}')
+        .then(response => {
+            if (!response.ok) {
+                popup('danger', 'Une erreur est survenue lors de la récupération des données');
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(datas => {
+            buildManagement(datas);
+        })
+        .catch(error => {
+            popup('danger', 'Une erreur est survenue lors de la récupération des données');
+            console.error('Error:', error);
+        });
+}
+
+function showInfos(infos) {
+    document.querySelector('#employee_lastname').value = infos.lastname_employee;
+    document.querySelector('#employee_name').value = infos.name_employee;
+    document.querySelector('#employee_email').value = infos.email_employee;
+    document.querySelector('#username').value = infos.username;
+    document.querySelectorAll('#role option').forEach(option => { if (option.value === infos.name_role) {option.selected = true;} });
+    document.querySelector('#id_employee').value = infos.id_employee;
+    document.querySelector('#password').value = '';
+    document.querySelector('#id_user').value = infos.id_user;
+    document.querySelector('#confirmbtn').innerHTML = '<i class="fa-regular fa-save"></i> Enregistrer';
+    document.querySelector('#candform').style.display = 'flex';
+    document.querySelector('.delete').onclick = function() {
+        deleteType('employee', infos.id_employee, event);
+        showNew();
+    };
+    document.querySelector('.delete').style.display = 'inline';
+    document.querySelector('.listsection table tbody').innerHTML = '';
+    if (infos.interviews.length === 0) {
+        document.querySelector('.listsection table').style.display = 'none';
+        document.querySelector('.listsection h3').style.display = 'block';
+    } else {
+        document.querySelector('.listsection table').style.display = 'table';
+        document.querySelector('.listsection h3').style.display = 'none';
+        infos.interviews.forEach(interview => {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `<td>${interview.name_event}</td><td>${interview.date_event}</td><td>${interview.name_candidate}</td><td>${formatDuration(interview.duration_interview)}</td>`;
+            let td = document.createElement('td');
+            td.classList.add('actionbtn');
+            let button = document.createElement('button');
+            button.onclick = function() { openfeedback(this, interview); };
+            button.classList.add('feedback-btn');
+            button.innerHTML = 'Voir les feedbacks';
+            td.appendChild(button);
+            tr.appendChild(td);
+            document.querySelector('.listsection table tbody').appendChild(tr);
+            console.log(interview);
+        });
+    }
+    document.querySelector('.listsection').style.display = 'flex';
+}
+
+function showNew() {
+    document.querySelectorAll('.itemlist').forEach(item => { item.classList.remove('selected'); });
+    document.querySelector('#employee_lastname').value = '';
+    document.querySelector('.listsection').style.display = 'none';
+    document.querySelector('#employee_name').value = '';
+    document.querySelector('#employee_email').value = '';
+    document.querySelector('#username').value = '';
+    document.querySelectorAll('#role option').forEach(option => { if (option.value === 'employee') option.selected = true; });
+    document.querySelector('#id_employee').value = '';
+    document.querySelector('#password').value = '';
+    document.querySelector('#id_user').value = '';
+    document.querySelector('#confirmbtn').innerHTML = '<i class="fa-regular fa-save"></i> Enregistrer';
+    document.querySelector('#candform').style.display = 'flex';
+    document.querySelector('.delete').style.display = 'none';
+    document.querySelector('.listsection table tbody').innerHTML = '';
+}
+
+function openfeedback(btn, inter) {
+    let modal = document.querySelector('#feedbackModal');
+    let participantFeedbackEl = modal.querySelector('#employeeFeedback');
+    let candidateFeedbackEl = modal.querySelector('#candidateFeedback');
+    let partfeedtitle = modal.querySelector('#empfeedtitle');
+    let candfeedtitle = modal.querySelector('#candfeedtitle');
+    console.log(inter);
+    let employeeFeedback = inter.feedback_employee;
+    let candidateFeedback = inter.feedback_candidate;
+
+
+    if (employeeFeedback === null) {
+        employeeFeedbackEl.style.display = 'none';
+        partfeedtitle.style.display = 'none';
+    } else {
+        employeeFeedbackEl.style.display = 'flex';
+        partfeedtitle.style.display = 'block';
+        mark(employeeFeedbackEl, employeeFeedback);
+    }
+
+    if (candidateFeedback === null) {
+        candidateFeedbackEl.style.display = 'none';
+        candfeedtitle.style.display = 'none';
+    } else {
+        candidateFeedbackEl.style.display = 'flex';
+        candfeedtitle.style.display = 'block';
+        mark(candidateFeedbackEl, candidateFeedback);
+    }
+
+    if (candidateFeedback === null && employeeFeedback === null) {
+        popup('info', 'Aucun feedback n\'a été enregistré pour cet entretien');
+    } else {
+        toggleElement(modal);
+    }
+}
+
+function buildManagement(datas) {
+    let sideItemList = document.querySelector('.sideItemList');
+    num = 0;
+    datas.forEach(employee => {
+        let item = document.createElement('div');
+        item.classList.add('itemlist');
+        item.onclick = function() { showInfos(employee); this.classList.add('selected'); document.querySelectorAll('.itemlist').forEach(item => { if (item !== this) item.classList.remove('selected'); }); };
+        item.id = `deleteElement-${employee.id_employee}-employee`;
+        item.innerHTML = `<i class="fa-regular fa-user"></i><p>${employee.name_employee} ${employee.lastname_employee}</p>`;
+        sideItemList.appendChild(item);
+        if (num === 0) item.click();
+        num++;
+    });
+    document.querySelector('#loading').style.display = 'none';
+    document.querySelector('.tabmanagment').style.display = 'flex';
+}
+
+function done(event) {
+    event.preventDefault();
+    let employee = {
+        id_employee: document.querySelector('#id_employee').value,
+        id_user: document.querySelector('#id_user').value,
+        lastname_employee: document.querySelector('#employee_lastname').value,
+        name_employee: document.querySelector('#employee_name').value,
+        email_employee: document.querySelector('#employee_email').value,
+        username: document.querySelector('#username').value,
+        password: document.querySelector('#password').value
+    };
+
+    if (document.querySelector('#id_employee').value != '') {
+        url = '{{ url_for('api.update_api', type='employee') }}';
+    } else {
+        url = '{{ url_for('api.add_api', type='employee') }}';
+    }
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(employee)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                popup('danger', 'Une erreur est survenue lors de l\'enregistrement des données: ' + (data.message || 'Erreur inconnue'));
+            });
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        popup('success', 'Employé enregistré avec succès');
+        loadData();
+    })
+    .catch(error => {
+        popup('danger', 'Une erreur est survenue lors de l\'enregistrement des données');
+        console.error('Error:', error);
+    });
+}
+
+modal = document.getElementById('feedbackModal');
+
+window.onclick = function(event) {
+    if (event.target == modal) {
+        toggleElement(modal);
+    }
+}
+
+loadData();
+</script>
 {% endblock %}
