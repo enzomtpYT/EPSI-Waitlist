@@ -3,54 +3,115 @@
 {% block title %}Liste{% endblock %}
 
 {% block content %}
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/list.css') }}">
-  {% if datas.message %}
-    <h1 class="title">{{ datas.message }}</h1>
-  {% else %}
-    <h1 class="title">{{ datas.title }}</h1>
-    <div class="listcontainer">
-      {% for dict_item in datas.list %}
-        {% for key, value in dict_item.items() %}
-          <div class="column">
-            <h2 class="interv">{{ key }}</h2>
-            <div class="candidates">
-              {% for item in value %}
-                {% if loop.index <= 5 %}
-                  {% if loop.index == 1 %}
-                    <div class="managecandidate current" id="interview-{{ item.id_interview }}">
-                  {% else %}
-                    <div class="managecandidate" id="interview-{{ item.id_interview }}">
-                  {% endif %}
-                  <div class="dropdown">
-                    <button>{{ item.name_candidate }} {{ item.lastname_candidate }}</button>
-                    <div class="dropdown-content">
-                      <form action="{{ url_for('list.remove_candidate_from_list', id_interview=item.id_interview) }}" method="post" style="display:inline;">
-                        <button type="submit" class="dropdown-item">Supprimer cet entretien</button>
-                      </form>
-                      <form action="{{ url_for('list.remove_candidate_from_all_interviews_for_event', id_event=datas.event_id, id_candidate=item.id_candidate) }}" method="post" style="display:inline;">
-                        <button type="submit" class="dropdown-item">Supprimer tous les entretiens de ce candidat</button>
-                      </form>
-                    </div></div>
-
-                    <div>
-                      <button class="shy" onclick="startInterview({{ item.id_interview }})">Commencer</button>
-                    </div>
-                    <div id="duration-{{ item.id_interview }}" class="duration">00:00</div>
-
-                    <div class="stacked-button">
-                      <button onclick="handleEndInterview(event, {{ item.id_interview }})" class="shy" type="submit">Entretien terminé</button>
-                      <button class="shy">Suivant</button>
-                    </div>
-                  </div>
-                {% endif %}
-              {% endfor %}
-            </div>
-          </div>
-        {% endfor %}
-      {% endfor %}
-    </div>
-
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/list.css') }}">
+<h1 id="eventname" class="title"></h1>
+<div class="listcontainer"></div>
 <script>
+function loadData() {
+    fetch('{{ url_for('api.get_list') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: {{ id }} })
+    })
+    .then(response => {
+        if (!response.ok) {
+            popup('danger', 'Une erreur est survenue lors de la récupération des données');
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(datas => {
+      buildList(datas);
+    })
+    .catch(error => {
+        popup('danger', 'Une erreur est survenue lors de la récupération des données');
+        console.error('Error:', error);
+    });   
+}
+
+function buildList(info) {
+  document.querySelector('#eventname').textContent = info.name_event;
+  const list = document.querySelector('.listcontainer');
+  list.innerHTML = '';
+  console.log(info);
+  for (const [key, value] of Object.entries(info.interviews)) {
+    const participant = document.createElement('div');
+    participant.classList.add('column');
+    participant.id = `participant-${key}`;
+    h2 = document.createElement('h2');
+    h2.classList.add('interv');
+    h2.textContent = key;
+    participant.appendChild(h2);
+    const candidates = document.createElement('div');
+    candidates.classList.add('candidates');
+    for (const [keyaa, candidate] of Object.entries(value)) {
+      const managecandidate = document.createElement('div');
+      managecandidate.classList.add('managecandidate');
+      if (keyaa == 0) {
+        managecandidate.classList.add('current');
+      }
+      managecandidate.id = `interview-${candidate.id_interview}`;
+
+
+      /* Dropdown */
+      const dropdown = document.createElement('div');
+      dropdown.classList.add('dropdown');
+        const candidatebtn = document.createElement('button');
+        candidatebtn.innerHTML = `<i class="shy fa-regular fa-play"></i> ${candidate.name_candidate} ${candidate.lastname_candidate}`;
+        candidatebtn.onclick = () => startInterview(candidate.id_interview);
+        candidatebtn.classList.add('candidatebtn');
+          const dropdownContent = document.createElement('div');
+          dropdownContent.classList.add('dropdown-content');
+            const dropbtn1 = document.createElement('button');
+            dropbtn1.type = 'submit';
+            dropbtn1.classList.add('dropdown-item');
+            dropbtn1.textContent = 'Supprimer cet entretien';
+            const dropbtn2 = document.createElement('button');
+            dropbtn2.type = 'submit';
+            dropbtn2.classList.add('dropdown-item');
+            dropbtn2.textContent = 'Supprimer tous les entretiens de ce candidat';
+            dropdownContent.appendChild(dropbtn1);
+            dropdownContent.appendChild(dropbtn2);
+        dropdown.appendChild(candidatebtn);
+        dropdown.appendChild(dropdownContent);
+      managecandidate.appendChild(dropdown);
+      /* End Dropdown */
+
+      const nextButton = document.createElement('span');
+      nextButton.innerHTML = '<i class="fa-regular fa-arrow-up-arrow-down"></i></i>';
+      nextButton.title = 'Passer au candidat suivant';
+      nextButton.onclick = (event) => NextCandidate(event, info.id_event, key);
+      nextButton.classList.add('nextbtn');
+      nextButton.classList.add('clickable');
+      nextButton.classList.add('shy');
+      managecandidate.appendChild(nextButton);
+
+      const duration = document.createElement('span');
+      duration.id = `duration-${candidate.id_interview}`;
+      duration.classList.add('duration');
+      duration.innerHTML = '<i class="fa-regular fa-stopwatch"></i> 00:00';
+      duration.title = 'Durée de l\'interview';
+      duration.classList.add('shy');
+      managecandidate.appendChild(duration);
+
+      const endInterviewButton = document.createElement('span');
+      endInterviewButton.innerHTML = '<i class="fa-regular fa-stop"></i>';
+      endInterviewButton.title = 'Fin de l\'interview';
+      endInterviewButton.onclick = (event) => EndInterview(event, candidate.id_interview);
+      endInterviewButton.classList.add('endbtn');
+      endInterviewButton.classList.add('clickable');
+      endInterviewButton.classList.add('shy');
+      managecandidate.appendChild(endInterviewButton);
+
+      candidates.appendChild(managecandidate);
+    }
+    participant.appendChild(candidates);
+    list.appendChild(participant);
+  }
+}
+
 let timers = {};
 function startInterview(id_interview) {
     fetch('/api/start_interview', {
@@ -84,47 +145,37 @@ function startCountdown(id_interview) {
         display.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     }, 1000);
 }
-function endInterview(id_interview) {
-    clearInterval(timers[id_interview]);
-    fetch('/api/end_interview', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ id_interview: id_interview })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            alert(data.error);
-        } else {
-            alert('Interview ended successfully');
-            // Remove the interview element from the DOM
-            const interviewElement = document.getElementById(`interview-${id_interview}`);
-            if (interviewElement) {
-                interviewElement.remove();
-            }
-            // Update the remaining interviews
-            updateInterviews();
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while ending the interview.');
-    });
-}
-function handleEndInterview(event, id_interview) {
-    event.preventDefault();
-    endInterview(id_interview);
-}
-function updateInterviews() {
-    document.querySelectorAll('.candidates').forEach(item => {
-        if (item.firstElementChild) {
-            item.firstElementChild.classList.add('current');
-        }
-    });
-}
-</script>
 
-  {% endif %}
+function NextCandidate(event, id_event, participant_name) {
+  event.preventDefault();
+  fetch('{{ url_for('api.skip_candidate') }}', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ id_event: id_event, participant_name: participant_name })
+  })
+  .then(response => {
+    if (!response.ok) {
+      popup('danger', 'Une erreur est survenue lors de la récupération des données');
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(datas => {
+    const current = document.querySelector(`#participant-${participant_name} .current`);
+    current.classList.remove('current');
+    const newCurrent = current.parentElement.children[1];
+    newCurrent.classList.add('current');
+    newCurrent.parentNode.prepend(newCurrent);
+  })
+  .catch(error => {
+    popup('danger', 'Une erreur est survenue lors de la récupération des données');
+    console.error('Error:', error);
+  });
+}
+
+loadData();
+
+</script>
 {% endblock %}

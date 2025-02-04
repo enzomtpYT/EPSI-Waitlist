@@ -2,9 +2,8 @@
     display: flex;
 }
 
-.interv{
+.interv {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     padding: 1rem 2rem;
     background-color: var(--main-color);
@@ -46,41 +45,33 @@
     border-bottom: 1px solid #e9ecef;
 }
 
+.current > .clickable {
+    padding: 0.5rem 1rem;
+    background-color: var(--alt2);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.current > .clickable:active {
+    background-color: #554693
+}
+
 .shy {
     display: none;
 }
 
-.current > div > button {
-    display: block;
-}
-
-.current > div > h4 {
-    color: red;
-    font-size: 1.5rem;
-}
-
-.current > div > form > button {
-    display: block;
-    background-color: rgb(67, 187, 67);
+.current .shy {
+    display: inline;
 }
 
 .current {
-    background-color: #c5c6c6;
-    border-radius: 20px;
-}
-
-.managecandidate > form > button {
-    max-width: 100%;
-    width: 100%;
-}
-
-.stacked-button {
-    display: flex;
-    flex-direction: column;
+    background-color: var(--alt1);
+    border-radius: 10px;
 }
 
 .dropdown {
   position: relative;
+  cursor: pointer;
   display: inline-block;
 }
 
@@ -89,8 +80,24 @@
   position: absolute;
   background-color: #dc3545;
   z-index: 1;
-  border-radius: 10px;
+  border-radius: 0 0 10px 10px;
   overflow: hidden;
+}
+
+.candidatebtn {
+    transition: 0.1s;
+}
+
+.current .candidatebtn {
+    background-color: seagreen;
+}
+
+.current .candidatebtn:hover {
+    background-color: rgba(0, 128, 0, 0.7);
+}
+
+.dropdown:hover .candidatebtn {
+    border-radius: 10px 10px 0 0;
 }
 
 .dropdown-content .dropdown-item {

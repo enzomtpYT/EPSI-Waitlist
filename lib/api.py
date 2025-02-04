@@ -197,9 +197,29 @@ def get_list(id=None):
                 order.append(dict(candidate))
             weights = [candidate["priority"] for candidate in order]
             interviews[participant['name_participant']] = weighted_shuffle(order, weights)
-    event["intetviews"] = interviews
+    event["interviews"] = interviews
     cache["events"][str(id)] = event
     return event, None
+
+def skip_candidate(event_id, name_participant):
+    """" Skip le candidat actuel et le met en 2 ème position dans le cache """
+    
+    event_id = str(event_id)
+    if cache["events"].get(event_id) is None:
+        return "Aucun évenement avec cet id"
+    
+    event = cache["events"][event_id]
+    if event.get("interviews") is None:
+        return "Aucun entretien trouvé"
+    
+    if event["interviews"].get(name_participant) is None:
+        return "Aucun participant trouvé"
+    
+    interviews = event["interviews"][name_participant]
+    if len(interviews) < 2:
+        return "Pas assez de candidats"
+
+    interviews[0], interviews[1] = interviews[1], interviews[0]
 
 def delete(type, id):
     if type == "event":

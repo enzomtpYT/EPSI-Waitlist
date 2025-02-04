@@ -46,32 +46,20 @@ def reload(id):
 @list_bp.route("/list")
 def list():
     today, error = database.get_today_events()
-    d, mess = get_data(today, error)
-    if mess:
-        flash(mess)
-    return render_template('list.html', datas=d)
+    return render_template('list.html', id=today)
 
 @list_bp.route("/list/<int:id>")
 def list_id(id):
-    d, mess = get_data(id)
-    if mess:
-        flash(mess)
-    return render_template('list.html', datas=d)
+    return render_template('list.html', id=id)
 
 @list_bp.route("/list/manage")
 def manage_list():
     today, error = database.get_today_events()
-    d, mess = get_data(today, error)
-    if mess:
-        flash(mess)
-    return render_template('manage_list.html', datas=d)
+    return render_template('manage_list.html', id=today)
 
 @list_bp.route("/list/<int:id>/manage")
 def manage_list_id(id):
-    d, mess = get_data(id)
-    if mess:
-        flash(mess)
-    return render_template('manage_list.html', datas=d)
+    return render_template('manage_list.html', id=id)
 
 @list_bp.route("/interview_finished/<int:interview_id>", methods=['POST'])
 def interview_finished(interview_id):

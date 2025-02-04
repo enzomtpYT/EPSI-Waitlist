@@ -52,6 +52,21 @@ def get_list():
         return jsonify({"error": error}), 400
     return jsonify(datas)
 
+@api_bp.route('/api/skip_candidate', methods=['POST'])
+def skip_candidate():
+    data = request.get_json()
+    if data:
+        event_id = data.get('id_event')
+        participant_name = data.get('participant_name')
+    if event_id is None:
+        return jsonify({"error": "Missing event_id parameter"}), 400
+    if participant_name is None:
+        return jsonify({"error": "Missing participant_name parameter"}), 400
+    error = api.skip_candidate(event_id, participant_name)
+    if error:
+        return jsonify({"error": error}), 400
+    return jsonify({"success": True})
+
 @api_bp.route("/api/delete/<string:type>", methods=['POST'])
 def delete_api(type):
     data = request.get_json()
