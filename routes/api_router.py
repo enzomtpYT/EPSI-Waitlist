@@ -86,7 +86,7 @@ def add_api(type):
     if data:
         error = api.add(type, data)
     if error:
-        return jsonify({"error": error}), 400
+        return jsonify({"message": error}), 400
     return jsonify({"success": True}), 200
 
 @api_bp.route("/api/update/<string:type>", methods=['POST'])

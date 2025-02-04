@@ -2344,7 +2344,7 @@ def create_employee(lastname, name, email, role):
     """
     conn = get_db_connection()
     if conn is None:
-        return None, "Erreur base de données"
+        return None, None, "Erreur base de données"
     try:
         cursor = conn.cursor()
 
@@ -2360,17 +2360,17 @@ def create_employee(lastname, name, email, role):
         cursor.execute('SELECT id_role FROM Role WHERE name_role = %s', (role,))
         role_id = cursor.fetchone()
         if role_id is None:
-            return None, "Rôle non trouvé"
+            return None, None, "Rôle non trouvé"
 
         # Insere l'association de l'employé avec le rôle dans la table User_role
         cursor.execute('INSERT INTO User_role (id_user, id_role) VALUES (%s, %s)', (user_id, role_id[0]))
 
         # Sauvegarde les modifications
         conn.commit()
-        return employee_id, None
+        return employee_id, user_id, None
     except psycopg2.Error as e:
         print(f"Erreur lors de la création de l'employé: {e}")
-        return None, "Erreur lors de la création de l'employé"
+        return None, None, "Erreur lors de la création de l'employé"
     finally:
         # Ferme la connexion à la base de données
         conn.close()
@@ -2462,14 +2462,15 @@ def get_employee(employee_id):
         # Ferme la connexion à la base de données
         conn.close()
 
-def edit_employee(lastname, name, email, id_employee):
+def edit_employee(lastname, name, email, role, id_employee):
     """
-    Met à jour un employé dans la base de données.
+    Met à jour les informations d'un employé, y compris son rôle.
 
     Args:
         lastname (str): Le nom de famille de l'employé.
         name (str): Le prénom de l'employé.
         email (str): L'adresse email de l'employé.
+        role (str): Le rôle de l'employé.
         id_employee (int): L'identifiant de l'employé.
 
     Returns:
@@ -2478,20 +2479,36 @@ def edit_employee(lastname, name, email, id_employee):
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
-
     try:
         cursor = conn.cursor()
-        # Met à jour l'employé dans la base de données
-        cursor.execute('UPDATE Employee SET lastname_employee = %s, name_employee = %s, email_employee = %s WHERE id_employee = %s', (lastname, name, email, id_employee))
-        # Sauvegarde les modifications
+
+        # Met à jour les informations de l'employé dans la table Employee
+        cursor.execute('''
+        UPDATE Employee
+        SET lastname_employee = %s, name_employee = %s, email_employee = %s
+        WHERE id_employee = %s
+        ''', (lastname, name, email, id_employee))
+
+        # Récupère l'id_role correspondant au nom du rôle
+        cursor.execute('SELECT id_role FROM Role WHERE name_role = %s', (role,))
+        role_id = cursor.fetchone()
+        if role_id is None:
+            return "Rôle non trouvé"
+
+        # Met à jour le rôle de l'utilisateur dans la table User_role
+        cursor.execute('''
+        UPDATE User_role
+        SET id_role = %s
+        WHERE id_user = (SELECT id_user FROM Employee WHERE id_employee = %s)
+        ''', (role_id[0], id_employee))
+
         conn.commit()
+        return None
     except psycopg2.Error as e:
         print(f"Erreur lors de la mise à jour de l'employé: {e}")
         return "Erreur lors de la mise à jour de l'employé"
     finally:
-        # Fermes la connexion à la base de données
         conn.close()
-    return None
 
 def delete_employee(id_employee):
     """
