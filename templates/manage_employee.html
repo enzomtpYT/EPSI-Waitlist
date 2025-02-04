@@ -237,7 +237,8 @@ function done(event) {
         name_employee: document.querySelector('#employee_name').value,
         email_employee: document.querySelector('#employee_email').value,
         username: document.querySelector('#username').value,
-        password: document.querySelector('#password').value
+        password: document.querySelector('#password').value,
+        name_role: document.querySelector('#role').value
     };
 
     if (document.querySelector('#id_employee').value != '') {
@@ -263,6 +264,9 @@ function done(event) {
         return response.json();
     })
     .then(data => {
+        if (!data || !data.success) {
+            return;
+        }
         popup('success', 'Employé enregistré avec succès');
         loadData();
     })

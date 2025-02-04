@@ -1,4 +1,5 @@
 from lib import database, auth
+from flask import request, jsonify
 import datetime, random
 
 cache = {
@@ -9,13 +10,13 @@ def weighted_shuffle(arr, weights):
     """
     Mélange un tableau en utilisant des poids.
     Plus un élément a un poids élevé, plus il a de chances d'être proche de l'index 0.
-    
+
     :param arr: Liste des éléments à mélanger.
     :param weights: Liste des poids associés aux éléments.
     :return: Liste mélangée selon les poids.
     """
     assert len(arr) == len(weights), "La taille des listes doit être identique."
-    
+
     # Générer des clés pondérées et trier
     weighted_items = [(item, random.random() / weight) for item, weight in zip(arr, weights)]
     weighted_items.sort(key=lambda x: x[1])  # Trier selon la clé pondérée
@@ -269,7 +270,27 @@ def add(type, data):
                     return error
 
     elif type == "employee":
-        error = database.add_employee(data)
+
+        error = None
+        lastname_employee = data.get("lastname_employee")
+        name_employee = data.get("name_employee")
+        email_employee = data.get("email_employee")
+        role = data.get("name_role")
+        if lastname_employee is None or name_employee is None or email_employee is None or role is None:
+            return "Champs manquants"
+        employee_id, user_id, error = database.create_employee(lastname_employee, name_employee, email_employee, role)
+        if error is None:
+            username = data.get("username")
+            password = data.get("password")
+            if username is not None:
+                error = database.auth_update_username(username, user_id)
+                if error:
+                    return error
+            if password is not None:
+                error = auth.update_user_pass(password, user_id)
+                if error:
+                    return error
+
     elif type == "tag":
         error = database.add_tag(data)
     elif type == "interview":
@@ -351,7 +372,29 @@ def update(type, data):
                     return error
 
     elif type == "employee":
-        error = database.update_employee(data)
+
+        id_employee = data.get('id_employee')
+        lastname_employee = data.get('lastname_employee')
+        name_employee = data.get('name_employee')
+        email_employee = data.get('email_employee')
+        role = data.get('name_role')
+        if id_employee is None or lastname_employee is None or name_employee is None or email_employee is None or role is None:
+            return "Champs manquants"
+        error = database.edit_employee(lastname_employee, name_employee, email_employee, role, id_employee)
+
+        id_user = data.get("id_user")
+        username = data.get("username")
+        password = data.get("password")
+        if error is None:
+            if username is not None:
+                error = database.auth_update_username(username, id_user)
+                if error:
+                    return error
+            if password is not None:
+                error = auth.update_user_pass(password, id_user)
+                if error:
+                    return error
+
     elif type == "tag":
         error = database.update_tag(data)
     elif type == "interview":
