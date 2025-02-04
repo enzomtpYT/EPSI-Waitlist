@@ -7,7 +7,6 @@ from routes.auth import auth_bp
 from routes.api_router import api_bp
 from routes.index import index_bp
 from routes.admin import admin_bp
-from routes.create_employee import create_employee_bp
 from routes.manage_employee import manage_employee_bp
 from routes.employee import employee_bp
 from routes.list import list_bp
@@ -30,7 +29,6 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(api_bp)
 app.register_blueprint(index_bp)
 app.register_blueprint(admin_bp)
-app.register_blueprint(create_employee_bp)
 app.register_blueprint(manage_employee_bp)
 app.register_blueprint(employee_bp)
 app.register_blueprint(list_bp)
