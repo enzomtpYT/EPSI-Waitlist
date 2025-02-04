@@ -7,12 +7,10 @@ from routes.auth import auth_bp
 from routes.api_router import api_bp
 from routes.index import index_bp
 from routes.admin import admin_bp
-from routes.create_employee import create_employee_bp
 from routes.manage_employee import manage_employee_bp
 from routes.employee import employee_bp
 from routes.list import list_bp
 from routes.manage_candidate import manage_candidate_bp
-from routes.create_participant import create_participant_bp
 from routes.manage_participant import manage_participant_bp
 from routes.participant import participant_bp
 from routes.create_event import create_event_bp
@@ -31,12 +29,10 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(api_bp)
 app.register_blueprint(index_bp)
 app.register_blueprint(admin_bp)
-app.register_blueprint(create_employee_bp)
 app.register_blueprint(manage_employee_bp)
 app.register_blueprint(employee_bp)
 app.register_blueprint(list_bp)
 app.register_blueprint(manage_candidate_bp)
-app.register_blueprint(create_participant_bp)
 app.register_blueprint(manage_participant_bp)
 app.register_blueprint(participant_bp)
 app.register_blueprint(create_event_bp)

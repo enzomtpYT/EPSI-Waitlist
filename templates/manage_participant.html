@@ -1,49 +1,360 @@
 {% extends "base.html" %}
 
-{% block title %}Admin - Gérer Intervenant{% endblock %}
+{% block title %}Admin - Gérer Intervenants{% endblock %}
 
 {% block content %}
-<h1 class="title">Gérer les intervenants</h1>
+<div class="tableContent">
+    <h1 style="margin-left: 1rem;">Gérer les intervenants</h1>
+    <h2 style="margin-left: 1rem;" id="loading">Chargement...</h2>
+    <div class="tabmanagment" style="display: none;">
 
-<div class="admin-section">
-    <h2>Liste des intervenants</h2>
-    {% if participants %}
-    <table>
-        <thead>
-            <tr>
-                <th>Nom</th>
-                <th>E-mail</th>
-                <th>Tags</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for participant in participants %}
-            <tr>
-                <td>{{ participant.name_participant }}</td>
-                <td>{{ participant.email_participant }}</td>
-                <td class="taggrid">
-                    {% for tag in participant.tags %}
-                        {% if tag.name_tag %}
-                            <p class="display-tag">{{ tag.name_tag }}</p>
-                        {% endif %}
-                    {% endfor %}
-                </td>
-                <td class="actionbtn">
-                    <a href="/admin/manage_participant/participant/{{ participant.id_participant }}">
-                        <button type="button">Voir</button>
-                    </a>
-                    <form action="/admin/manage_participant/{{ participant.id_participant }}/delete" method="post" style="display:inline;">
-                        <button class="delete" type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet intervenant ?');">Supprimer</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>Aucun intervenant n'existe.</p>
-    {% endif %}
+        <div class="sideItemList">
+            <button class="listbtn" onclick="showNew()"><i class="fa-regular fa-user-plus"></i> Créer un intervenant</button>
+            <button class="listbtn" onclick="loadData()"><i class="fa-regular fa-rotate-right"></i> Recharger la liste</button>
+        </div>
+
+        <div class="resizer" id="resizer"></div>
+
+        <div class="infoeditor">
+            <form id="candform" style="display: none;">
+                <label for="participant_name">Nom :</label>
+                <input type="text" id="participant_name" name="participant_name" value="">
+
+                <label for="participant_email">E-mail :</label>
+                <input type="email" id="participant_email" name="participant_email" value="">
+
+                <label for="username">Nom d'utilisateur :</label>
+                <input type="text" id="username" name="username" value="">
+
+                <label for="password">Mot de passe :</label>
+                <div class="editpass">
+                    <div class="iconified-input">
+                        <input type="password" id="password" name="password" value="">
+                        <i onclick="showpass()" id="showpass" class="fa-regular fa-eye icon showpass"></i>
+                    </div>
+                    <button type="button" onclick="generatepass().then(pass => {document.getElementById('password').value = pass})"><i class="fa-regular fa-key"></i> Générer un mot de passe</button>
+                </div>
+
+                <div>
+                    <button id="confirmbtn" onclick="done(event)"><i class="fa-regular fa-save"></i> Enregistrer</button>
+                    <button class="delete"><i class="fa-regular fa-trash"></i> Supprimer</button>
+                </div>
+
+                <input type="hidden" id="id_participant" name="id_participant" value="">
+                <input type="hidden" id="id_user" name="id_user" value="">
+                <input type="hidden" id="tags" name="tags" value="">
+            </form>
+
+            <div class="sectionmanagetag">
+                <div class="sectionremovetags"></div>
+                <div class="sectionaddtags"></div>
+            </div>
+
+            <div class="listsection" display="none">
+                <h2>Liste des entretiens</h2>
+                <h3>Aucun entretiens trouvé</h3>
+                <div class="tablewrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Événement</th>
+                                <th>Date</th>
+                                <th>Candidat</th>
+                                <th>Durée de l'entretien</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
+<div id="feedbackModal" class="modal">
+    <div class="modal-content">
+        <i class="fa-regular fa-x close" onclick="toggleElement(this.parentElement.parentElement)"></i>
+        <h2>Feedback de l'entretien</h2>
+        <h3 id="partfeedtitle">Feedback de l'intervenant :</h3>
+        <div class="feedb" id="participantFeedback"></div>
+        <h3 id="candfeedtitle">Feedback du candidat :</h3>
+        <div class="feedb" id="candidateFeedback"></div>
+    </div>
+</div>
+
+<script>
+let AllTags = null;
+
+function loadData() {
+    document.querySelector('#candform').style.display = 'none';
+    document.querySelector('.sectionmanagetag').style.display = 'none';
+    document.querySelector('.listsection').style.display = 'none';
+    document.querySelectorAll('.itemlist').forEach(item => item.remove());
+    document.querySelectorAll('.sectionaddtags button').forEach(tag => tag.remove());
+    document.querySelectorAll('.sectionremovetags button').forEach(tag => tag.remove());
+    fetch('{{ url_for('api.get_tags') }}')
+        .then(response => {
+            if (!response.ok) {
+                popup('danger', 'Une erreur est survenue lors de la récupération des données');
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(datas => {
+            AllTags = datas;
+        })
+        .catch(error => {
+            popup('danger', 'Une erreur est survenue lors de la récupération des données');
+            console.error('Error:', error);
+        });
+    fetch('{{ url_for('api.get_participants') }}')
+        .then(response => {
+            if (!response.ok) {
+                popup('danger', 'Une erreur est survenue lors de la récupération des données');
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(datas => {
+            buildManagement(datas, AllTags);
+        })
+        .catch(error => {
+            popup('danger', 'Une erreur est survenue lors de la récupération des données');
+            console.error('Error:', error);
+        });
+}
+
+function showInfos(infos) {
+    document.querySelector('#participant_name').value = infos.name_participant;
+    document.querySelector('#participant_email').value = infos.email_participant;
+    document.querySelector('#username').value = infos.username;
+    document.querySelector('#id_participant').value = infos.id_participant;
+    document.querySelector('#password').value = '';
+    document.querySelector('#id_user').value = infos.id_user;
+    document.querySelector('#tags').value = JSON.stringify(infos.tags);
+    document.querySelector('#confirmbtn').innerHTML = '<i class="fa-regular fa-save"></i> Enregistrer';
+    document.querySelector('#candform').style.display = 'flex';
+    document.querySelector('.sectionmanagetag').style.display = 'flex';
+    document.querySelector('.delete').onclick = function() {
+        deleteType('participant', infos.id_participant, event);
+        showNew();
+    };
+    document.querySelector('.delete').style.display = 'inline';
+    document.querySelector('.sectionremovetags').innerHTML = '';
+    document.querySelector('.sectionaddtags').innerHTML = '';
+    infos.tags.forEach(tag => {
+        let tagButton = document.createElement('button');
+        tagButton.classList.add('remove-tag');
+        tagButton.dataset.tagid = tag.id_tag;
+        tagButton.innerHTML = `<i class="fa-regular fa-xmark"></i> ${tag.name_tag}`;
+        tagButton.onclick = function() {
+            removeTag(tag, this);
+        };
+        document.querySelector('.sectionremovetags').appendChild(tagButton);
+    });
+    AllTags.forEach(tag => {
+        if (!infos.tags.some(userTag => userTag.id_tag === tag.id_tag)) {
+            let tagButton = document.createElement('button');
+            tagButton.classList.add('add-tag');
+            tagButton.dataset.tagid = tag.id_tag;
+            tagButton.innerHTML = `<i class="fa-regular fa-plus"></i> ${tag.name_tag}`;
+            tagButton.onclick = function() {
+                addTag(tag, this);
+            };
+            document.querySelector('.sectionaddtags').appendChild(tagButton);
+        }
+    });
+    document.querySelector('.listsection table tbody').innerHTML = '';
+    if (infos.interviews.length === 0) {
+        document.querySelector('.listsection table').style.display = 'none';
+        document.querySelector('.listsection h3').style.display = 'block';
+    } else {
+        document.querySelector('.listsection table').style.display = 'table';
+        document.querySelector('.listsection h3').style.display = 'none';
+        infos.interviews.forEach(interview => {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `<td>${interview.name_event}</td><td>${interview.date_event}</td><td>${interview.name_candidate}</td><td>${formatDuration(interview.duration_interview)}</td>`;
+            let td = document.createElement('td');
+            td.classList.add('actionbtn');
+            let button = document.createElement('button');
+            button.onclick = function() { openfeedback(this, interview); };
+            button.classList.add('feedback-btn');
+            button.innerHTML = 'Voir les feedbacks';
+            td.appendChild(button);
+            tr.appendChild(td);
+            document.querySelector('.listsection table tbody').appendChild(tr);
+            console.log(interview);
+        });
+    }
+    document.querySelector('.listsection').style.display = 'flex';
+}
+
+function showNew() {
+    document.querySelectorAll('.itemlist').forEach(item => { item.classList.remove('selected'); });
+    document.querySelector('.listsection').style.display = 'none';
+    document.querySelector('#participant_name').value = '';
+    document.querySelector('#participant_email').value = '';
+    document.querySelector('#username').value = '';
+    document.querySelector('#id_participant').value = '';
+    document.querySelector('#password').value = '';
+    document.querySelector('#tags').value = JSON.stringify([]);
+    document.querySelector('#id_user').value = '';
+    document.querySelector('#confirmbtn').innerHTML = '<i class="fa-regular fa-save"></i> Enregistrer';
+    document.querySelector('#candform').style.display = 'flex';
+    document.querySelector('.sectionmanagetag').style.display = 'flex';
+    document.querySelector('.delete').style.display = 'none';
+    document.querySelector('.sectionremovetags').innerHTML = '';
+    document.querySelector('.listsection table tbody').innerHTML = '';
+    document.querySelector('.sectionaddtags').innerHTML = '';
+    AllTags.forEach(tag => {
+        let tagButton = document.createElement('button');
+        tagButton.classList.add('add-tag');
+        tagButton.dataset.tagid = tag.id_tag;
+        tagButton.innerHTML = `<i class="fa-regular fa-plus"></i> ${tag.name_tag}`;
+        tagButton.onclick = function() {
+            addTag(tag, this);
+        };
+        document.querySelector('.sectionaddtags').appendChild(tagButton);
+    });
+}
+
+function openfeedback(btn, inter) {
+    let modal = document.querySelector('#feedbackModal');
+    let participantFeedbackEl = modal.querySelector('#participantFeedback');
+    let candidateFeedbackEl = modal.querySelector('#candidateFeedback');
+    let partfeedtitle = modal.querySelector('#partfeedtitle');
+    let candfeedtitle = modal.querySelector('#candfeedtitle');
+    console.log(inter);
+    let participantFeedback = inter.feedback_participant;
+    let candidateFeedback = inter.feedback_candidate;
+
+
+    if (participantFeedback === null) {
+        participantFeedbackEl.style.display = 'none';
+        partfeedtitle.style.display = 'none';
+    } else {
+        participantFeedbackEl.style.display = 'flex';
+        partfeedtitle.style.display = 'block';
+        mark(participantFeedbackEl, participantFeedback);
+    }
+
+    if (candidateFeedback === null) {
+        candidateFeedbackEl.style.display = 'none';
+        candfeedtitle.style.display = 'none';
+    } else {
+        candidateFeedbackEl.style.display = 'flex';
+        candfeedtitle.style.display = 'block';
+        mark(candidateFeedbackEl, candidateFeedback);
+    }
+
+    if (candidateFeedback === null && participantFeedback === null) {
+        popup('info', 'Aucun feedback n\'a été enregistré pour cet entretien');
+    } else {
+        toggleElement(modal);
+    }
+}
+
+function buildManagement(datas, tags) {
+    let sideItemList = document.querySelector('.sideItemList');
+    num = 0;
+    datas.forEach(participant => {
+        let item = document.createElement('div');
+        item.classList.add('itemlist');
+        item.onclick = function() { showInfos(participant); this.classList.add('selected'); document.querySelectorAll('.itemlist').forEach(item => { if (item !== this) item.classList.remove('selected'); }); };
+        item.id = `deleteElement-${participant.id_participant}-participant`;
+        item.innerHTML = `<i class="fa-regular fa-user"></i><p>${participant.name_participant}</p>`;
+        sideItemList.appendChild(item);
+        if (num === 0) item.click();
+        num++;
+    });
+    document.querySelector('#loading').style.display = 'none';
+    document.querySelector('.tabmanagment').style.display = 'flex';
+}
+
+function addTag(tag, button) {
+    let tags = JSON.parse(document.querySelector('#tags').value);
+    tags.push(tag);
+    document.querySelector('#tags').value = JSON.stringify(tags);
+    let tagButton = document.createElement('button');
+    tagButton.classList.add('remove-tag');
+    tagButton.dataset.tagid = tag.id_tag;
+    tagButton.innerHTML = `<i class="fa-regular fa-xmark"></i> ${tag.name_tag}`;
+    tagButton.onclick = function() {
+        removeTag(tag, this);
+    };
+    document.querySelector('.sectionremovetags').appendChild(tagButton);
+    if (button) button.remove();
+}
+
+function removeTag(tag, button) {
+    let tags = JSON.parse(document.querySelector('#tags').value);
+    tags = tags.filter(t => t.id_tag !== tag.id_tag);
+    document.querySelector('#tags').value = JSON.stringify(tags);
+    let tagButton = document.createElement('button');
+    tagButton.classList.add('add-tag');
+    tagButton.dataset.tagid = tag.id_tag;
+    tagButton.innerHTML = `<i class="fa-regular fa-plus"></i> ${tag.name_tag}`;
+    tagButton.onclick = function() {
+        addTag(tag, this);
+    };
+    document.querySelector('.sectionaddtags').appendChild(tagButton);
+    if (button) button.remove();
+}
+
+function done(event) {
+    event.preventDefault();
+    let participant = {
+        id_participant: document.querySelector('#id_participant').value,
+        id_user: document.querySelector('#id_user').value,
+        name_participant: document.querySelector('#participant_name').value,
+        email_participant: document.querySelector('#participant_email').value,
+        username: document.querySelector('#username').value,
+        password: document.querySelector('#password').value,
+        tags: JSON.parse(document.querySelector('#tags').value)
+    };
+
+    if (document.querySelector('#id_participant').value != '') {
+        url = '{{ url_for('api.update_api', type='participant') }}';
+    } else {
+        url = '{{ url_for('api.add_api', type='participant') }}';
+    }
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(participant)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                popup('danger', 'Une erreur est survenue lors de l\'enregistrement des données: ' + (data.message || 'Erreur inconnue'));
+            });
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        popup('success', 'Intervenant enregistré avec succès');
+        loadData();
+    })
+    .catch(error => {
+        popup('danger', 'Une erreur est survenue lors de l\'enregistrement des données');
+        console.error('Error:', error);
+    });
+}
+
+modal = document.getElementById('feedbackModal');
+
+window.onclick = function(event) {
+    if (event.target == modal) {
+        toggleElement(modal);
+    }
+}
+
+loadData();
+</script>
 {% endblock %}
