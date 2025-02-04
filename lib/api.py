@@ -1,5 +1,27 @@
 from lib import database, auth
-import datetime
+import datetime, random
+
+cache = {
+    "events": {},
+}
+
+def weighted_shuffle(arr, weights):
+    """
+    Mélange un tableau en utilisant des poids.
+    Plus un élément a un poids élevé, plus il a de chances d'être proche de l'index 0.
+    
+    :param arr: Liste des éléments à mélanger.
+    :param weights: Liste des poids associés aux éléments.
+    :return: Liste mélangée selon les poids.
+    """
+    assert len(arr) == len(weights), "La taille des listes doit être identique."
+    
+    # Générer des clés pondérées et trier
+    weighted_items = [(item, random.random() / weight) for item, weight in zip(arr, weights)]
+    weighted_items.sort(key=lambda x: x[1])  # Trier selon la clé pondérée
+
+    # Retourner uniquement les éléments dans le nouvel ordre
+    return [item[0] for item in weighted_items]
 
 def get_event_participants(id_event):
     event, error = database.get_event(id_event)
@@ -100,28 +122,29 @@ def get_candidates():
     return candidates_with_tags, None
 
 def get_list(id=None):
+    if cache["events"].get(str(id)) is not None:
+        print("Cache hit")
+        return cache["events"][str(id)], None
+    print("Cache miss")
     event, error = database.get_event(id)
+    event = dict(event)
     if error:
         return None, error
     elif event is None:
         return None, "Aucun évenement avec cet id"
-    candid, error = database.get_event_candidates(id)
-    inter, error = database.get_event_participant(id)
-    list = {}
-    if inter:
-        for interv in inter:
-            all, error = database.get_event_interview_candidate(id, interv['id_participant'])
-            if interv['name_participant'] not in list:
-                list[interv['name_participant']] = []
-            for candid in all:
-                list[interv['name_participant']].append(dict(candid))  # Convert Row to dict
-
-    data = {
-        "list": list,
-        "title": event['name_event'],
-        "event_id": id
-    }
-    return data, None
+    participants, error = database.get_event_participant(id)
+    interviews = {}
+    if participants:
+        for participant in participants:
+            order = []
+            candidates, error = database.get_event_interview_candidate(id, participant['id_participant'])
+            for candidate in candidates:
+                order.append(dict(candidate))
+            weights = [candidate["priority"] for candidate in order]
+            interviews[participant['name_participant']] = weighted_shuffle(order, weights)
+    event["intetviews"] = interviews
+    cache["events"][str(id)] = event
+    return event, None
 
 def delete(type, id):
     if type == "event":

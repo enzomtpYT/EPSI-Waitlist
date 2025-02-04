@@ -286,10 +286,11 @@ def get_event_interview_candidate(todayevent, id_participant):
     try:
         cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
-        SELECT Interview.id_candidate, Candidate.lastname_candidate, Candidate.name_candidate, Candidate.email_candidate, Interview.id_interview
+        SELECT Interview.id_interview, Interview.id_candidate, Interview.id_participant, Interview.start_time_interview, Candidate.lastname_candidate, Candidate.name_candidate, Attends.priority
         FROM Interview
         JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
-        WHERE id_event = %s AND id_participant = %s AND happened = %s
+        JOIN Attends ON Interview.id_event = Attends.id_event AND Interview.id_candidate = Attends.id_candidate
+        WHERE Interview.id_event = %s AND id_participant = %s AND happened = %s
         ''', (todayevent, id_participant, False))
         candid = cursor.fetchall()
         return candid, None
