@@ -26,6 +26,10 @@ def manage_event_participants_api_args():
 
 @api_bp.route('/api/get_list', methods=['POST'])
 def get_list():
+    data = request.get_json()
+    if data:
+        id = data.get('id')
+
     if request.content_type != 'application/json':
         id, error = database.get_today_events()
         if error:
@@ -42,7 +46,7 @@ def get_list():
             else:
                 id, error = database.get_today_events()
                 if error:
-                    return jsonify({"error": error}), 400    
+                    return jsonify({"error": error}), 400
     datas, error = api.get_list(id)
     if error:
         return jsonify({"error": error}), 400
@@ -82,6 +86,13 @@ def update_api(type):
 @api_bp.route("/api/get_candidates", methods=['GET'])
 def get_candidates():
     datas, error = api.get_candidates()
+    if error:
+        return jsonify({"error": error}), 400
+    return jsonify(datas)
+
+@api_bp.route("/api/get_participants", methods=['GET'])
+def get_participants():
+    datas, error = api.get_participants()
     if error:
         return jsonify({"error": error}), 400
     return jsonify(datas)

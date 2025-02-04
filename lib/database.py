@@ -678,7 +678,7 @@ def create_participant(name, email):
     """
     conn = get_db_connection()
     if conn is None:
-        return "Erreur base de données"
+        return None, None, "Erreur base de données"
     try:
         cursor = conn.cursor()
 
@@ -695,10 +695,10 @@ def create_participant(name, email):
 
         # Sauvegarde les modifications
         conn.commit()
-        return participant_id, None
+        return participant_id, user_id, None
     except psycopg2.Error as e:
         print(f"Erreur lors de la création de l'intervenant: {e}")
-        return None, "Erreur lors de la création de l'intervenant"
+        return None, None, "Erreur lors de la création de l'intervenant"
     finally:
         # Fermes la connexion à la base de données
         conn.close()

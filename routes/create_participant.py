@@ -17,7 +17,7 @@ def create_participant():
             error = 'L\'adresse email est obligatoire.'
 
         if error is None:
-            participant_id, error = database.create_participant(name, email)
+            participant_id, user_id, error = database.create_participant(name, email)
             if error is None:
                 for tag_id in selected_tags:
                     database.add_tag_to_participant(participant_id, tag_id)

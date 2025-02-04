@@ -96,8 +96,38 @@ def get_candidates():
         else:
             candidate_dict["username"] = user_info["username"]
         candidates_with_tags.append(candidate_dict)
-    
+
     return candidates_with_tags, None
+
+def get_participants():
+    participants, error = database.get_all_participants()
+    if error:
+        return None, error
+
+    participants_with_tags = []
+    for participant in participants:
+        participant_dict = dict(participant)
+        participant_tags, error = database.get_participant_tags(participant['id_participant'])
+        if error:
+            participant_dict['tags'] = []
+        else:
+            participant_dict['tags'] = participant_tags
+        interviews, error = database.get_participant_interviews(participant['id_participant'])
+        if error:
+            participant_dict['interviews'] = []
+        else:
+            for interview in interviews:
+                if isinstance(interview['duration_interview'], datetime.time):
+                    interview['duration_interview'] = interview['duration_interview'].strftime('%H:%M:%S')
+            participant_dict['interviews'] = interviews
+        user_info, error = database.get_user(participant['id_user'])
+        if error:
+            participant_dict["username"] = ''
+        else:
+            participant_dict["username"] = user_info["username"]
+        participants_with_tags.append(participant_dict)
+
+    return participants_with_tags, None
 
 def get_list(id=None):
     event, error = database.get_event(id)
@@ -144,9 +174,30 @@ def add(type, data):
     if type == "event":
         error = database.add_event(data)
     elif type == "participant":
-        error = database.add_participant(data)
+
+        error = None
+        name_participant = data.get("name_participant")
+        email_participant = data.get("email_participant")
+        selected_tags = data.get("tags")
+        if name_participant is None or email_participant is None:
+            return "Champs manquants"
+        participant_id, user_id, error = database.create_participant(name_participant, email_participant)
+        if error is None:
+            for tag in selected_tags:
+                database.add_tag_to_participant(participant_id, tag["id_tag"])
+            username = data.get("username")
+            password = data.get("password")
+            if username is not None:
+                error = database.auth_update_username(username, user_id)
+                if error:
+                    return error
+            if password is not None:
+                error = auth.update_user_pass(password, user_id)
+                if error:
+                    return error
+
     elif type == "candidate":
-        
+
         error = None
         lastname_candidate = data.get("lastname_candidate")
         name_candidate = data.get("name_candidate")
@@ -168,7 +219,7 @@ def add(type, data):
                 error = auth.update_user_pass(password, user_id)
                 if error:
                     return error
-        
+
     elif type == "employee":
         error = database.add_employee(data)
     elif type == "tag":
@@ -183,9 +234,41 @@ def update(type, data):
     if type == "event":
         error = database.update_event(data)
     elif type == "participant":
-        error = database.update_participant(data)
+
+        id_participant = data.get("id_participant")
+        name_participant = data.get("name_participant")
+        email_participant = data.get("email_participant")
+        newtags = data.get("tags")
+        currenttags, error = database.get_participant_tags(id_participant)
+        currenttags = [dict(tag) for tag in currenttags]
+        if name_participant is None or email_participant is None:
+            return "Champs manquants"
+        error = database.edit_participant(name_participant, email_participant, id_participant)
+        if error:
+            return error
+        if newtags is not None:
+            print(f'currenttags: {currenttags}\nnwetags: {newtags}')
+            for otag in currenttags:
+                if otag not in newtags:
+                    database.remove_tag_from_participant(id_participant, otag['id_tag'])
+            for ntag in newtags:
+                if ntag not in currenttags:
+                    database.add_tag_to_participant(id_participant, ntag['id_tag'])
+        id_user = data.get("id_user")
+        username = data.get("username")
+        password = data.get("password")
+        if error is None:
+            if username is not None:
+                error = database.auth_update_username(username, id_user)
+                if error:
+                    return error
+            if password is not None:
+                error = auth.update_user_pass(password, id_user)
+                if error:
+                    return error
+
     elif type == "candidate":
-        
+
         id_candidate = data.get("id_candidate")
         lastname_candidate = data.get("lastname_candidate")
         name_candidate = data.get("name_candidate")
@@ -218,7 +301,7 @@ def update(type, data):
                 error = auth.update_user_pass(password, id_user)
                 if error:
                     return error
-                
+
     elif type == "employee":
         error = database.update_employee(data)
     elif type == "tag":
