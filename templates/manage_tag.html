@@ -16,15 +16,15 @@
                 <tbody>
                     <tr>
                         <form action="{{ url_for('manage_tag.manage_tag') }}" method="post">
-    
+
                             <input type="hidden" name="id_tag" value="{{ tag.id_tag }}">
                             <label for="tag_name">Nom :</label>
                             <input type="text" id="tag_name" name="tag_name" value="{{ tag.name_tag }}">
-    
+
                             <div class="button-group">
                                 <button type="submit">Enregistrer</button>
                         </form>
-    
+
                         <form action="{{ url_for('manage_tag.delete_tag', id_tag=tag.id_tag) }}" method="post">
                                 <button class="delete" type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce tag ?');">Supprimer</button>
                             </div>
@@ -34,9 +34,35 @@
             </table>
         </div>
         {% endfor %}
+        <div class="tagitem">
+            <table>
+                <tbody>
+                    <tr>
+                        <form action="{{ url_for('manage_tag.create_tag') }}" method="post">
+
+                            {# <input type="hidden" name="id_tag" value="{{ tag.id_tag }}"> #}
+                            <label for="tag_name">Nom :</label>
+                            <input type="text" id="tag_name" name="tag_name">
+
+                            <div class="button-group">
+                                <button type="submit">Créer</button>
+                            </div>
+                        </form>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     {% else %}
-    <p>Aucun tag n'existe.</p>
+    <div class="tagitem">
+        <form action="{{ url_for('manage_tag.create_tag') }}" method="post">
+
+            <label for="tag_name">Nom :</label>
+            <input type="text" id="tag_name" name="tag_name">
+
+            <button type="submit">Créer</button>
+        </form>
+    </div>
     {% endif %}
 </div>
 

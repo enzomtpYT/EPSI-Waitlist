@@ -28,6 +28,28 @@ def manage_tag():
         return render_template('manage_tag.html', tags=[])
     return render_template('manage_tag.html', tags=tags)
 
+@manage_tag_bp.route('/admin/manage_tag/create', methods=('GET', 'POST'))
+def create_tag():
+    if request.method == 'POST':
+        name = request.form['tag_name']
+        error = None
+
+        if not name:
+            error = 'Le nom est obligatoire.'
+
+        if error is None:
+            error = database.create_tag(name)
+            if error is None:
+                flash("Tag créé avec succès!", "success")
+                return redirect(url_for('manage_tag.manage_tag'))
+            else:
+                flash(f"Erreur lors de la création du tag: {error}", "danger")
+                return redirect(url_for('manage_tag.manage_tag'))
+
+    if error:
+        flash("Erreur lors de la récupération des tags", "danger")
+    return redirect(url_for('manage_tag.manage_tag'))
+
 @manage_tag_bp.route("/admin/manage_tag/<int:id_tag>/delete", methods=['POST'])
 def delete_tag(id_tag):
     error = database.delete_tag(id_tag)
