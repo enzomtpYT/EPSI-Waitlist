@@ -161,6 +161,7 @@ function addTimeslot(start=null, end=null, tempid=tid) {
     const removeButton = document.createElement('button');
     removeButton.type = 'button';
     removeButton.textContent = 'Supprimer';
+    removeButton.classList.add('delete');
     removeButton.onclick = () => {
         delete timeslots[tempid];
         timeslotDiv.remove()
