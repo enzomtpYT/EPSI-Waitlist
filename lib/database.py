@@ -96,7 +96,7 @@ def get_event(event_id):
         cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('SELECT * FROM Event WHERE id_event = %s', (event_id,))
         event = cursor.fetchone()
-        if event:
+        if event['has_timeslots']:
             cursor.execute('SELECT * FROM Timeslot WHERE id_event = %s', (event_id,))
             timeslots = cursor.fetchall()
             event['timeslots'] = timeslots
