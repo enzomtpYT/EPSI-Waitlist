@@ -86,7 +86,7 @@ def add_api(type):
     if data:
         error = api.add(type, data)
     if error:
-        return jsonify({"message": error}), 400
+        return jsonify({"error": error}), 400
     return jsonify({"success": True}), 200
 
 @api_bp.route("/api/update/<string:type>", methods=['POST'])
@@ -128,20 +128,12 @@ def get_tags():
 
 @api_bp.route("/api/start_interview", methods=['POST'])
 def start_interview():
-    try:
-        data = request.get_json()
-        if not data:
-            return jsonify({"error": "Missing data"}), 400
-        id_interview = data.get('id_interview')
-        if not id_interview:
-            return jsonify({"error": "Missing id_interview parameter"}), 400
-        updated_id, error = database.start_interview(id_interview)
-        if error:
-            return jsonify({"error": error}), 400
-        return jsonify({"interview_id": updated_id})
-    except Exception as e:
-        print(f"Erreur dans start_interview: {e}")
-        return jsonify({"error": "Internal server error"}), 500
+    data = request.get_json()
+    if data:
+        error = api.start_interview(data)
+    if error:
+        return jsonify({"error": error}), 400
+    return jsonify({"success": True})
 
 @api_bp.route("/api/end_interview", methods=['POST'])
 def end_interview():

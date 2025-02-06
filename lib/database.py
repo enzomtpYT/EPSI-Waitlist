@@ -1065,13 +1065,14 @@ def get_interview(id_interview):
     finally:
         conn.close()
 
-def start_interview(id_interview):
+def start_interview(id_interview, start_time):
     """
     Démarre un entretien en enregistrant l'heure de début.
 
     Args:
         id_candidate (int): L'identifiant du candidat.
         id_participant (int): L'identifiant du participant.
+        start_time (datetime): L'heure de début de l'entretien.
 
     Returns:
         tuple: Un tuple contenant l'identifiant de l'entretien et un message d'erreur si une erreur est survenue.
@@ -1081,7 +1082,6 @@ def start_interview(id_interview):
         return None, "Erreur base de données"
     try:
         cursor = conn.cursor()
-        start_time = datetime.datetime.now()
         cursor.execute('''
         UPDATE Interview
         SET start_time_interview = %s
