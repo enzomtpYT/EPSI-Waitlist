@@ -69,7 +69,7 @@ function buildList(info) {
         const candidatebtn = document.createElement('button');
         candidatebtn.innerHTML = `<i class="shy fa-regular fa-play"></i> ${candidate.name_candidate} ${candidate.lastname_candidate}`;
         candidatebtn.onclick = () => {
-          startInterview(candidate);
+          startInterview(candidate, info.id_event, key);
         }
         candidatebtn.classList.add('candidatebtn');
           const dropdownContent = document.createElement('div');
@@ -114,7 +114,7 @@ function buildList(info) {
   return Promise.resolve();
 }
 
-function startInterview(candidate) {
+function startInterview(candidate, id_event, participant_name) {
   if (!candidate.start_time_interview) {
     startTime = new Date()
   } else {
@@ -136,7 +136,7 @@ function startInterview(candidate) {
   nextcancelbtn.title = 'Annuler l\'interview';
   nextcancelbtn.classList.add('cancelbtn');
   nextcancelbtn.onclick = () => {
-    cancelInterview(candidate.id_interview);
+    cancelInterview(candidate, id_event, participant_name);
   }
 
   if (!candidate.start_time_interview){
@@ -202,6 +202,41 @@ function NextCandidate(event, id_event, participant_name) {
     popup('danger', 'Une erreur est survenue lors de la récupération des données');
     console.error('Error:', error);
   });
+}
+
+function cancelInterview(candidate, id_event, participant_name) {
+  fetch('{{ url_for('api.start_interview') }}', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ id_interview: candidate.id_interview, start_time: null })
+  })
+  .then(response => {
+    if (!response.ok) {
+      popup('danger', 'Une erreur est survenue lors de la récupération des données');
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(datas => {
+    const display = document.getElementById(`duration-${candidate.id_interview}`);
+    clearInterval(timers[candidate.id_interview]);
+    display.innerHTML = '<i class="fa-duotone fa-regular fa-stopwatch"></i> 00:00';
+    delete timers[candidate.id_interview];
+    const managecandidate = document.querySelector(`#interview-${candidate.id_interview}`);
+    managecandidate.classList.remove('undergoing');
+    const candidatebtn = document.querySelector(`#interview-${candidate.id_interview} .candidatebtn`);
+    candidatebtn.innerHTML = `<i class="fa-regular fa-play"></i> ${candidate.name_candidate} ${candidate.lastname_candidate}`;
+    candidatebtn.onclick = () => {
+      startInterview(candidate, id_event, participant_name);
+    }
+    const nextcancelbtn = document.querySelector(`#interview-${candidate.id_interview} .nextcancelbtn`);
+    nextcancelbtn.innerHTML = '<i class="fa-regular fa-arrow-up-arrow-down"></i>';
+    nextcancelbtn.title = 'Passer au candidat suivant';
+    nextcancelbtn.classList.remove('cancelbtn');
+    nextcancelbtn.onclick = (event) => NextCandidate(event, id_event, participant_name);
+  })
 }
 
 loadData();

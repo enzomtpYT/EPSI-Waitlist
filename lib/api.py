@@ -286,16 +286,18 @@ def get_list(id, forced=False):
     return event, None
 
 def start_interview(data):
-    try:
-        start_time = datetime.datetime.strptime(data.get('start_time'), "%Y-%m-%dT%H:%M:%S.%fZ")
-    except ValueError:
-        return jsonify({"error": "Invalid start_time format"}), 400
+    start_time = None
+    if data.get('start_time') is not None:
+        try:
+            start_time = datetime.datetime.strptime(data.get('start_time'), "%Y-%m-%dT%H:%M:%S.%fZ")
+        except ValueError:
+            return jsonify({"error": "Invalid start_time format"}), 400
     
     id_interview = data.get('id_interview')
     if not id_interview:
         return jsonify({"error": "Missing id_interview parameter"}), 400
     
-    updated_id, error = database.start_interview(id_interview, start_time)
+    updated_id, error = database.editstart_interview(id_interview, start_time)
     
     updatecache()
     

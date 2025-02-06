@@ -1160,7 +1160,7 @@ def get_interview(id_interview):
     finally:
         conn.close()
 
-def start_interview(id_interview, start_time):
+def editstart_interview(id_interview, start_time):
     """
     Démarre un entretien en enregistrant l'heure de début.
 
