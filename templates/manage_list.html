@@ -25,7 +25,11 @@ function loadData() {
         return response.json();
     })
     .then(datas => {
-      buildList(datas);
+      buildList(datas).then(() => {
+        document.querySelectorAll('.undergoing .candidatebtn').forEach((btn) => {
+          btn.click();
+        });
+      });
     })
     .catch(error => {
         popup('danger', 'Une erreur est survenue lors de la récupération des données');
@@ -55,7 +59,9 @@ function buildList(info) {
         managecandidate.classList.add('current');
       }
       managecandidate.id = `interview-${candidate.id_interview}`;
-
+      if (candidate.start_time_interview) {
+        managecandidate.classList.add('undergoing')
+      }
 
       /* Dropdown */
       const dropdown = document.createElement('div');
@@ -63,12 +69,7 @@ function buildList(info) {
         const candidatebtn = document.createElement('button');
         candidatebtn.innerHTML = `<i class="shy fa-regular fa-play"></i> ${candidate.name_candidate} ${candidate.lastname_candidate}`;
         candidatebtn.onclick = () => {
-          startInterview(candidate.id_interview);
-          candidatebtn.innerHTML = `<i class="shy fa-regular fa-stop"></i> ${candidate.name_candidate} ${candidate.lastname_candidate}`;
-          candidatebtn.classList.add('undergoing');
-          candidatebtn.onclick = () => {
-            EndInterview(candidate.id_interview);
-          }
+          startInterview(candidate);
         }
         candidatebtn.classList.add('candidatebtn');
           const dropdownContent = document.createElement('div');
@@ -119,32 +120,46 @@ function buildList(info) {
     participant.appendChild(candidates);
     list.appendChild(participant);
   }
+  return Promise.resolve();
 }
 
-function startInterview(id_interview) {
-  startTime = new Date()
-  startCountdown(id_interview, startTime);
-  fetch('/api/start_interview', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ id_interview: id_interview, start_time: startTime })
-  })
-  .then(response => response.json())
-  .then(data => {
-      if (data.error) {
+function startInterview(candidate) {
+  if (!candidate.start_time_interview) {
+    startTime = new Date()
+  } else {
+    startTime = new Date(Date.parse(candidate.start_time_interview));
+  }
+  startCountdown(candidate.id_interview, startTime);
+  managecandidate = document.querySelector(`#interview-${candidate.id_interview}`)
+  managecandidate.classList.add('undergoing');
+  candidatebtn = document.querySelector(`#interview-${candidate.id_interview} .candidatebtn`);
+  candidatebtn.innerHTML = `<i class="fa-regular fa-stop"></i> ${candidate.name_candidate} ${candidate.lastname_candidate}`;
+  candidatebtn.onclick = () => {
+    EndInterview(candidate.id_interview);
+  }
+  if (!candidate.start_time_interview){
+    fetch('/api/start_interview', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id_interview: candidate.id_interview, start_time: startTime })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+          popup('danger', 'Une erreur est survenue lors de la récupération des données');
+          const display = document.getElementById(`duration-${candidate.id_interview}`);
+          clearInterval(timers[candidate.id_interview]);
+          display.innerHTML = '<i class="fa-duotone fa-regular fa-stopwatch"></i> 00:00';
+          delete timers[candidate.id_interview];
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
         popup('danger', 'Une erreur est survenue lors de la récupération des données');
-        const display = document.getElementById(`duration-${id_interview}`);
-        clearInterval(timers[id_interview]);
-        display.innerHTML = '<i class="fa-duotone fa-regular fa-stopwatch"></i> 00:00';
-        delete timers[id_interview];
-      }
-  })
-  .catch(error => {
-      console.error('Error:', error);
-      popup('danger', 'Une erreur est survenue lors de la récupération des données');
-  });
+    });
+  }
 }
 
 function startCountdown(id_interview, startTime) {
@@ -154,7 +169,7 @@ function startCountdown(id_interview, startTime) {
         let elapsed = new Date(now - startTime);
         let minutes = elapsed.getUTCMinutes();
         let seconds = elapsed.getUTCSeconds();
-        display.innerHTML = `<i class="fa-duotone fa-regular fa-stopwatch"></i> ${minutes < 10 ? '0' : 0}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        display.innerHTML = `<i class="fa-duotone fa-regular fa-stopwatch"></i> ${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     }, 1000);
 }
 

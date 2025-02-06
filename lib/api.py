@@ -285,7 +285,7 @@ def get_list(id, forced=False):
 
 def start_interview(data):
     try:
-        start_time = datetime.strptime(data.get('start_time'), "%Y-%m-%dT%H:%M:%S.%fZ")
+        start_time = datetime.datetime.strptime(data.get('start_time'), "%Y-%m-%dT%H:%M:%S.%fZ")
     except ValueError:
         return jsonify({"error": "Invalid start_time format"}), 400
     
