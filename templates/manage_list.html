@@ -89,15 +89,6 @@ function buildList(info) {
       managecandidate.appendChild(dropdown);
       /* End Dropdown */
 
-      const nextButton = document.createElement('span');
-      nextButton.innerHTML = '<i class="fa-regular fa-arrow-up-arrow-down"></i></i>';
-      nextButton.title = 'Passer au candidat suivant';
-      nextButton.onclick = (event) => NextCandidate(event, info.id_event, key);
-      nextButton.classList.add('nextbtn');
-      nextButton.classList.add('clickable');
-      nextButton.classList.add('shy');
-      managecandidate.appendChild(nextButton);
-
       const duration = document.createElement('span');
       duration.id = `duration-${candidate.id_interview}`;
       duration.classList.add('duration');
@@ -106,14 +97,14 @@ function buildList(info) {
       duration.classList.add('shy');
       managecandidate.appendChild(duration);
 
-      const endInterviewButton = document.createElement('span');
-      endInterviewButton.innerHTML = '<i class="fa-regular fa-stop"></i>';
-      endInterviewButton.title = 'Fin de l\'interview';
-      endInterviewButton.onclick = () => EndInterview(candidate.id_interview);
-      endInterviewButton.classList.add('endbtn');
-      endInterviewButton.classList.add('clickable');
-      endInterviewButton.classList.add('shy');
-      managecandidate.appendChild(endInterviewButton);
+      const nextButton = document.createElement('span');
+      nextButton.innerHTML = '<i class="fa-regular fa-arrow-up-arrow-down"></i></i>';
+      nextButton.title = 'Passer au candidat suivant';
+      nextButton.onclick = (event) => NextCandidate(event, info.id_event, key);
+      nextButton.classList.add('nextcancelbtn');
+      nextButton.classList.add('clickable');
+      nextButton.classList.add('shy');
+      managecandidate.appendChild(nextButton);
 
       candidates.appendChild(managecandidate);
     }
@@ -130,15 +121,26 @@ function startInterview(candidate) {
     startTime = new Date(Date.parse(candidate.start_time_interview));
   }
   startCountdown(candidate.id_interview, startTime);
+
   managecandidate = document.querySelector(`#interview-${candidate.id_interview}`)
   managecandidate.classList.add('undergoing');
+
   candidatebtn = document.querySelector(`#interview-${candidate.id_interview} .candidatebtn`);
   candidatebtn.innerHTML = `<i class="fa-regular fa-stop"></i> ${candidate.name_candidate} ${candidate.lastname_candidate}`;
   candidatebtn.onclick = () => {
     EndInterview(candidate.id_interview);
   }
+
+  nextcancelbtn = document.querySelector(`#interview-${candidate.id_interview} .nextcancelbtn`);
+  nextcancelbtn.innerHTML = '<i class="fa-regular fa-xmark"></i>';
+  nextcancelbtn.title = 'Annuler l\'interview';
+  nextcancelbtn.classList.add('cancelbtn');
+  nextcancelbtn.onclick = () => {
+    cancelInterview(candidate.id_interview);
+  }
+
   if (!candidate.start_time_interview){
-    fetch('/api/start_interview', {
+    fetch('{{ url_for('api.start_interview') }}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

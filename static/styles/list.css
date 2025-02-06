@@ -106,7 +106,7 @@
   background: none;
 }
 
-.current.undergoing .candidatebtn {
+.current.undergoing .candidatebtn, .cancelbtn {
     background-color: #dc3545;
 }
 
