@@ -59,9 +59,9 @@ def skip_candidate():
         event_id = data.get('id_event')
         participant_name = data.get('participant_name')
     if event_id is None:
-        return jsonify({"error": "Missing event_id parameter"}), 400
+        return jsonify({"error": "ID Évenement manquant"}), 400
     if participant_name is None:
-        return jsonify({"error": "Missing participant_name parameter"}), 400
+        return jsonify({"error": "Nom Participant manquant"}), 400
     error = api.skip_candidate(event_id, participant_name)
     if error:
         return jsonify({"error": error}), 400

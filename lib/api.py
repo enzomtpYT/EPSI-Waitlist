@@ -310,6 +310,7 @@ def skip_candidate(event_id, name_participant):
         return "Aucun évenement avec cet id"
     
     event = cache["events"][event_id]
+    event = event.to_dict()
     if event.get("interviews") is None:
         return "Aucun entretien trouvé"
     
