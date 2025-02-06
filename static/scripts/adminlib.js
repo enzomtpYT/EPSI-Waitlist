@@ -30,6 +30,9 @@ function afterLoad() {
     /* Resizer */
 
     var resize = document.querySelector("#resizer");
+    if (!resize) {
+        return;
+    }
     var left = document.querySelector(".sideItemList");
     var container = document.querySelector(".tabmanagment");
     var moveX = left.getBoundingClientRect().width + resize.getBoundingClientRect().width / 2;

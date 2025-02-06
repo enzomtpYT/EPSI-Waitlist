@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from lib import database, api
+import json
 
 event_bp = Blueprint('event', __name__)
 
@@ -20,11 +21,14 @@ def edit_event(id_event):
     if request.method == 'POST':
         name = request.form['name_event']
         date = request.form['date_event']
-        has_timeslots = request.form.get('has_timeslots') == 'on'
         start_time_event = request.form.get('start_time_event') or None
         end_time_event = request.form.get('end_time_event') or None
+        has_timeslots = request.form.get('has_timeslots') == 'on'
+        timeslots = request.form.get('timeslots')
+        if timeslots:
+            timeslots = json.loads(timeslots)
         tags = request.form.getlist('tags')
-        
+
         error = None
 
         if not name:
@@ -35,6 +39,14 @@ def edit_event(id_event):
         if error is None:
             error = database.edit_event(name, date, id_event, has_timeslots, start_time_event, end_time_event)
             if error is None:
+                if has_timeslots:
+                    for key, timeslot in timeslots.items():
+                        start_timeslot = timeslot['start']
+                        end_timeslot = timeslot['end']
+                        error = database.add_timeslot_to_event(id_event, start_timeslot, end_timeslot)
+                    error = 'temp'
+                    if error:
+                        flash(f"Erreur lors de l'ajout des créneaux horaires: {error}", "danger")
                 flash("Événement mis à jour avec succès!", "success")
                 return redirect(url_for('event.edit_event', id_event=id_event))
             else:
@@ -42,6 +54,15 @@ def edit_event(id_event):
                 return redirect(url_for('event.edit_event', id_event=id_event))
 
     return render_template('event.html', event=event, tags=tags, event_tags=event_tags)
+
+@event_bp.route("/admin/manage_event/event/<int:id_event>/delete_timeslot/<int:id_timeslot>", methods=['POST'])
+def delete_timeslot(id_event, id_timeslot):
+    error = database.delete_timeslot(id_timeslot)
+    if error:
+        flash(f"Erreur lors de la suppression du créneau: {error}", "danger")
+    else:
+        flash("Créneau supprimé avec succès!", "success")
+    return redirect(url_for('event.edit_event', id_event=id_event))
 
 @event_bp.route("/admin/manage_event/event/<int:id_event>/add_tag_event", methods=['POST'])
 def add_tag_event(id_event):

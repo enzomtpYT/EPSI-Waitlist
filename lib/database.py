@@ -80,13 +80,13 @@ def get_all_events():
 
 def get_event(event_id):
     """
-    Récupère un événement de la base de données en utilisant son identifiant.
+    Récupère un événement de la base de données en utilisant son identifiant et inclut les créneaux horaires associés.
 
     Args:
         event_id (int): L'identifiant de l'événement.
 
     Returns:
-        dict: Un dictionnaire représentant l'événement.
+        dict: Un dictionnaire représentant l'événement et ses créneaux horaires.
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
     conn = get_db_connection()
@@ -96,6 +96,10 @@ def get_event(event_id):
         cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('SELECT * FROM Event WHERE id_event = %s', (event_id,))
         event = cursor.fetchone()
+        if event:
+            cursor.execute('SELECT * FROM Timeslot WHERE id_event = %s', (event_id,))
+            timeslots = cursor.fetchall()
+            event['timeslots'] = timeslots
         return event, None
     except psycopg2.Error as e:
         print(f"Erreur requête base de données: {e}")
@@ -130,6 +134,59 @@ def edit_event(name, date, id_event, has_timeslots, start_time_event=None, end_t
     finally:
         conn.close()
     return None
+
+def add_timeslot_to_event(id_event, start_timeslot, end_timeslot):
+    """
+    Ajoute des créneaux horaires à un événement.
+
+    Args:
+        id_event (int): L'identifiant de l'événement.
+        start_timeslot (str): L'heure de début du créneau horaire.
+        end_timeslot (str): L'heure de fin du créneau horaire.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        cursor = conn.cursor()
+        cursor.execute('''
+        INSERT INTO Timeslot (id_event, start_timeslot, end_timeslot)
+        VALUES (%s, %s, %s)
+        ''', (id_event, start_timeslot, end_timeslot))
+        conn.commit()
+        return None
+    except psycopg2.Error as e:
+        print(f"Erreur lors de l'ajout des créneaux horaires: {e}")
+        return "Erreur lors de l'ajout des créneaux horaires"
+    finally:
+        conn.close()
+
+def delete_timeslot(id_timeslot):
+    """
+    Supprime un événement de la base de données en utilisant son identifiant.
+
+    Args:
+        id_timeslot (int): L'identifiant de l'événement.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM Timeslot WHERE id_timeslot = %s", (id_timeslot,))
+        conn.commit()
+        return None
+    except psycopg2.Error as e:
+        print(f"Erreur lors de la suppression de l'événement: {e}")
+        return "Erreur lors de la suppression de l'événement"
+    finally:
+        conn.close()
 
 def delete_event(id_event):
     """

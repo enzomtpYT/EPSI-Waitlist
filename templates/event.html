@@ -15,21 +15,24 @@
             <label for="date_event">Date :</label>
             <input type="date" id="date_event" name="date_event" value="{{ event.date_event }}">
 
-            <label>A crénaux horaires?</label>
-            <input {% if event.has_timeslots %}checked{% endif %} onchange="enableschedules()" id="has_timeslots" class="enabletimeslots" type="checkbox" name="has_timeslots">
+            <label for="start_time_event">Heure de début :</label>
+            <input value="{{ event.start_time_event }}" type="time" id="start_time_event" name="start_time_event">
 
-            <div class="schedules">
-                <div>
-                    <label for="start_time">Heure de début :</label>
-                    <input value="{{ event.start_time_event }}" type="time" id="start_time_event" name="start_time_event">
+            <label for="end_time_event">Heure de fin :</label>
+            <input value="{{ event.end_time_event }}" type="time" id="end_time_event" name="end_time_event">
+
+            <label>A crénaux horaires ?</label>
+            <input {% if event.has_timeslots %}checked{% endif %} onclick="toggleTimeslots()" id="has_timeslots" class="enabletimeslots" type="checkbox" name="has_timeslots">
+
+            <div id="timeslot-section" class="schedules">
+                <h3>Créneaux</h3>
+                <div id="timeslot-container">
                 </div>
-                <div>
-                    <label for="end_time">Heure de fin :</label>
-                    <input value="{{ event.end_time_event }}" type="time" id="end_time_event" name="end_time_event">
-                </div>
+                <button type="button" onclick="addTimeslot()">Ajouter un créneau</button>
             </div>
 
-            <button type="submit">Enregistrer</button>
+            <input type="hidden" name="timeslots" id="timeslots" value="">
+            <button onclick="addts()" type="submit">Enregistrer</button>
 
         </form>
     </div>
@@ -102,6 +105,13 @@
 </div>
 
 <script>
+let timeslots = {};
+tid = 0;
+
+function addts(){
+    document.getElementById('timeslots').value = JSON.stringify(timeslots);
+}
+
 function enableschedules() {
     var enabletimeslots = document.getElementById('has_timeslots');
     var schedules = document.querySelector('.schedules');
@@ -115,6 +125,68 @@ function enableschedules() {
 document.addEventListener('DOMContentLoaded', function() {
     enableschedules();
 });
+
+function addTimeslot(start=null, end=null, tempid=tid) {
+    timeslots[tempid] = {};
+    const timeslotContainer = document.getElementById('timeslot-container');
+    const timeslotDiv = document.createElement('div');
+    timeslotDiv.classList.add('timeslot'+tempid);
+
+    const startInput = document.createElement('input');
+    startInput.value = start;
+    startInput.type = 'time';
+    startInput.id = 'start_timeslot';
+    startInput.placeholder = 'Start Time';
+    startInput.onchange = () => {
+        const endInput = timeslotDiv.querySelector('#end_timeslot');
+        if (endInput.value === '' || endInput.value < startInput.value) {
+            endInput.value = startInput.value;
+        }
+        timeslots[tempid] = {start: startInput.value, end: endInput.value};
+    };
+
+    const endInput = document.createElement('input');
+    endInput.value = end;
+    endInput.type = 'time';
+    endInput.id = 'end_timeslot';
+    endInput.placeholder = 'End Time';
+    endInput.onchange = () => {
+        const startInput = timeslotDiv.querySelector('#start_timeslot');
+        if (startInput.value === '' || endInput.value < startInput.value) {
+            startInput.value = endInput.value;
+        }
+        timeslots[tempid] = {start: startInput.value, end: endInput.value};
+    };
+
+    const removeButton = document.createElement('button');
+    removeButton.type = 'button';
+    removeButton.textContent = 'Supprimer';
+    removeButton.classList.add('delete');
+    removeButton.onclick = () => {
+        delete timeslots[tempid];
+        timeslotDiv.remove()
+    };
+
+    timeslotDiv.appendChild(startInput);
+    timeslotDiv.appendChild(endInput);
+    timeslotDiv.appendChild(removeButton);
+
+    timeslotContainer.appendChild(timeslotDiv);
+    tid++;
+}
+
+function toggleTimeslots() {
+    const timeslotSection = document.getElementById('timeslot-section');
+    timeslotSection.style.display = document.getElementById('has_timeslots').checked ? 'block' : 'none';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    toggleTimeslots();
+});
+
+{% for timeslot in event.timeslots %}
+addTimeslot('{{ timeslot.start_timeslot }}', '{{ timeslot.end_timeslot }}');
+{% endfor %}
 </script>
 
 {% endblock %}
