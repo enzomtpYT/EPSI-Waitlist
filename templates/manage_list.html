@@ -128,7 +128,7 @@ function startInterview(candidate, id_event, participant_name) {
   candidatebtn = document.querySelector(`#interview-${candidate.id_interview} .candidatebtn`);
   candidatebtn.innerHTML = `<i class="fa-regular fa-stop"></i> ${candidate.name_candidate} ${candidate.lastname_candidate}`;
   candidatebtn.onclick = () => {
-    EndInterview(candidate.id_interview);
+    EndInterview(candidate.id_interview, participant_name);
   }
 
   nextcancelbtn = document.querySelector(`#interview-${candidate.id_interview} .nextcancelbtn`);
@@ -237,6 +237,35 @@ function cancelInterview(candidate, id_event, participant_name) {
     nextcancelbtn.classList.remove('cancelbtn');
     nextcancelbtn.onclick = (event) => NextCandidate(event, id_event, participant_name);
   })
+}
+
+function EndInterview(id_interview, participant_name) {
+  fetch('{{ url_for('api.end_interview') }}', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ id_interview: id_interview })
+  })
+  .then(response => {
+    if (!response.ok) {
+      popup('danger', 'Une erreur est survenue lors de la récupération des données');
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(datas => {
+    clearInterval(timers[id_interview]);
+    delete timers[id_interview];
+    const managecandidate = document.querySelector(`#interview-${id_interview}`);
+    managecandidate.remove();
+    const participantcolumn = document.querySelector(`#participant-${participant_name} .candidates`);
+    participantcolumn.firstChild.classList.add('current');
+  })
+  .catch(error => {
+    popup('danger', 'Une erreur est survenue lors de la récupération des données');
+    console.error('Error:', error);
+  });
 }
 
 loadData();
