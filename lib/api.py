@@ -232,23 +232,31 @@ def get_employees():
 
     return employees_return, None
 
-def updatecache(id=None):
-    ids = [id] if id is not None else cache["events"].keys()
-    for id in ids:
-        cached = cache["events"].get(str(id))
-        cached = cached.to_dict()
-        list, error = get_list(id, forced=True)
-        if not error:
-            if list != cached:
-                print(f"Cache for event {id} is outdated, updating")
-                cache["events"][str(id)] = list
+def updatecache_event(id):
+    cached = cache["events"].get(str(id))
+    cached = cached.to_dict()
+    list, error = get_list(id, forced=True)
+    if not error:
+        if list != cached:
+            print(f"Cache for event {id} is outdated, updating")
+            cache["events"][str(id)] = list
+        else:
+            print(f"Cache for event {id} is up to date")
+
+def updatecache_all(id=None, type=None):
+    types = [type] if type is not None else cache.keys()
+    for type in types:
+        ids = [id] if id is not None else cache[type].keys()
+        for id in ids:
+            if type == "events":
+                threading.Thread(target=updatecache_event, args=(id,)).start()
             else:
-                print(f"Cache for event {id} is up to date")
+                print("Unknown type")
 
 def get_list(id, forced=False):
     cached = cache["events"].get(str(id))
     if cached is not None and not forced:
-        threading.Thread(target=updatecache, args=(id,)).start()
+        updatecache_all(id, "events")
         return cached.to_dict(), None
     event, error = database.get_event(id)
     event = dict(event)
@@ -299,7 +307,7 @@ def start_interview(data):
     
     updated_id, error = database.editstart_interview(id_interview, start_time)
     
-    updatecache()
+    updatecache_all(data.get('id_event'), "events")
     
     if error:
         return jsonify({"error": error}), 400

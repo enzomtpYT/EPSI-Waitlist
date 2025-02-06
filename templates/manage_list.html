@@ -145,7 +145,7 @@ function startInterview(candidate, id_event, participant_name) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ id_interview: candidate.id_interview, start_time: startTime })
+        body: JSON.stringify({ id_interview: candidate.id_interview, start_time: startTime, id_event: id_event })
     })
     .then(response => response.json())
     .then(data => {
@@ -210,7 +210,7 @@ function cancelInterview(candidate, id_event, participant_name) {
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ id_interview: candidate.id_interview, start_time: null })
+    body: JSON.stringify({ id_interview: candidate.id_interview, start_time: null, id_event: id_event })
   })
   .then(response => {
     if (!response.ok) {
