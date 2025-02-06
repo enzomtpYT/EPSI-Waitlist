@@ -1,10 +1,65 @@
 from lib import database, auth
-from flask import request, jsonify
-import datetime, random
+from flask import jsonify
+import datetime, random, threading
+from collections.abc import MutableMapping
 
-cache = {
-    "events": {},
-}
+class CacheManager(MutableMapping):
+    def __init__(self):
+        self.cache = { "events": {} }
+
+    def __getitem__(self, key):
+        value = self.cache[key]
+        # print(f"Read from cache: {key} -> {value}")
+        if isinstance(value, dict):
+            value = CacheProxy(self, key, value)
+        return value
+
+    def __setitem__(self, key, value):
+        self.cache[key] = value
+        # print(f"Written to cache: {key} -> {value}")
+
+    def __delitem__(self, key):
+        del self.cache[key]
+
+    def __iter__(self):
+        return iter(self.cache)
+
+    def __len__(self):
+        return len(self.cache)
+
+class CacheProxy(MutableMapping):
+    def __init__(self, manager, parent_key, proxied_dict):
+        self.manager = manager
+        self.parent_key = parent_key
+        self.proxied_dict = proxied_dict
+
+    def __getitem__(self, key):
+        value = self.proxied_dict[key]
+        # print(f"Read from cache: {key} -> {value}")
+        if isinstance(value, dict):
+            value = CacheProxy(self.manager, self.parent_key, self.proxied_dict)
+        return value
+
+    def __setitem__(self, key, value):
+        self.proxied_dict[key] = value
+        self.manager[self.parent_key] = self.proxied_dict
+        # print(f"Written to cache: {key} -> {value}")
+
+    def __delitem__(self, key):
+        del self.proxied_dict[key]
+        self.manager[self.parent_key] = self.proxied_dict
+
+    def __iter__(self):
+        return iter(self.proxied_dict)
+
+    def __len__(self):
+        return len(self.proxied_dict)
+
+    def to_dict(self):
+        for k, v in self.proxied_dict.items():
+            return v.to_dict() if isinstance(v, CacheProxy) else v
+
+cache = CacheManager()
 
 def weighted_shuffle(arr, weights):
     """
@@ -177,11 +232,22 @@ def get_employees():
 
     return employees_return, None
 
-def get_list(id=None):
-    if cache["events"].get(str(id)) is not None:
-        print("Cache hit")
-        return cache["events"][str(id)], None
-    print("Cache miss")
+def updatecache(id):
+    cached = cache["events"].get(str(id))
+    cached = cached.to_dict()
+    list, error = get_list(id, forced=True)
+    if not error:
+        if list != cached:
+            print(f"Cache for event {id} is outdated, updating")
+            cache["events"][str(id)] = list
+        else:
+            print(f"Cache for event {id} is up to date")
+
+def get_list(id, forced=False):
+    cached = cache["events"].get(str(id))
+    if cached is not None and not forced:
+        threading.Thread(target=updatecache, args=(id,)).start()
+        return cached.to_dict(), None
     event, error = database.get_event(id)
     event = dict(event)
     if error:
@@ -195,12 +261,42 @@ def get_list(id=None):
             order = []
             candidates, error = database.get_event_interview_candidate(id, participant['id_participant'])
             for candidate in candidates:
-                order.append(dict(candidate))
-            weights = [candidate["priority"] for candidate in order]
-            interviews[participant['name_participant']] = weighted_shuffle(order, weights)
-    event["interviews"] = interviews
-    cache["events"][str(id)] = event
+                cand = dict(candidate)
+                if cached is not None:
+                    ccached = cached.to_dict()
+                    for cached_candidate in ccached["interviews"][participant['name_participant']]:
+                        if cached_candidate['id_candidate'] == candidate['id_candidate']:
+                            position = cached_candidate['position']
+                            cand['position'] = position
+                            if len(order) <= position:
+                                order.extend([None] * (position + 1 - len(order)))
+                            order[position] = cand
+                else:
+                    order.append(cand)
+                    weights = [candidate["priority"] for candidate in order]
+                    order = weighted_shuffle(order, weights)
+                    for candidate in order:
+                        candidate['position'] = order.index(candidate)
+            interviews[participant['name_participant']] = order
+        event["interviews"] = interviews
+    if not forced:
+        cache["events"][str(id)] = event
     return event, None
+
+def start_interview(data):
+    try:
+        start_time = datetime.strptime(data.get('start_time'), "%Y-%m-%dT%H:%M:%S.%fZ")
+    except ValueError:
+        return jsonify({"error": "Invalid start_time format"}), 400
+    
+    id_interview = data.get('id_interview')
+    if not id_interview:
+        return jsonify({"error": "Missing id_interview parameter"}), 400
+    
+    updated_id, error = database.start_interview(id_interview, start_time)
+    
+    if error:
+        return jsonify({"error": error}), 400
 
 def skip_candidate(event_id, name_participant):
     """" Skip le candidat actuel et le met en 2 ème position dans le cache """
