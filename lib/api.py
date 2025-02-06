@@ -61,6 +61,27 @@ class CacheProxy(MutableMapping):
 
 cache = CacheManager()
 
+def updatecache_event(id):
+    cached = cache["events"].get(str(id))
+    cached = cached.to_dict()
+    list, error = get_list(id, forced=True)
+    if not error:
+        if list != cached:
+            print(f"Cache for event {id} is outdated, updating")
+            cache["events"][str(id)] = list
+        else:
+            print(f"Cache for event {id} is up to date")
+
+def updatecache_all(id=None, type=None):
+    types = [type] if type is not None else cache.keys()
+    for type in types:
+        ids = [id] if id is not None else cache[type].keys()
+        for id in ids:
+            if type == "events":
+                threading.Thread(target=updatecache_event, args=(id,)).start()
+            else:
+                print("Unknown type")
+
 def weighted_shuffle(arr, weights):
     """
     Mélange un tableau en utilisant des poids.
@@ -231,27 +252,6 @@ def get_employees():
         employees_return.append(employee_dict)
 
     return employees_return, None
-
-def updatecache_event(id):
-    cached = cache["events"].get(str(id))
-    cached = cached.to_dict()
-    list, error = get_list(id, forced=True)
-    if not error:
-        if list != cached:
-            print(f"Cache for event {id} is outdated, updating")
-            cache["events"][str(id)] = list
-        else:
-            print(f"Cache for event {id} is up to date")
-
-def updatecache_all(id=None, type=None):
-    types = [type] if type is not None else cache.keys()
-    for type in types:
-        ids = [id] if id is not None else cache[type].keys()
-        for id in ids:
-            if type == "events":
-                threading.Thread(target=updatecache_event, args=(id,)).start()
-            else:
-                print("Unknown type")
 
 def get_list(id, forced=False):
     cached = cache["events"].get(str(id))
