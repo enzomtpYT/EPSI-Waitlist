@@ -106,7 +106,11 @@
   background: none;
 }
 
-.dropdown-content .dropdown-item:hover {
+.current .candidatebtn.undergoing {
+    background-color: #dc3545;
+}
+
+.dropdown-content .dropdown-item:hover, .current .candidatebtn.undergoing:hover {
   background-color: #c82333;
 }
 

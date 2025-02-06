@@ -7,6 +7,8 @@
 <h1 id="eventname" class="title"></h1>
 <div class="listcontainer"></div>
 <script>
+let timers = {};
+
 function loadData() {
     fetch('{{ url_for('api.get_list') }}', {
         method: 'POST',
@@ -60,7 +62,14 @@ function buildList(info) {
       dropdown.classList.add('dropdown');
         const candidatebtn = document.createElement('button');
         candidatebtn.innerHTML = `<i class="shy fa-regular fa-play"></i> ${candidate.name_candidate} ${candidate.lastname_candidate}`;
-        candidatebtn.onclick = () => startInterview(candidate.id_interview);
+        candidatebtn.onclick = () => {
+          startInterview(candidate.id_interview);
+          candidatebtn.innerHTML = `<i class="shy fa-regular fa-stop"></i> ${candidate.name_candidate} ${candidate.lastname_candidate}`;
+          candidatebtn.classList.add('undergoing');
+          candidatebtn.onclick = () => {
+            EndInterview(candidate.id_interview);
+          }
+        }
         candidatebtn.classList.add('candidatebtn');
           const dropdownContent = document.createElement('div');
           dropdownContent.classList.add('dropdown-content');
@@ -99,7 +108,7 @@ function buildList(info) {
       const endInterviewButton = document.createElement('span');
       endInterviewButton.innerHTML = '<i class="fa-regular fa-stop"></i>';
       endInterviewButton.title = 'Fin de l\'interview';
-      endInterviewButton.onclick = (event) => EndInterview(event, candidate.id_interview);
+      endInterviewButton.onclick = () => EndInterview(candidate.id_interview);
       endInterviewButton.classList.add('endbtn');
       endInterviewButton.classList.add('clickable');
       endInterviewButton.classList.add('shy');
@@ -112,37 +121,40 @@ function buildList(info) {
   }
 }
 
-let timers = {};
 function startInterview(id_interview) {
-    fetch('/api/start_interview', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ id_interview: id_interview })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            alert(data.error);
-        } else {
-            startCountdown(id_interview);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while starting the interview.');
-    });
+  startTime = new Date()
+  startCountdown(id_interview, startTime);
+  fetch('/api/start_interview', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ id_interview: id_interview, start_time: startTime })
+  })
+  .then(response => response.json())
+  .then(data => {
+      if (data.error) {
+        popup('danger', 'Une erreur est survenue lors de la récupération des données');
+        const display = document.getElementById(`duration-${id_interview}`);
+        clearInterval(timers[id_interview]);
+        display.innerHTML = '<i class="fa-duotone fa-regular fa-stopwatch"></i> 00:00';
+        delete timers[id_interview];
+      }
+  })
+  .catch(error => {
+      console.error('Error:', error);
+      popup('danger', 'Une erreur est survenue lors de la récupération des données');
+  });
 }
-function startCountdown(id_interview) {
+
+function startCountdown(id_interview, startTime) {
     const display = document.getElementById(`duration-${id_interview}`);
-    let startTime = new Date();
     timers[id_interview] = setInterval(() => {
         let now = new Date();
         let elapsed = new Date(now - startTime);
         let minutes = elapsed.getUTCMinutes();
         let seconds = elapsed.getUTCSeconds();
-        display.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        display.innerHTML = `<i class="fa-duotone fa-regular fa-stopwatch"></i> ${minutes < 10 ? '0' : 0}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     }, 1000);
 }
 
