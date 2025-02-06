@@ -274,8 +274,8 @@ def get_list(id, forced=False):
                 cand = dict(candidate)
                 if cached is not None:
                     ccached = cached.to_dict()
-                    for cached_candidate in ccached["interviews"][participant['name_participant']]:
-                        if cached_candidate['id_candidate'] == candidate['id_candidate']:
+                    for cached_candidate in ccached["interviews"].get(participant['name_participant']):
+                        if cached_candidate is not None and cached_candidate['id_candidate'] == candidate['id_candidate']:
                             position = cached_candidate['position']
                             cand['position'] = position
                             if len(order) <= position:
@@ -311,6 +311,14 @@ def start_interview(data):
     
     if error:
         return jsonify({"error": error}), 400
+
+def end_interview(data):
+    if data.get('id_interview') is not None:
+        interview_id = data.get('id_interview')
+        error = database.end_interview(interview_id, status=True)
+        if error:
+            return jsonify({"error": error}), 400
+        updatecache_all(data.get('id_event'), "events")        
 
 def skip_candidate(event_id, name_participant):
     """" Skip le candidat actuel et le met en 2 ème position dans le cache """
