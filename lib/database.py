@@ -135,7 +135,7 @@ def edit_event(name, date, id_event, has_timeslots, start_time_event=None, end_t
         conn.close()
     return None
 
-def add_timeslot_to_event(id_event, start_timeslot, end_timeslot):
+def add_timeslot_to_event(id_event, start_timeslot, end_timeslot, nbr_spots):
     """
     Ajoute des créneaux horaires à un événement.
 
@@ -143,6 +143,7 @@ def add_timeslot_to_event(id_event, start_timeslot, end_timeslot):
         id_event (int): L'identifiant de l'événement.
         start_timeslot (str): L'heure de début du créneau horaire.
         end_timeslot (str): L'heure de fin du créneau horaire.
+        nbr_spots (int): Le nombre de places disponibles.
 
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
@@ -153,11 +154,48 @@ def add_timeslot_to_event(id_event, start_timeslot, end_timeslot):
     try:
         cursor = conn.cursor()
         cursor.execute('''
-        INSERT INTO Timeslot (id_event, start_timeslot, end_timeslot)
-        VALUES (%s, %s, %s)
-        ''', (id_event, start_timeslot, end_timeslot))
+        INSERT INTO Timeslot (id_event, start_timeslot, end_timeslot, nbr_spots_timeslot)
+        VALUES (%s, %s, %s, %s)
+        ''', (id_event, start_timeslot, end_timeslot, nbr_spots))
         conn.commit()
         return None
+    except psycopg2.Error as e:
+        print(f"Erreur lors de l'ajout des créneaux horaires: {e}")
+        return "Erreur lors de l'ajout des créneaux horaires"
+    finally:
+        conn.close()
+
+def edit_timeslot(id_event, start_timeslot, end_timeslot, nbr_spots, id_timeslot):
+    """
+    Modifie le créneau horaires d'un événement.
+
+    Args:
+        id_event (int): L'identifiant de l'événement.
+        start_timeslot (str): L'heure de début du créneau horaire.
+        end_timeslot (str): L'heure de fin du créneau horaire.
+        nbr_spots (int): Le nombre de places disponibles.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        cursor = conn.cursor()
+        if id_timeslot != '':
+            cursor.execute('''
+            UPDATE Timeslot SET id_event = %s, start_timeslot = %s, end_timeslot = %s, nbr_spots_timeslot = %s WHERE id_timeslot = %s)
+            ''', (start_timeslot, end_timeslot, nbr_spots, id_timeslot))
+            conn.commit()
+            return None
+        else:
+            cursor.execute('''
+            INSERT INTO Timeslot (id_event, start_timeslot, end_timeslot, nbr_spots_timeslot)
+            VALUES (%s, %s, %s, %s)
+            ''', (id_event, start_timeslot, end_timeslot, nbr_spots))
+            conn.commit()
+            return None
     except psycopg2.Error as e:
         print(f"Erreur lors de l'ajout des créneaux horaires: {e}")
         return "Erreur lors de l'ajout des créneaux horaires"
