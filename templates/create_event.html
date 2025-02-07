@@ -92,7 +92,7 @@ function addTimeslot(start=null, end=null, spots=null, tsid=null) {
 
     const startLabel = document.createElement('label');
     startLabel.textContent = 'Heure de début :';
-    startLabel.htmlFor = 'start_timeslot';
+    startLabel.htmlFor = `start_timeslot_${JSid}`;
 
     const startInput = document.createElement('input');
     startInput.value = start;
@@ -109,7 +109,7 @@ function addTimeslot(start=null, end=null, spots=null, tsid=null) {
 
     const endLabel = document.createElement('label');
     endLabel.textContent = 'Heure de fin :';
-    endLabel.htmlFor = 'end_timeslot';
+    endLabel.htmlFor = `end_timeslot_${JSid}`;
 
     const endInput = document.createElement('input');
     endInput.value = end;
@@ -126,7 +126,7 @@ function addTimeslot(start=null, end=null, spots=null, tsid=null) {
 
     const spotsLabel = document.createElement('label');
     spotsLabel.textContent = 'Nombre de places :';
-    spotsLabel.htmlFor = 'spots_timeslot';
+    spotsLabel.htmlFor = `spots_timeslot_${JSid}`;
 
     const spotsInput = document.createElement('input');
     spotsInput.value = spots;
