@@ -21,7 +21,7 @@
             <label for="end_time_event">Heure de fin :</label>
             <input value="{{ event.end_time_event }}" type="time" id="end_time_event" name="end_time_event">
 
-            <label>A crénaux horaires ?</label>
+            <label for="has_timeslots">A crénaux horaires ?</label>
             <input {% if event.has_timeslots %}checked{% endif %} onclick="toggleTimeslots()" id="has_timeslots" class="enabletimeslots" type="checkbox" name="has_timeslots">
 
             <div id="timeslot-section" class="schedules">
@@ -109,10 +109,17 @@ let timeslots = {};
 tid = 0;
 
 function addts(){
+    document.querySelectorAll('#timeslot-container > *').forEach((timeslotDiv) => {
+        tempid = timeslotDiv.firstElementChild.id.split('_')[2];
+        const startInput = timeslotDiv.querySelector(`#start_timeslot_${tempid}`);
+        const endInput = timeslotDiv.querySelector(`#end_timeslot_${tempid}`);
+        const spotsInput = timeslotDiv.querySelector(`#spots_timeslot_${tempid}`);
+        timeslots[tempid] = {start: startInput.value, end: endInput.value, spots: spotsInput.value, id: tempid};
+    });
     document.getElementById('timeslots').value = JSON.stringify(timeslots);
 }
 
-function enableschedules() {
+{# function enableschedules() {
     var enabletimeslots = document.getElementById('has_timeslots');
     var schedules = document.querySelector('.schedules');
     if (enabletimeslots.checked) {
@@ -124,38 +131,70 @@ function enableschedules() {
 
 document.addEventListener('DOMContentLoaded', function() {
     enableschedules();
-});
+}); #}
 
-function addTimeslot(start=null, end=null, tempid=tid) {
+function addTimeslot(start=null, end=null, spots=null, tempid=tid, id=null) {
     timeslots[tempid] = {};
     const timeslotContainer = document.getElementById('timeslot-container');
     const timeslotDiv = document.createElement('div');
     timeslotDiv.classList.add('timeslot'+tempid);
 
+    const idInput = document.createElement('input');
+    if (id) {
+        idInput.value = parseInt(id, 10);
+    }
+    else {
+        idInput.value = '';
+    }
+    idInput.type = 'hidden';
+    idInput.id = `id_timeslot_${tempid}`;
+    timeslotDiv.appendChild(idInput);
+
+    const startLabel = document.createElement('label');
+    startLabel.textContent = 'Heure de début :';
+    startLabel.htmlFor = 'start_timeslot';
+
     const startInput = document.createElement('input');
     startInput.value = start;
     startInput.type = 'time';
-    startInput.id = 'start_timeslot';
-    startInput.placeholder = 'Start Time';
+    startInput.id = `start_timeslot_${tempid}`;
+    startInput.placeholder = 'Début';
     startInput.onchange = () => {
         const endInput = timeslotDiv.querySelector('#end_timeslot');
         if (endInput.value === '' || endInput.value < startInput.value) {
             endInput.value = startInput.value;
         }
-        timeslots[tempid] = {start: startInput.value, end: endInput.value};
+        timeslots[tempid] = {start: startInput.value, end: endInput.value, spots: spotsInput.value, id: idInput.value};
     };
+
+    const endLabel = document.createElement('label');
+    endLabel.textContent = 'Heure de fin :';
+    endLabel.htmlFor = 'end_timeslot';
 
     const endInput = document.createElement('input');
     endInput.value = end;
     endInput.type = 'time';
-    endInput.id = 'end_timeslot';
-    endInput.placeholder = 'End Time';
+    endInput.id = `end_timeslot_${tempid}`;
+    endInput.placeholder = 'Fin';
     endInput.onchange = () => {
         const startInput = timeslotDiv.querySelector('#start_timeslot');
         if (startInput.value === '' || endInput.value < startInput.value) {
             startInput.value = endInput.value;
         }
-        timeslots[tempid] = {start: startInput.value, end: endInput.value};
+        timeslots[tempid] = {start: startInput.value, end: endInput.value, spots: spotsInput.value, id: idInput.value};
+    };
+
+    const spotsLabel = document.createElement('label');
+    spotsLabel.textContent = 'Nombre de places :';
+    spotsLabel.htmlFor = 'spots_timeslot';
+
+    const spotsInput = document.createElement('input');
+    spotsInput.value = spots;
+    spotsInput.type = 'number';
+    spotsInput.id = `spots_timeslot_${tempid}`;
+    spotsInput.onchange = () => {
+        const spotsInput = timeslotDiv.querySelector('#spots_timeslot');
+        timeslots[tempid] = {start: startInput.value, end: endInput.value, spots: spotsInput.value, id: idInput.value};
     };
 
     const removeButton = document.createElement('button');
@@ -167,8 +206,12 @@ function addTimeslot(start=null, end=null, tempid=tid) {
         timeslotDiv.remove()
     };
 
+    timeslotDiv.appendChild(startLabel);
     timeslotDiv.appendChild(startInput);
+    timeslotDiv.appendChild(endLabel);
     timeslotDiv.appendChild(endInput);
+    timeslotDiv.appendChild(spotsLabel);
+    timeslotDiv.appendChild(spotsInput);
     timeslotDiv.appendChild(removeButton);
 
     timeslotContainer.appendChild(timeslotDiv);
@@ -182,10 +225,11 @@ function toggleTimeslots() {
 
 document.addEventListener('DOMContentLoaded', function() {
     toggleTimeslots();
+    addts();
 });
 
 {% for timeslot in event.timeslots %}
-addTimeslot('{{ timeslot.start_timeslot }}', '{{ timeslot.end_timeslot }}');
+addTimeslot('{{ timeslot.start_timeslot }}', '{{ timeslot.end_timeslot }}', '{{ timeslot.nbr_spots_timeslot }}', '{{ timeslot.id_timeslot }}');
 {% endfor %}
 </script>
 
