@@ -25,10 +25,8 @@ def edit_event(id_event):
         end_time_event = request.form.get('end_time_event') or None
         has_timeslots = request.form.get('has_timeslots') == 'on'
         timeslots = request.form.get('timeslots')
-        print(f"Raw timeslots: {timeslots}")
         if timeslots:
             timeslots = json.loads(timeslots)
-            print(f"Parsed timeslots: {timeslots}")
         tags = request.form.getlist('tags')
 
         error = None
@@ -51,7 +49,8 @@ def edit_event(id_event):
                             error = database.add_timeslot_to_event(id_event, start_timeslot, end_timeslot, nbr_spots)
                         elif start_timeslot and end_timeslot and nbr_spots and id_timeslot:
                             error = database.edit_timeslot(start_timeslot, end_timeslot, nbr_spots, id_timeslot)
-                    error = 'temp'
+                        else:
+                            error = "Les champs des créneaux horaires ne sont pas correctement remplis."
                     if error:
                         flash(f"Erreur lors de l'ajout des créneaux horaires: {error}", "danger")
                 flash("Événement mis à jour avec succès!", "success")

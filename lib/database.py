@@ -184,7 +184,7 @@ def edit_timeslot(start_timeslot, end_timeslot, nbr_spots, id_timeslot):
     try:
         cursor = conn.cursor()
         cursor.execute('''
-        UPDATE Timeslot SET start_timeslot = %s, end_timeslot = %s, nbr_spots_timeslot = %s WHERE id_timeslot = %s)
+        UPDATE Timeslot SET start_timeslot = %s, end_timeslot = %s, nbr_spots_timeslot = %s WHERE id_timeslot = %s
         ''', (start_timeslot, end_timeslot, nbr_spots, id_timeslot))
         conn.commit()
         return None

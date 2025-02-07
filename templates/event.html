@@ -106,15 +106,16 @@
 
 <script>
 let timeslots = {};
-tid = 0;
+let JSid = 0;
 
 function addts(){
     document.querySelectorAll('#timeslot-container > *').forEach((timeslotDiv) => {
-        tempid = timeslotDiv.firstElementChild.id.split('_')[2];
+        const tempid = timeslotDiv.firstElementChild.id.split('_')[2];
+        const tsid = timeslotDiv.querySelector(`#id_timeslot_${tempid}`).value;
         const startInput = timeslotDiv.querySelector(`#start_timeslot_${tempid}`);
         const endInput = timeslotDiv.querySelector(`#end_timeslot_${tempid}`);
         const spotsInput = timeslotDiv.querySelector(`#spots_timeslot_${tempid}`);
-        timeslots[tempid] = {start: startInput.value, end: endInput.value, spots: spotsInput.value, id: tempid};
+        timeslots[tempid] = {start: startInput.value, end: endInput.value, spots: spotsInput.value, id: tsid};
     });
     document.getElementById('timeslots').value = JSON.stringify(timeslots);
 }
@@ -133,21 +134,16 @@ document.addEventListener('DOMContentLoaded', function() {
     enableschedules();
 }); #}
 
-function addTimeslot(start=null, end=null, spots=null, tempid=tid, id=null) {
-    timeslots[tempid] = {};
+function addTimeslot(start=null, end=null, spots=null, tsid=null) {
+    timeslots[JSid] = {};
     const timeslotContainer = document.getElementById('timeslot-container');
     const timeslotDiv = document.createElement('div');
-    timeslotDiv.classList.add('timeslot'+tempid);
+    timeslotDiv.classList.add('timeslot'+JSid);
 
     const idInput = document.createElement('input');
-    if (id) {
-        idInput.value = parseInt(id, 10);
-    }
-    else {
-        idInput.value = '';
-    }
+    idInput.value = tsid ? tsid : '';
     idInput.type = 'hidden';
-    idInput.id = `id_timeslot_${tempid}`;
+    idInput.id = `id_timeslot_${JSid}`;
     timeslotDiv.appendChild(idInput);
 
     const startLabel = document.createElement('label');
@@ -157,14 +153,14 @@ function addTimeslot(start=null, end=null, spots=null, tempid=tid, id=null) {
     const startInput = document.createElement('input');
     startInput.value = start;
     startInput.type = 'time';
-    startInput.id = `start_timeslot_${tempid}`;
+    startInput.id = `start_timeslot_${JSid}`;
     startInput.placeholder = 'Début';
     startInput.onchange = () => {
         const endInput = timeslotDiv.querySelector('#end_timeslot');
         if (endInput.value === '' || endInput.value < startInput.value) {
             endInput.value = startInput.value;
         }
-        timeslots[tempid] = {start: startInput.value, end: endInput.value, spots: spotsInput.value, id: idInput.value};
+        timeslots[JSid] = {start: startInput.value, end: endInput.value, spots: spotsInput.value, id: idInput.value};
     };
 
     const endLabel = document.createElement('label');
@@ -174,14 +170,14 @@ function addTimeslot(start=null, end=null, spots=null, tempid=tid, id=null) {
     const endInput = document.createElement('input');
     endInput.value = end;
     endInput.type = 'time';
-    endInput.id = `end_timeslot_${tempid}`;
+    endInput.id = `end_timeslot_${JSid}`;
     endInput.placeholder = 'Fin';
     endInput.onchange = () => {
         const startInput = timeslotDiv.querySelector('#start_timeslot');
         if (startInput.value === '' || endInput.value < startInput.value) {
             startInput.value = endInput.value;
         }
-        timeslots[tempid] = {start: startInput.value, end: endInput.value, spots: spotsInput.value, id: idInput.value};
+        timeslots[JSid] = {start: startInput.value, end: endInput.value, spots: spotsInput.value, id: idInput.value};
     };
 
     const spotsLabel = document.createElement('label');
@@ -191,10 +187,10 @@ function addTimeslot(start=null, end=null, spots=null, tempid=tid, id=null) {
     const spotsInput = document.createElement('input');
     spotsInput.value = spots;
     spotsInput.type = 'number';
-    spotsInput.id = `spots_timeslot_${tempid}`;
+    spotsInput.id = `spots_timeslot_${JSid}`;
     spotsInput.onchange = () => {
         const spotsInput = timeslotDiv.querySelector('#spots_timeslot');
-        timeslots[tempid] = {start: startInput.value, end: endInput.value, spots: spotsInput.value, id: idInput.value};
+        timeslots[JSid] = {start: startInput.value, end: endInput.value, spots: spotsInput.value, id: idInput.value};
     };
 
     const removeButton = document.createElement('button');
@@ -202,7 +198,7 @@ function addTimeslot(start=null, end=null, spots=null, tempid=tid, id=null) {
     removeButton.textContent = 'Supprimer';
     removeButton.classList.add('delete');
     removeButton.onclick = () => {
-        delete timeslots[tempid];
+        delete timeslots[JSid];
         timeslotDiv.remove()
     };
 
@@ -215,7 +211,7 @@ function addTimeslot(start=null, end=null, spots=null, tempid=tid, id=null) {
     timeslotDiv.appendChild(removeButton);
 
     timeslotContainer.appendChild(timeslotDiv);
-    tid++;
+    JSid++;
 }
 
 function toggleTimeslots() {
