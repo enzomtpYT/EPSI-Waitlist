@@ -497,7 +497,12 @@ def get_candidate(candidate_id):
         return None, "Erreur base de données"
     try:
         cursor = conn.cursor(cursor_factory=RealDictCursor)
-        cursor.execute('SELECT * FROM Candidate WHERE id_candidate = %s', (candidate_id,))
+        cursor.execute('''
+        SELECT Candidate.*, "User".username
+        FROM Candidate
+        JOIN "User" ON Candidate.id_user = "User".id_user
+        WHERE id_candidate = %s
+        ''', (candidate_id,))
         candidate = cursor.fetchone()
         return candidate, None
     except psycopg2.Error as e:
@@ -830,7 +835,12 @@ def get_participant(participant_id):
         return None, "Erreur base de données"
     try:
         cursor = conn.cursor(cursor_factory=RealDictCursor)
-        cursor.execute('SELECT * FROM Participant WHERE id_participant = %s', (participant_id,))
+        cursor.execute('''
+        SELECT Participant.*, "User".username
+        FROM Participant
+        JOIN "User" ON Participant.id_user = "User".id_user
+        WHERE id_participant = %s
+        ''', (participant_id,))
         participant = cursor.fetchone()
         return participant, None
     except psycopg2.Error as e:
@@ -2537,8 +2547,13 @@ def get_employee(employee_id):
         return None, "Erreur base de données"
     try:
         cursor = conn.cursor(cursor_factory=RealDictCursor)
-        # Exécute la requête pour récupérer l'employé
-        cursor.execute('SELECT * FROM Employee WHERE id_employee = %s', (employee_id,))
+        # Exécute la requête pour récupérer l'employé et le nom d'utilisateur
+        cursor.execute('''
+        SELECT Employee.*, "User".username
+        FROM Employee
+        JOIN "User" ON Employee.id_user = "User".id_user
+        WHERE id_employee = %s
+        ''', (employee_id,))
         employee = cursor.fetchone()
         return employee, None
     except psycopg2.Error as e:
