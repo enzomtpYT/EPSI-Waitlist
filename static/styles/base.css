@@ -14,7 +14,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Roboto';  
+    font-family: 'Roboto';
 }
 
 .background {
@@ -419,6 +419,7 @@ button:active {
 .profile {
     width: fit-content;
     flex-shrink: 0;
+    align-self: flex-start;
 }
 
 .settings {

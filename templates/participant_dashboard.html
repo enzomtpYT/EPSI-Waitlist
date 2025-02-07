@@ -3,13 +3,52 @@
 {% block title %}Accueil intervenant{% endblock %}
 
 {% block content %}
-<h1 class="title">Bienvenue, {{ participant.name_participant }}</h1>
+<h1 class="title">Bienvenue, {{ participant.name_participant }} {{ participant.lastname_participant }}</h1>
 
 <div class="section-separator">
-    <div class="section profile">
+    <div class="infoeditor section profile">
         <h2>Profil</h2>
-        <p>Nom : {{ participant.name_participant }}</p>
-        <p>Email : {{ participant.email_participant }}</p>
+        <form id="candform">
+            <label for="participant_name">Nom :</label>
+            <input type="text" id="participant_name" name="participant_name" value="{{ participant.name_participant }}">
+
+            <label for="participant_email">E-mail :</label>
+            <input type="email" id="participant_email" name="participant_email" value="{{ participant.email_participant }}">
+
+            <label for="username">Nom d'utilisateur :</label>
+            <input type="text" id="username" name="username" value="{{ participant.username_participant }}" readonly>
+
+            <label for="password">Mot de passe :</label>
+            <div class="editpass">
+                <div class="iconified-input">
+                    <input type="password" id="password" name="password" value="">
+                    <i onclick="showpass()" id="showpass" class="fa-regular fa-eye icon showpass"></i>
+                </div>
+                <button type="button" onclick="generatepass().then(pass => {document.getElementById('password').value = pass})"><i class="fa-regular fa-key"></i> Générer un mot de passe</button>
+            </div>
+
+            <input type="hidden" id="id_participant" name="id_participant" value="{{ participant.id_participant }}">
+            <input type="hidden" id="id_user" name="id_user" value="{{ participant.id_user }}">
+            <input type="hidden" id="tags" name="tags" value="{{ participant.tags }}">
+
+            <div class="form-group">
+                <p>Tags :</p>
+                <div class="taglist">
+                {% if participant.tags %}
+                    {% for tag in participant.tags %}
+                        <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                {% else %}
+                    <p>Aucun tag trouvé.</p>
+                {% endif %}
+                </div>
+            </div>
+
+            <div>
+            <br>
+                <button id="confirmbtn"><i class="fa-regular fa-save"></i> Mettre à jour</button>
+            </div>
+        </form>
     </div>
 
     <div class="section-stacker">
@@ -27,5 +66,4 @@
         </div>
     </div>
 </div>
-
 {% endblock %}
