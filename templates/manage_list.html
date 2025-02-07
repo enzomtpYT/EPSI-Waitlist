@@ -4,6 +4,7 @@
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='styles/list.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.6/Sortable.js" integrity="sha512-wbxhPuCdD4/lneMQ7JYty2YytHYqNazZ5xNrzNESJ26aJ0rcUr+JK25SJW+wsc0iJf+jMk8Q4wfjSbBiG6+Mbg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <h1 id="eventname" class="title"></h1>
 <div class="listcontainer"></div>
 <script>
@@ -41,7 +42,6 @@ function buildList(info) {
   document.querySelector('#eventname').textContent = info.name_event;
   const list = document.querySelector('.listcontainer');
   list.innerHTML = '';
-  console.log(info);
   for (const [key, value] of Object.entries(info.interviews)) {
     const participant = document.createElement('div');
     participant.classList.add('column');
@@ -106,9 +106,28 @@ function buildList(info) {
       nextButton.classList.add('shy');
       managecandidate.appendChild(nextButton);
 
+      // add bars for drag and drop
+      const drag = document.createElement('span');
+      drag.innerHTML = '<i class="fa-regular fa-bars"></i>';
+      drag.classList.add('drag');
+      managecandidate.appendChild(drag);
+
       candidates.appendChild(managecandidate);
     }
     participant.appendChild(candidates);
+    new Sortable(candidates,{
+      animation: 150,
+      handle: ".drag",
+      draggable: ".managecandidate:not(.current)",
+      easing: "cubic-bezier(1, 0, 0, 1)",
+
+      	onEnd: function (evt) {
+          if (evt.oldIndex == evt.newIndex) {
+            return;
+          }
+          console.log(evt.oldIndex, evt.newIndex, evt.item.id.split('-')[1], key);
+	      },
+    })
     list.appendChild(participant);
   }
   return Promise.resolve();

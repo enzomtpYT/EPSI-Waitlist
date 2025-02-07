@@ -1,5 +1,6 @@
 .listcontainer {
     display: flex;
+    flex-wrap: wrap;
 }
 
 .interv {
@@ -13,10 +14,11 @@
 .column {
     display: flex;
     flex-direction: column;
-    margin: 0 auto;
+    margin: 0;
     border-left: 1px solid #e9ecef;
     background-color: var(--alt2);
-    width: 100%;
+    min-width: fit-content;
+    flex-grow: 1;
 }
 
 .listcontainer > .column:first-child{
@@ -24,7 +26,9 @@
 }
 
 .candidates {
+    gap: 5px;
     width: 100%;
+    min-width: fit-content;
     display: flex;
     padding: 1.25rem;
     flex-direction: column;
@@ -41,8 +45,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 2rem;
-    border-bottom: 1px solid #e9ecef;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e9ecef55;
+    border-radius: 10px 10px 0 0;
+    min-width: fit-content;
+    gap: 0.5rem;
 }
 
 .current > .clickable {
@@ -66,7 +73,6 @@
 
 .current {
     background-color: var(--alt1);
-    border-radius: 10px;
 }
 
 .dropdown {
@@ -86,6 +92,7 @@
 
 .candidatebtn {
     transition: 0.1s;
+    min-width: fit-content;
 }
 
 .current .candidatebtn {
@@ -134,4 +141,17 @@
 
 .duration {
     white-space: nowrap;
+}
+
+.drag {
+    cursor: pointer;
+}
+
+.current .drag {
+    display: none;
+}
+
+.sortable-ghost {
+    opacity: 0.5;
+    background-color: var(--alt1);
 }
