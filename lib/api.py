@@ -271,22 +271,26 @@ def get_list(id, forced=False):
             order = []
             candidates, error = database.get_event_interview_candidate(id, participant['id_participant'])
             for candidate in candidates:
-                cand = dict(candidate)
+                candidate = dict(candidate)
                 if cached is not None:
                     ccached = cached.to_dict()
                     for cached_candidate in ccached["interviews"].get(participant['name_participant']):
                         if cached_candidate is not None and cached_candidate['id_candidate'] == candidate['id_candidate']:
-                            position = cached_candidate['position']
-                            cand['position'] = position
-                            if len(order) <= position:
-                                order.extend([None] * (position + 1 - len(order)))
-                            order[position] = cand
+                            pos = cached_candidate['position']
+                            if len(order) <= pos:
+                                order.extend([None] * (pos + 1 - len(order)))
+                            order[pos] = candidate
                 else:
-                    order.append(cand)
+                    order.append(candidate)
                     weights = [candidate["priority"] for candidate in order]
                     order = weighted_shuffle(order, weights)
-                    for candidate in order:
-                        candidate['position'] = order.index(candidate)
+            for candidatee in order:
+                if candidatee['start_time_interview'] is not None:
+                    order.remove(candidatee)
+                    order.insert(0, candidatee)
+                    for candidatee in order:
+                        candidatee['position'] = order.index(candidatee)
+                candidatee['position'] = order.index(candidatee)
             interviews[participant['name_participant']] = order
         event["interviews"] = interviews
     if not forced:
