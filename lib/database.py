@@ -55,7 +55,7 @@ def create_event(name, date, has_timeslots, start_time_event=None, end_time_even
 
 def get_all_events():
     """
-    Récupère tous les événements de la base de données.
+    Récupère tous les événements de la base de données et ajoute les tags associés à chaque événement.
 
     Returns:
         list: Une liste de dictionnaires représentant les événements.
@@ -69,6 +69,15 @@ def get_all_events():
         cursor.execute('SELECT * FROM Event')
         events = cursor.fetchall()
         if events:
+            for event in events:
+                cursor.execute('''
+                SELECT Tag.id_tag
+                FROM Tag
+                JOIN Event_tag ON Tag.id_tag = Event_tag.id_tag
+                WHERE Event_tag.id_event = %s
+                ''', (event['id_event'],))
+                tags = cursor.fetchall()
+                event['tags'] = [tag['id_tag'] for tag in tags]
             return events, None
         else:
             return None, "Pas d'événement aujourd'hui"
@@ -80,13 +89,13 @@ def get_all_events():
 
 def get_event(event_id):
     """
-    Récupère un événement de la base de données en utilisant son identifiant et inclut les créneaux horaires associés.
+    Récupère un événement de la base de données en utilisant son identifiant et inclut les créneaux horaires et les tags associés.
 
     Args:
         event_id (int): L'identifiant de l'événement.
 
     Returns:
-        dict: Un dictionnaire représentant l'événement et ses créneaux horaires.
+        dict: Un dictionnaire représentant l'événement, ses créneaux horaires et ses tags.
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
     conn = get_db_connection()
@@ -100,6 +109,14 @@ def get_event(event_id):
             cursor.execute('SELECT * FROM Timeslot WHERE id_event = %s', (event_id,))
             timeslots = cursor.fetchall()
             event['timeslots'] = timeslots
+        cursor.execute('''
+        SELECT Tag.id_tag
+        FROM Tag
+        JOIN Event_tag ON Tag.id_tag = Event_tag.id_tag
+        WHERE Event_tag.id_event = %s
+        ''', (event_id,))
+        tags = cursor.fetchall()
+        event['tags'] = [tag['id_tag'] for tag in tags]
         return event, None
     except psycopg2.Error as e:
         print(f"Erreur requête base de données: {e}")

@@ -105,7 +105,6 @@ def get_event_participants(id_event):
     participants, error = database.get_all_participants()
     candidates, error = database.get_all_candidates()
     alltags, error = database.get_all_tags()
-    eventtag, error = database.get_event_tags(id_event)
     eventcandidates, error = database.get_event_candidates(id_event)
     eventparticipants, error = database.get_event_participant(id_event)
 
@@ -135,13 +134,13 @@ def get_event_participants(id_event):
                 candidate["attends"] = True
                 candidate["priority"] = cand["priority"]
 
-    event["tags"] = [tag["id_tag"] for tag in eventtag]
-
     datas = {
         "event": dict(event),
         "participants": participants,
         "candidates": candidates,
-        "tags": alltags
+        "tags": alltags,
+        "eventparticipants": eventparticipants,
+        "eventcandidates": eventcandidates,
     }
 
     if error:

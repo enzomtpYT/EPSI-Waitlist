@@ -16,7 +16,6 @@ def edit_event(id_event):
         return redirect(url_for('event.event'))
 
     tags, error = database.get_all_tags()
-    event_tags, error = database.get_event_tags(id_event)
 
     if request.method == 'POST':
         name = request.form['name_event']
@@ -59,7 +58,7 @@ def edit_event(id_event):
                 flash(f"Erreur lors de la mise à jour de l'Événement: {error}", "danger")
                 return redirect(url_for('event.edit_event', id_event=id_event))
 
-    return render_template('event.html', event=event, tags=tags, event_tags=event_tags)
+    return render_template('event.html', event=event, tags=tags)
 
 @event_bp.route("/admin/manage_event/event/<int:id_event>/delete_timeslot/<int:id_timeslot>", methods=['POST'])
 def delete_timeslot(id_event, id_timeslot):
@@ -106,7 +105,7 @@ def delete_event(id_event):
     database.delete_event(id_event)
     return redirect(url_for('manage_event.manage_event'))
 
-@event_bp.route('/admin/manage_event/event/<int:id_event>/manage_event_participants', methods=['GET', 'POST', 'HEAD'])
+@event_bp.route('/admin/manage_event/event/<int:id_event>/manage_event_participants', methods=['GET', 'POST'])
 def manage_event_participants(id_event):
     datas, error = api.get_event_participants(id_event)
     if error:
