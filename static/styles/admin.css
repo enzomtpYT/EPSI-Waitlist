@@ -33,7 +33,7 @@
     width:100%;
     z-index: 1;
     overflow: auto;
-    max-height: 18rem;
+    max-height: 100%;
 }
 
 .listsection table {
@@ -49,6 +49,8 @@
     padding: 1rem;
     background-color: var(--main-color);
     border-radius: 5px;
+    flex-grow: 1;
+    min-height: 12rem;
 }
 
 .admin-section {
@@ -195,7 +197,7 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    padding: 1.5rem;
+    padding: 1rem;
     backdrop-filter: brightness(0.6);
     gap: 1rem;
 }
@@ -231,6 +233,7 @@
     justify-content: flex-start;
     align-content: flex-start;
     gap: 0.25rem;
+    overflow-y: scroll;
 }
 
 .sectionremovetags > *, .sectionaddtags > * {
