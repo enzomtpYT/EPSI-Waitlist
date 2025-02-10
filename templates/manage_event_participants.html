@@ -11,8 +11,7 @@
 
         <div class="tag-section">
             <h2>Filtrer par tags</h2>
-            <div class="tag-selector">
-            </div>
+            <div class="tag-selector"></div>
         </div>
 
         <div class="table-sections">
@@ -139,9 +138,17 @@ function loadData() {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({'id_event': {{ id_event }}})
-    }).then(response => response.json())
-    .then(data => {
+    }).then(response => {
+            if (!response.ok) {
+                popup('danger', 'Une erreur est survenue lors de la récupération des données');
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+    }).then(data => {
         buildListsAndTags(data);
+    }).catch(error => {
+        popup("danger", "Une erreur est survenue lors du chargement des données.");
+        console.error(error);
     })
 }
 function toggletag(tag) {
