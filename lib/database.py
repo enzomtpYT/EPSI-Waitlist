@@ -315,58 +315,72 @@ def get_today_events():
     finally:
         conn.close()
 
-def get_event_candidates(id):
+def get_event_details(id_event):
     """
-    Récupère les candidats associés à un événement.
+    Récupère les détails d'un événement, y compris les candidats, les participants et les tags associés.
 
     Args:
-        todayevent (int): L'identifiant de l'événement.
+        id_event (int): L'identifiant de l'événement.
 
     Returns:
-        tuple: Un tuple contenant une liste de candidats et un message d'erreur si une erreur est survenue.
+        dict: Un dictionnaire contenant les détails de l'événement, les candidats, les participants et les tags.
+        str: Un message d'erreur si une erreur est survenue, None sinon.
     """
     conn = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
         cursor = conn.cursor(cursor_factory=RealDictCursor)
+        
+        # Récupère les informations de l'événement et les tags associés en une seule requête
         cursor.execute('''
-        SELECT Candidate.*, Attends.priority
+        SELECT Event.*, 
+               COALESCE(json_agg(DISTINCT Tag.*) FILTER (WHERE Tag.id_tag IS NOT NULL), '[]') AS tags
+        FROM Event
+        LEFT JOIN Event_tag ON Event.id_event = Event_tag.id_event
+        LEFT JOIN Tag ON Event_tag.id_tag = Tag.id_tag
+        WHERE Event.id_event = %s
+        GROUP BY Event.id_event
+        ''', (id_event,))
+        event = cursor.fetchone()
+        
+        # Récupère tous les candidats et leurs tags en une seule requête
+        cursor.execute('''
+        SELECT Candidate.*, 
+               COALESCE(json_agg(DISTINCT Tag.*) FILTER (WHERE Tag.id_tag IS NOT NULL), '[]') AS tags,
+               COALESCE(Attends.priority, 1) AS priority,
+               COALESCE(Attends.id_event IS NOT NULL, FALSE) AS attends
         FROM Candidate
-        JOIN Attends ON Candidate.id_candidate = Attends.id_candidate
-        WHERE Attends.id_event = %s
-        ''', (id,))
-        candidates = cursor.fetchall()
-        return candidates, None
-    except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
-        return None, "Erreur requête base de données"
-    finally:
-        conn.close()
-
-def get_event_participant(id):
-    """
-    Récupère les participants associés à un événement.
-
-    Args:
-        todayevent (int): L'identifiant de l'événement.
-
-    Returns:
-        tuple: Un tuple contenant une liste de participants et un message d'erreur si une erreur est survenue.
-    """
-    conn = get_db_connection()
-    if conn is None:
-        return None, "Erreur base de données"
-    try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        LEFT JOIN Candidate_tag ON Candidate.id_candidate = Candidate_tag.id_candidate
+        LEFT JOIN Tag ON Candidate_tag.id_tag = Tag.id_tag
+        LEFT JOIN Attends ON Candidate.id_candidate = Attends.id_candidate AND Attends.id_event = %s
+        GROUP BY Candidate.id_candidate, Attends.priority, Attends.id_event
+        ''', (id_event,))
+        all_candidates = cursor.fetchall()
+        
+        # Récupère tous les participants et leurs tags en une seule requête
         cursor.execute('''
-        SELECT Participant.*
+        SELECT Participant.*, 
+               COALESCE(json_agg(DISTINCT Tag.*) FILTER (WHERE Tag.id_tag IS NOT NULL), '[]') AS tags,
+               COALESCE(Participates.id_event IS NOT NULL, FALSE) AS attends
         FROM Participant
-        JOIN Participates ON Participant.id_participant = Participates.id_participant
-        WHERE Participates.id_event = %s
-        ''', (id,))
-        inter = cursor.fetchall()
-        return inter, None
+        LEFT JOIN Participant_tag ON Participant.id_participant = Participant_tag.id_participant
+        LEFT JOIN Tag ON Participant_tag.id_tag = Tag.id_tag
+        LEFT JOIN Participates ON Participant.id_participant = Participates.id_participant AND Participates.id_event = %s
+        GROUP BY Participant.id_participant, Participates.id_event
+        ''', (id_event,))
+        all_participants = cursor.fetchall()
+        
+        # Récupère tous les tags
+        cursor.execute('SELECT * FROM Tag')
+        all_tags = cursor.fetchall()
+        
+        return {
+            "event": event,
+            "candidates": all_candidates,
+            "participants": all_participants,
+            "tags": all_tags
+        }, None
     except psycopg2.Error as e:
         print(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"

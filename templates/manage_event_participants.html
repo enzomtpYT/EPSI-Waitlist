@@ -5,19 +5,13 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='styles/manage_event_participants.css') }}">
 <div class="managecontent">
-    <h1 class="title">Gérer les participants pour l'événement: {{ data.event.name_event }}</h1>
+    <h1 class="title">Chargement...</h1>
 
     <div class="tagnform">
 
         <div class="tag-section">
             <h2>Filtrer par tags</h2>
             <div class="tag-selector">
-                {% for tag in data.tags %}
-                <div onclick="toggletag(this)" id="{{ tag.id_tag }}" class="tagfilter {% if tag.id_tag in data.event.tags %} selectag {% endif %}">
-                    <i class="fa-regular fa-tag"></i>
-                    <p>{{ tag.name_tag }}</p>
-                </div>
-                {% endfor %}
             </div>
         </div>
 
@@ -33,21 +27,7 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {% for participant in data.participants %}
-                            <tr>
-                                <td>{{ participant.name_participant }}</td>
-                                <td>{{ participant.email_participant }}</td>
-                                <td>
-                                    {% if participant.attends == true %}
-                                        <input class="checkbox" type="checkbox" name="participants" value="{{ participant.id_participant }}" checked>
-                                    {% else %}
-                                        <input class="checkbox" type="checkbox" name="participants" value="{{ participant.id_participant }}">
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
@@ -59,43 +39,128 @@
                         <thead>
                             <tr>
                                 <th>Nom</th>
-                                <th>Email</th>
+                                <th>Prenom</th>
                                 <th>Poids</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {% for candidate in data.candidates %}
-                            <tr>
-                                <td>{{ candidate.name_candidate }}</td>
-                                <td>{{ candidate.email_candidate }}</td>
-                                <td>
-                                    <input type="number" name="priority_{{ candidate.id_candidate }}" value="{{ candidate.priority }}" min="1" max="100">
-                                </td>
-                                <td>
-                                    {% if candidate.attends == true %}
-                                        <input class="checkbox" type="checkbox" name="candidates" value="{{ candidate.id_candidate }}" checked>
-                                    {% else %}
-                                        <input class="checkbox" type="checkbox" name="candidates" value="{{ candidate.id_candidate }}">
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
 
-            <button type="submit">Ajouter les participants</button>
+            <button id="submit">Ajouter les participants</button>
 
         </div>
     </div>
 </div>
 
 <script>
-    function toggletag(tag) {
-        enabled = tag.classList.toggle("selectag");
+let selectedTags = [];
+
+function buildListsAndTags(datas) {
+    let tagSelector = document.querySelector(".tag-selector");
+    let intervList = document.querySelector(".interv tbody");
+    let candList = document.querySelector(".cand tbody");
+
+    for (let participant of datas.participants) {
+        let tr = document.createElement("tr");
+        tr.id = `${participant.id_participant}`;
+        tr.innerHTML = `
+            <td>${participant.name_participant}</td>
+            <td>${participant.email_participant}</td>
+            <td>
+                <input class="checkbox" type="checkbox" ${participant.attends ? "checked" : ""}>
+            </td>
+        `;
+        intervList.appendChild(tr);
     }
+
+    for (let candidate of datas.candidates) {
+        let tr = document.createElement("tr");
+        for (let tag of candidate.tags) {
+            tr.classList.add(`tag-${tag.id_tag}`);
+        }
+        tr.id = `${candidate.id_candidate}`;
+        tr.innerHTML = `
+            <td>${candidate.lastname_candidate}</td>
+            <td>${candidate.name_candidate}</td>
+            <td>
+                <input type="number" value="${candidate.priority}" min="1" max="100">
+            </td>
+            <td>
+                <input class="checkbox" type="checkbox" ${candidate.attends ? "checked" : ""}>
+            </td>
+        `;
+        candList.appendChild(tr);
+    }
+
+    for (let tag of datas.tags) {
+        let tagDiv = document.createElement("div");
+        tagDiv.classList.add("tagfilter");
+        if (datas.event.tags.some(eventTag => eventTag.id_tag === tag.id_tag)) {
+            tagDiv.classList.add("selectag");
+            selectedTags.push(tag.id_tag);
+            // Make the class tag-{ tag.id_tag } visible
+            let tagElements = document.querySelectorAll(`.tag-${tag.id_tag}`);
+            tagElements.forEach(tagElement => {
+                tagElement.style.display = "table-row";
+            });
+        } else {
+            // Make the class tag-{ tag.id_tag } invisible
+            let tagElements = document.querySelectorAll(`.tag-${tag.id_tag}`);
+            tagElements.forEach(tagElement => {
+                tagElement.style.display = "none";
+            });
+        }
+        tagDiv.id = tag.id_tag;
+        tagDiv.innerHTML = `
+            <i class="fa-regular fa-tag"></i>
+            <p>${tag.name_tag}</p>
+        `;
+        tagSelector.appendChild(tagDiv);
+    }
+
+    let tags = document.querySelectorAll(".tagfilter");
+    tags.forEach(tag => {
+        tag.addEventListener("click", () => {
+            toggletag(tag);
+        });
+    });
+
+    let title = document.querySelector(".title");
+    title.textContent = `Gérer les participants pour l'événement: ${datas.event.name_event}`;
+}
+
+function loadData() {
+    fetch("{{ url_for('api.manage_event_participants_api_args') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({'id_event': {{ id_event }}})
+    }).then(response => response.json())
+    .then(data => {
+        buildListsAndTags(data);
+    })
+}
+function toggletag(tag) {
+    enabled = tag.classList.toggle("selectag");
+    if (enabled) {
+        selectedTags.push(parseInt(tag.id));
+    } else {
+        selectedTags = selectedTags.filter(function(id) {
+            return id !== parseInt(tag.id);
+        });
+    }
+    let tagElements = document.querySelectorAll(`.tag-${tag.id}`);
+    tagElements.forEach(tagElement => {
+        const isActive = selectedTags.some(selectedTag => tagElement.classList.contains(`tag-${selectedTag}`));
+        tagElement.style.display = isActive ? "table-row" : "none";
+    });
+}
+
+loadData();
 </script>
 
 {% endblock %}
