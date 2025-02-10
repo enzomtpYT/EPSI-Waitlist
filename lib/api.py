@@ -63,6 +63,14 @@ cache = CacheManager()
 
 def updatecache_event(id):
     cached = cache["events"].get(str(id))
+    if not cached:
+        print(f"Cache for event {id} not found, creating")
+        list, error = get_list(id, forced=True)
+        if error:
+            print(f"Error while creating cache for event {id}: {error}")
+            return
+        cache["events"][str(id)] = list
+        return
     cached = cached.to_dict()
     list, error = get_list(id, forced=True)
     if not error:
@@ -102,11 +110,33 @@ def weighted_shuffle(arr, weights):
 
 def get_event_participants(id_event):
     datas, error = database.get_event_details(id_event)
-
     if error:
         return None, error
-
     return datas, None
+
+def process_event_participants(datas):
+    participants = datas.get("participants", [])
+    candidates = datas.get("candidates", [])
+
+    for participant in participants:
+        if participant["attends"]:
+            error = database.upsert_event_participates(datas["id_event"], participant["id_participant"])
+        elif participant["attends"] is False:
+            error = database.delete_participates(datas["id_event"], participant["id_participant"])
+        if error:
+            return error
+
+    for candidate in candidates:
+        if candidate["attends"]:
+            error = database.upsert_event_attends(datas["id_event"], candidate["id_candidate"], candidate["priority"])
+        elif candidate["attends"] is False:
+            error = database.delete_attends(candidate["id_candidate"], datas["id_event"])
+        if error:
+            return error
+    
+    threading.Thread(target=updatecache_all, args=(datas["id_event"], "events")).start()
+    
+    return None
 
 def api_interviews(session_token):
     interviews, error = database.get_user_past_interviews(session_token)
@@ -223,7 +253,7 @@ def get_list(id, forced=False):
         return None, error
     elif event is None:
         return None, "Aucun évenement avec cet id"
-    participants, error = database.get_event_participant(id)
+    participants, error = database.get_event_participants(id)
     interviews = {}
     if participants:
         for participant in participants:

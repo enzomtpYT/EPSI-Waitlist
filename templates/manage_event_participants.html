@@ -11,7 +11,12 @@
 
         <div class="tag-section">
             <h2>Filtrer par tags</h2>
-            <div class="tag-selector"></div>
+            <div class="tag-selector">
+                <div class="tagfilter selectag" id="attend">
+                    <i class="fa-regular fa-tag"></i>
+                    <p>Participants</p>
+                </div>
+            </div>
         </div>
 
         <div class="table-sections">
@@ -48,7 +53,7 @@
                 </div>
             </div>
 
-            <button id="submit">Ajouter les participants</button>
+            <button onclick="submit()" id="submit">Ajouter les participants</button>
 
         </div>
     </div>
@@ -151,19 +156,77 @@ function loadData() {
         console.error(error);
     })
 }
+
 function toggletag(tag) {
-    enabled = tag.classList.toggle("selectag");
-    if (enabled) {
-        selectedTags.push(parseInt(tag.id));
-    } else {
-        selectedTags = selectedTags.filter(function(id) {
-            return id !== parseInt(tag.id);
-        });
+    let enabled = tag.classList.toggle("selectag");
+    if (Number.isInteger(parseInt(tag.id))) {
+        if (enabled) {
+            selectedTags.push(parseInt(tag.id));
+        } else {
+            selectedTags = selectedTags.filter(function(id) {
+                return id !== parseInt(tag.id);
+            });
+        }
     }
-    let tagElements = document.querySelectorAll(`.tag-${tag.id}`);
-    tagElements.forEach(tagElement => {
-        const isActive = selectedTags.some(selectedTag => tagElement.classList.contains(`tag-${selectedTag}`));
+
+    let allTagElements = document.querySelectorAll(".cand tbody tr");
+    allTagElements.forEach(tagElement => {
+        const hasAllSelectedTags = !selectedTags.every(selectedTag => tagElement.classList.contains(`tag-${selectedTag}`));
+        const isChecked = tagElement.querySelector(".checkbox").checked;
+        const isAttendSelected = document.querySelector('#attend').classList.contains("selectag");
+
+        const isActive = hasAllSelectedTags || (isChecked && isAttendSelected);
         tagElement.style.display = isActive ? "table-row" : "none";
+    });
+}
+
+function submit() {
+    datas = {
+        "id_event": {{ id_event }},
+        "participants": [],
+        "candidates": []
+    };
+
+    let intervList = document.querySelectorAll(".interv tbody tr");
+    intervList.forEach(interv => {
+        let id = parseInt(interv.id);
+        let attends = interv.querySelector(".checkbox").checked;
+        datas.participants.push({
+            "id_participant": id,
+            "attends": attends
+        });
+    });
+
+    let candList = document.querySelectorAll(".cand tbody tr");
+    candList.forEach(cand => {
+        let id = parseInt(cand.id);
+        let attends = cand.querySelector(".checkbox").checked;
+        let priority = parseInt(cand.querySelector("input[type=number]").value);
+        datas.candidates.push({
+            "id_candidate": id,
+            "attends": attends,
+            "priority": priority
+        });
+    });
+
+    console.log(datas);
+    fetch("{{ url_for('api.process_event_participants') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(datas)
+    }).then(response => {
+        if (!response.ok) {
+            popup('danger', 'Une erreur est survenue lors de l\'ajout des participants');
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    }).then(data => {
+        popup('success', 'Les participants ont été ajoutés avec succès');
+    }).catch(error => {
+        popup("danger", "Une erreur est survenue lors de l'ajout des participants.");
+        console.error(error);
     });
 }
 

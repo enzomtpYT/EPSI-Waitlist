@@ -315,6 +315,123 @@ def get_today_events():
     finally:
         conn.close()
 
+def get_event_candidates(id_event):
+    """
+    Récupère les candidats associés à un événement.
+
+    Args:
+        id_event (int): L'identifiant de l'événement.
+
+    Returns:
+        tuple: Un tuple contenant une liste de candidats et un message d'erreur si une erreur est survenue.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+    try:
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor.execute('''
+        SELECT Candidate.*, Attends.priority
+        FROM Candidate
+        JOIN Attends ON Candidate.id_candidate = Attends.id_candidate
+        WHERE Attends.id_event = %s
+        ''', (id_event,))
+        candidates = cursor.fetchall()
+        return candidates, None
+    except psycopg2.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def get_event_participants(id_event):
+    """
+    Récupère les participants associés à un événement.
+
+    Args:
+        id_event (int): L'identifiant de l'événement.
+
+    Returns:
+        tuple: Un tuple contenant une liste de participants et un message d'erreur si une erreur est survenue.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+    try:
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor.execute('''
+        SELECT Participant.*
+        FROM Participant
+        JOIN Participates ON Participant.id_participant = Participates.id_participant
+        WHERE Participates.id_event = %s
+        ''', (id_event,))
+        participants = cursor.fetchall()
+        return participants, None
+    except psycopg2.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"
+    finally:
+        conn.close()
+
+def upsert_event_attends(id_event, id_candidate, priority):
+    """
+    Insère ou met à jour un candidat dans la table Attends.
+
+    Args:
+        id_event (int): L'identifiant de l'événement.
+        id_candidate (int): L'identifiant du candidat.
+        priority (int): La priorité du candidat.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        cursor = conn.cursor()
+        cursor.execute('''
+        INSERT INTO Attends (id_event, id_candidate, priority)
+        VALUES (%s, %s, %s)
+        ON CONFLICT (id_event, id_candidate) DO UPDATE SET priority = %s
+        ''', (id_event, id_candidate, priority, priority))
+        conn.commit()
+        return None
+    except psycopg2.Error as e:
+        print(f"Erreur lors de l'insertion ou de la mise à jour du candidat: {e}")
+        return "Erreur lors de l'insertion ou de la mise à jour du candidat"
+    finally:
+        conn.close()
+
+def upsert_event_participates(id_event, id_participant):
+    """
+    Insère ou met à jour un participant dans la table Participates.
+
+    Args:
+        id_event (int): L'identifiant de l'événement.
+        id_participant (int): L'identifiant du participant.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        cursor = conn.cursor()
+        cursor.execute('''
+        INSERT INTO Participates (id_event, id_participant)
+        VALUES (%s, %s)
+        ON CONFLICT (id_event, id_participant) DO NOTHING
+        ''', (id_event, id_participant))
+        conn.commit()
+        return None
+    except psycopg2.Error as e:
+        print(f"Erreur lors de l'insertion ou de la mise à jour du participant: {e}")
+        return "Erreur lors de l'insertion ou de la mise à jour du participant"
+    finally:
+        conn.close()
+
 def get_event_details(id_event):
     """
     Récupère les détails d'un événement, y compris les candidats, les participants et les tags associés.
@@ -1807,7 +1924,7 @@ def create_participates(id_participant, id_event):
         conn.close()
     return None
 
-def delete_participates(id_participant, id_event):
+def delete_participates(id_event, id_participant):
     """
     Supprime une participation de la base de données en utilisant l'identifiant du participant et de l'événement.
 
