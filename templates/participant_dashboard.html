@@ -36,7 +36,7 @@
                 <div class="taglist">
                 {% if participant.tags %}
                     {% for tag in participant.tags %}
-                        <span class="tag">{{ tag }}</span>
+                        <span class="tag">{{ tag.name_tag }}</span>
                     {% endfor %}
                 {% else %}
                     <p>Aucun tag trouvé.</p>
