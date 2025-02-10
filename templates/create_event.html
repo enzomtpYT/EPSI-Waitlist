@@ -20,7 +20,7 @@
         <label for="end_time_event">Heure de fin :</label>
         <input type="time" id="end_time_event" name="end_time_event">
 
-        <label for="has_timeslots">A crénaux horaires ?</label>
+        {# <label for="has_timeslots">A crénaux horaires ?</label>
         <input {% if event and event.has_timeslots %}checked{% endif %} onclick="toggleTimeslots()" id="has_timeslots" class="enabletimeslots" type="checkbox" name="has_timeslots">
 
         <div id="timeslot-section" class="schedules">
@@ -31,8 +31,7 @@
             <button type="button" onclick="addTimeslot()">Ajouter un créneau</button>
         </div>
 
-        <input type="hidden" name="timeslots" id="timeslots" value="">
-        {# <button onclick="addts()" type="submit">Enregistrer</button> #}
+        <input type="hidden" name="timeslots" id="timeslots" value=""> #}
 
         <label for="event_tags">Tags de l'événement :</label>
         <div id="event_tags" class="taglist">
@@ -57,7 +56,8 @@
         <input type="hidden" id="selected_tags" name="selected_tags">
 
         <div class="mt-5">
-            <button onclick="addts()" type="submit">Créer</button>
+            {# <button onclick="addts()" type="submit">Créer</button> #}
+            <button type="submit">Créer</button>
         </div>
     </form>
 </div>
