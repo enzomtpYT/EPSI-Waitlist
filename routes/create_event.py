@@ -32,20 +32,20 @@ def create_event():
         if error is None:
             event_id, error = database.create_event(name, date, has_timeslots, start_time_event, end_time_event)
             if error is None:
-                if has_timeslots:
-                    for key, timeslot in timeslots.items():
-                        start_timeslot = timeslot.get('start')
-                        end_timeslot = timeslot.get('end')
-                        nbr_spots = timeslot.get('spots')
-                        if start_timeslot and end_timeslot and nbr_spots:
-                            error = database.add_timeslot_to_event(event_id, start_timeslot, end_timeslot, nbr_spots)
-                            if error:
-                                flash(f"Erreur lors de l'ajout des créneaux horaires: {error}", "danger")
-                                break
-                        else:
-                            error = "Les champs des créneaux horaires ne sont pas correctement remplis."
-                            flash(f"Erreur lors de l'ajout des créneaux horaires: {error}", "danger")
-                            break
+                # if has_timeslots:
+                #     for key, timeslot in timeslots.items():
+                #         start_timeslot = timeslot.get('start')
+                #         end_timeslot = timeslot.get('end')
+                #         nbr_spots = timeslot.get('spots')
+                #         if start_timeslot and end_timeslot and nbr_spots:
+                #             error = database.add_timeslot_to_event(event_id, start_timeslot, end_timeslot, nbr_spots)
+                #             if error:
+                #                 flash(f"Erreur lors de l'ajout des créneaux horaires: {error}", "danger")
+                #                 break
+                #         else:
+                #             error = "Les champs des créneaux horaires ne sont pas correctement remplis."
+                #             flash(f"Erreur lors de l'ajout des créneaux horaires: {error}", "danger")
+                #             break
                 for tag_id in selected_tags:
                     database.add_tag_to_event(event_id, tag_id)
                 flash("Événement créé avec succès!", "success")
