@@ -39,20 +39,20 @@ def edit_event(id_event):
         if error is None:
             error = database.edit_event(name, date, id_event, has_timeslots, start_time_event, end_time_event)
             if error is None:
-                if has_timeslots:
-                    for key, timeslot in timeslots.items():
-                        start_timeslot = timeslot.get('start')
-                        end_timeslot = timeslot.get('end')
-                        nbr_spots = timeslot.get('spots')
-                        id_timeslot = timeslot.get('id')
-                        if start_timeslot and end_timeslot and nbr_spots and not id_timeslot:
-                            error = database.add_timeslot_to_event(id_event, start_timeslot, end_timeslot, nbr_spots)
-                        elif start_timeslot and end_timeslot and nbr_spots and id_timeslot:
-                            error = database.edit_timeslot(start_timeslot, end_timeslot, nbr_spots, id_timeslot)
-                        else:
-                            error = "Les champs des créneaux horaires ne sont pas correctement remplis."
-                    if error:
-                        flash(f"Erreur lors de l'ajout des créneaux horaires: {error}", "danger")
+                # if has_timeslots:
+                #     for key, timeslot in timeslots.items():
+                #         start_timeslot = timeslot.get('start')
+                #         end_timeslot = timeslot.get('end')
+                #         nbr_spots = timeslot.get('spots')
+                #         id_timeslot = timeslot.get('id')
+                #         if start_timeslot and end_timeslot and nbr_spots and not id_timeslot:
+                #             error = database.add_timeslot_to_event(id_event, start_timeslot, end_timeslot, nbr_spots)
+                #         elif start_timeslot and end_timeslot and nbr_spots and id_timeslot:
+                #             error = database.edit_timeslot(start_timeslot, end_timeslot, nbr_spots, id_timeslot)
+                #         else:
+                #             error = "Les champs des créneaux horaires ne sont pas correctement remplis."
+                #     if error:
+                #         flash(f"Erreur lors de l'ajout des créneaux horaires: {error}", "danger")
                 flash("Événement mis à jour avec succès!", "success")
                 return redirect(url_for('event.edit_event', id_event=id_event))
             else:
