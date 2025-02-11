@@ -109,6 +109,14 @@
     color: var(--accent-color);
 }
 
+.btnform {
+    flex-direction: row;
+}
+
+.actionsinfo > .admin-section > h2 {
+    flex-grow: 1;
+}
+
 .actionbtn {
     display: grid;
     gap: 10px;
@@ -128,10 +136,6 @@
 
 .manageinfos > .admin-section {
     margin: 16px;
-}
-
-.manageinfos > .admin-section > * > button {
-    max-width: 100%;
 }
 
 .schedules {
@@ -165,7 +169,7 @@
     min-width: 12vw;
     background-color: #2e2456cc;
     overflow: scroll;
-} 
+}
 
 .resizer {
     background-color: var(--alt1);

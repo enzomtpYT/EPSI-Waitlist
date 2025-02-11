@@ -76,7 +76,7 @@
 
 <h1>Entretiens lors de l'événement : {{ event.name_event }}</h1>
 
-<div class="manageinfos">
+<div class="manageinfos actionsinfo">
     <div class="admin-section">
         <h2>Participants à l'Événement</h2>
         <a href="{{ url_for('event.manage_event_participants', id_event=event.id_event) }}">
@@ -93,9 +93,12 @@
 
     <div class="admin-section">
         <h2>Historique de l'événement</h2>
+        <form class="btnform" action="{{ url_for('event.export_interviews_pdf', id_event=event.id_event) }}" method="post">
         <a href="{{ url_for('event.view_interviews', id_event=event.id_event) }}">
             <button type="button">Voir les entretiens</button>
         </a>
+            <button type="submit">Exporter en PDF</button>
+        </form>
     </div>
 
     <div class="admin-section">
