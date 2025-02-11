@@ -1,119 +1,108 @@
 {% extends "base.html" %}
 
 {% block title %}Admin - Gérer Base de Données{% endblock %}
-
 {% block content %}
 <div class="tableContent">
+    <div class="dropzone" id="dropzone">
+        <div class="importVisual">
+            <i class="fa-regular fa-file-arrow-down"></i>
+            <p>Glissez et déposez un fichier CSV ici</p>
+        </div>
+    </div>
     <h1 style="margin-left: 1rem;">Gérer la base de données</h1>
-    <h2 style="margin-left: 1rem;" id="loading">Chargement...</h2>
-    <div class="tabmanagment" style="display: none;">
-    <div class="sideItemList">
-        <button class="listbtn" onclick="showNew()"><i class="fa-regular fa-file-arrow-down"></i> Importer un CSV</button>
-        <button class="listbtn" onclick="loadData()"><i class="fa-regular fa-rotate-right"></i> Recharger la liste</button>
-    </div>
-    <div class="tab-content">
-        <div class="tab-pane fade show active" id="import-section">
-            <h2>Importer un fichier CSV pour mettre à jour la base de données</h2>
-            <form id="csvform" action="{{ url_for('manage_database.manage_database') }}" method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="csv_file">Fichier CSV :</label>
-                    <input type="file" id="csv_file" name="csv_file" accept=".csv" required>
-                </div>
-                <button type="submit">Importer</button>
-            </form>
+    <div class="tabmanagment">
+        <div class="sideItemList">
+            <button class="listbtn" onclick="document.querySelector('#fileInput').click()"><i class="fa-regular fa-file-arrow-down"></i> Importer un CSV</button>
+            <button class="listbtn" onclick="exportCSV()"><i class="fa-regular fa-file-arrow-up"></i> Exporter un CSV</button>
+            <button class="listbtn" onclick="reload()"><i class="fa-regular fa-rotate-right"></i> Recharger la liste</button>
         </div>
-        <div class="tab-pane fade" id="archive-section">
-            <h2>Voir l'archive de la base de données par année</h2>
-            <!-- Add your archive viewing content here -->
+        <div class="resizer" id="resizer"></div>
+        <div class="infoeditor">
+            <input type="file" onchange="ImportCSV(event)" hidden id="fileInput" accept=".csv">
+            <div class="tab-pane fade" id="archive-section">
+                <h2>Voir l'archive de la base de données par année</h2>
+                <!-- Add your archive viewing content here -->
+            </div>
         </div>
     </div>
-
-    <div class="resizer" id="resizer"></div>
 </div>
 
 <script>
-function handleCSVImport(event) {
+function importCSV() {
+    
+}
+
+const dropzone = document.getElementById("dropzone");
+
+document.addEventListener("dragover", (event) => {
     event.preventDefault();
-    const formData = new FormData(document.querySelector('#csvform'));
-    fetch('{{ url_for('manage_database.manage_database') }}', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(data => {
-                popup('danger', 'Une erreur est survenue lors de l\'importation du fichier CSV: ' + (data.message || 'Erreur inconnue'));
+    dropzone.classList.add("visible"); // Show dropzone when dragging over
+    setTimeout(() => {
+        dropzone.style.opacity = 1;
+    }, 1);
+});
+
+dropzone.addEventListener("dragleave", (event) => {
+    if (!dropzone.contains(event.relatedTarget)) {
+        setTimeout(() => {
+            dropzone.style.opacity = 0;
+        }, 2);
+        setTimeout(() => {
+            dropzone.classList.remove("visible"); // Hide when dragging leaves window
+        }, 251);
+    }
+});
+
+dropzone.addEventListener("drop", (event) => {
+    event.preventDefault();
+    setTimeout(() => {
+        dropzone.style.opacity = 0;
+    }, 2);
+    setTimeout(() => {
+        dropzone.classList.remove("visible"); // Hide after dropping file
+    }, 251);
+    const file = event.dataTransfer.files[0];
+    const fileInput = document.getElementById("fileInput");
+    fileInput.files = event.dataTransfer.files;
+    const changeEvent = new Event('change');
+    fileInput.dispatchEvent(changeEvent); // Trigger change event
+});
+
+function ImportCSV(ev) {
+    if (!ev.target.files[0] || !ev.target.files[0].name.endsWith(".csv")) {
+        popup('danger', 'Le fichier doit être un fichier CSV');
+        return;
+    }
+    const file = ev.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const data = e.target.result;
+        const lines = data.split("\n");
+        const headers = lines[0].split(",");
+        const table = document.createElement("table");
+        const thead = document.createElement("thead");
+        const tbody = document.createElement("tbody");
+        const tr = document.createElement("tr");
+        headers.forEach((header) => {
+            const th = document.createElement("th");
+            th.textContent = header;
+            tr.appendChild(th);
+        });
+        thead.appendChild(tr);
+        table.appendChild(thead);
+        lines.slice(1).forEach((line) => {
+            const tr = document.createElement("tr");
+            line.split(",").forEach((cell) => {
+                const td = document.createElement("td");
+                td.textContent = cell;
+                tr.appendChild(td);
             });
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        popup('success', 'Fichier CSV importé avec succès');
-    })
-    .catch(error => {
-        popup('danger', 'Une erreur est survenue lors de l\'importation du fichier CSV');
-        console.error('Error:', error);
-    });
-}
-
-document.querySelector('#csvform').addEventListener('submit', handleCSVImport);
-
-window.addEventListener('load', function() {
-    document.getElementById('loading').style.display = 'none';
-    document.querySelector('.tabmanagment').style.display = 'block';
-    document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', function(event) {
-            event.preventDefault();
-            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('show', 'active'));
-            document.querySelector(this.getAttribute('href')).classList.add('show', 'active');
-            document.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
-            this.classList.add('active');
+            tbody.appendChild(tr);
         });
-    });
-});
-
-document.querySelector('#csvform').addEventListener('submit', handleCSVImport);
-
-window.addEventListener('load', function() {
-    document.getElementById('loading').style.display = 'none';
-    document.querySelector('.tabmanagment').style.display = 'block';
-});
-
-function loadData() {
-    document.querySelectorAll('.itemlist').forEach(item => item.remove());
-    fetch('{{ url_for('api.get_list') }}')
-        .then(response => {
-            if (!response.ok) {
-                popup('danger', 'Une erreur est survenue lors de la récupération des données CSV');
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(datas => {
-            buildManagement(datas);
-        })
-        .catch(error => {
-            popup('danger', 'Une erreur est survenue lors de la récupération des données CSV');
-            console.error('Error:', error);
-        });
-}
-
-function buildManagement(datas) {
-    let sideItemList = document.querySelector('.sideItemList');
-    num = 0;
-    datas.forEach(data => {
-        let item = document.createElement('div');
-        item.classList.add('itemlist');
-        item.onclick = function() { showInfos(data); this.classList.add('selected'); document.querySelectorAll('.itemlist').forEach(item => { if (item !== this) item.classList.remove('selected'); }); };
-        item.id = `deleteElement-${data.id}-csv`;
-        item.innerHTML = `<i class="fa-regular fa-file-csv"></i><p>${data.name}</p>`;
-        sideItemList.appendChild(item);
-        if (num === 0) item.click();
-        num++;
-    });
-    document.querySelector('#loading').style.display = 'none';
-    document.querySelector('.tabmanagment').style.display = 'flex';
+        table.appendChild(tbody);
+        document.querySelector(".infoeditor").appendChild(table);
+    };
+    reader.readAsText(file);
 }
 
 </script>
