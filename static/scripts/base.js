@@ -26,6 +26,37 @@ function observeMarkdownLinks() {
     targetNodes.forEach(node => observer.observe(node, config));
 }
 
+function afterLoad() {
+    /* Resizer */
+
+    var resize = document.querySelector("#resizer");
+    if (!resize) {
+        return;
+    }
+    var left = document.querySelector(".sideItemList");
+    var container = document.querySelector(".tabmanagment");
+    var moveX = left.getBoundingClientRect().width + resize.getBoundingClientRect().width / 2;
+    var drag = false;
+
+    resize.addEventListener("mousedown", function (e) {
+        drag = true;
+    });
+
+    container.addEventListener("mousemove", function (e) {
+        moveX = e.x;
+        if (drag) {
+           left.style.width = moveX - resize.getBoundingClientRect().width / 2 - container.getBoundingClientRect().left + "px";
+           e.preventDefault();
+        }
+    });
+
+    document.addEventListener("mouseup", function (e) {
+        drag = false;
+    });
+
+    /* End Resizer */
+}
+
 updateLinks();
 observeMarkdownLinks();
 
