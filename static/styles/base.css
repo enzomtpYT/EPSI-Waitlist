@@ -138,7 +138,7 @@ button {
     background-color: var(--btn-color);
     color: #fff;
     cursor: pointer;
-    margin-inline: auto;
+    margin-inline: 0;
     border-radius: 10px;
     padding: .5rem 1rem;
     font-size: 1rem;

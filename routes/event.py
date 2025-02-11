@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from lib import database, api
 import json
+from fpdf import FPDF
+from flask import make_response
 
 event_bp = Blueprint('event', __name__)
 
@@ -99,6 +101,33 @@ def view_interviews(id_event):
         flash(error, "danger")
         return redirect(url_for('event.edit_event', id_event=id_event))
     return render_template('interviews.html', interviews=interviews, event=event, event_id=id_event)
+
+@event_bp.route("/admin/manage_event/event/<int:id_event>/export_interviews_pdf", methods=['GET'])
+def export_interviews_pdf(id_event):
+    _, interviews, error = database.get_event_interviews(id_event)
+    if error:
+        flash(error, "danger")
+        return redirect(url_for('event.edit_event', id_event=id_event))
+    # Generate PDF
+    class PDF(FPDF):
+        def header(self):
+            self.set_font('Arial', 'B', 12)
+            self.cell(0, 10, 'Interviews Report', 0, 1, 'C')
+
+    pdf = PDF()
+    pdf.add_page()
+    pdf.set_font('Arial', '', 12)
+
+    for interview in interviews:
+        pdf.cell(0, 10, f"Interview ID: {interview['id']}", 0, 1)
+        pdf.cell(0, 10, f"Participant: {interview['participant']}", 0, 1)
+        pdf.cell(0, 10, f"Date: {interview['date']}", 0, 1)
+        pdf.cell(0, 10, f"Notes: {interview['notes']}", 0, 1)
+        pdf.ln(10)
+
+    response = make_response(pdf.output(dest='S').encode('latin1'))
+    response.headers['Content-Type'] = 'application/pdf'
+    return response
 
 @event_bp.route("/admin/manage_event/event/<int:id_event>/delete", methods=['POST'])
 def delete_event(id_event):
