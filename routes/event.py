@@ -125,9 +125,8 @@ def export_interviews_pdf(id_event):
 
     pdf.cell(0, 10, f"Date de l'événement : {event.get('date_event', 'N/A')}", 0, 1)
     if tags:
-        pdf.cell(0, 10, "Tags de l'événement :", 0, 1)
-        for tag in tags:
-            pdf.cell(0, 10, f"- {tag.get('name_tag', 'N/A')}", 0, 1)
+        tag_names = ", ".join(tag.get('name_tag', 'N/A') for tag in tags)
+        pdf.cell(0, 10, f"Tags de l'événement : {tag_names}", 0, 1)
     pdf.ln(10)
 
     for interview in interviews:
