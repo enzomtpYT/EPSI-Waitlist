@@ -23,6 +23,25 @@ def get_db_connection():
 
 today = datetime.date.today()
 
+def insert_from_csv_row(row):
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        cursor = conn.cursor()
+        lastname_candidate, name_candidate, email_candidate = row
+        cursor.execute('''
+        INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate)
+        VALUES (%s, %s, %s, %s)
+        ''', (lastname_candidate, name_candidate, email_candidate))
+        conn.commit()
+        return None
+    except psycopg2.Error as e:
+        print(f"Erreur lors de l'insertion dans la base de données: {e}")
+        return "Erreur lors de l'insertion dans la base de données"
+    finally:
+        conn.close()
+
 # Event functions
 
 def create_event(name, date, has_timeslots, start_time_event=None, end_time_event=None):
@@ -448,10 +467,10 @@ def get_event_details(id_event):
         return None, "Erreur base de données"
     try:
         cursor = conn.cursor(cursor_factory=RealDictCursor)
-        
+
         # Récupère les informations de l'événement et les tags associés en une seule requête
         cursor.execute('''
-        SELECT Event.*, 
+        SELECT Event.*,
                COALESCE(json_agg(DISTINCT Tag.*) FILTER (WHERE Tag.id_tag IS NOT NULL), '[]') AS tags
         FROM Event
         LEFT JOIN Event_tag ON Event.id_event = Event_tag.id_event
@@ -460,10 +479,10 @@ def get_event_details(id_event):
         GROUP BY Event.id_event
         ''', (id_event,))
         event = cursor.fetchone()
-        
+
         # Récupère tous les candidats et leurs tags en une seule requête
         cursor.execute('''
-        SELECT Candidate.*, 
+        SELECT Candidate.*,
                COALESCE(json_agg(DISTINCT Tag.*) FILTER (WHERE Tag.id_tag IS NOT NULL), '[]') AS tags,
                COALESCE(Attends.priority, 1) AS priority,
                COALESCE(Attends.id_event IS NOT NULL, FALSE) AS attends
@@ -474,10 +493,10 @@ def get_event_details(id_event):
         GROUP BY Candidate.id_candidate, Attends.priority, Attends.id_event
         ''', (id_event,))
         all_candidates = cursor.fetchall()
-        
+
         # Récupère tous les participants et leurs tags en une seule requête
         cursor.execute('''
-        SELECT Participant.*, 
+        SELECT Participant.*,
                COALESCE(json_agg(DISTINCT Tag.*) FILTER (WHERE Tag.id_tag IS NOT NULL), '[]') AS tags,
                COALESCE(Participates.id_event IS NOT NULL, FALSE) AS attends
         FROM Participant
@@ -487,11 +506,11 @@ def get_event_details(id_event):
         GROUP BY Participant.id_participant, Participates.id_event
         ''', (id_event,))
         all_participants = cursor.fetchall()
-        
+
         # Récupère tous les tags
         cursor.execute('SELECT * FROM Tag')
         all_tags = cursor.fetchall()
-        
+
         return {
             "event": event,
             "candidates": all_candidates,

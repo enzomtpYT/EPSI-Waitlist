@@ -20,6 +20,7 @@ from routes.participant_dashboard import participant_dashboard_bp
 from routes.candidate_dashboard import candidate_dashboard_bp
 from routes.interviews import interviews_bp
 from routes.settings import settings_bp
+from routes.manage_database import manage_database_bp
 
 # Register the blueprints
 app.register_blueprint(auth_bp)
@@ -39,6 +40,7 @@ app.register_blueprint(participant_dashboard_bp)
 app.register_blueprint(candidate_dashboard_bp)
 app.register_blueprint(interviews_bp)
 app.register_blueprint(settings_bp)
+app.register_blueprint(manage_database_bp)
 
 @app.before_request
 def checkroutes():
