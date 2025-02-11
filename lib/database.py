@@ -129,13 +129,13 @@ def get_event(event_id):
             timeslots = cursor.fetchall()
             event['timeslots'] = timeslots
         cursor.execute('''
-        SELECT Tag.id_tag
+        SELECT Tag.id_tag, Tag.name_tag
         FROM Tag
         JOIN Event_tag ON Tag.id_tag = Event_tag.id_tag
         WHERE Event_tag.id_event = %s
         ''', (event_id,))
         tags = cursor.fetchall()
-        event['tags'] = [tag['id_tag'] for tag in tags]
+        event['tags'] = [dict(tag) for tag in tags]
         return event, None
     except psycopg2.Error as e:
         print(f"Erreur requête base de données: {e}")

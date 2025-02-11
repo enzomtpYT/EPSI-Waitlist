@@ -42,7 +42,7 @@
     <div class="admin-section">
         <h2>Tags de l'événement</h2>
         <div class="taglist">
-            {% for tag in event_tags %}
+            {% for tag in event.tags %}
                 <form class="tagform" action="{{ url_for('event.remove_tag_event', id_event=event.id_event) }}" method="post" style="display:inline;">
                     <input type="hidden" name="tag" value="{{ tag.id_tag }}">
                     <button class="delete remove-tag" type="submit" name="remove_tag">
@@ -60,7 +60,7 @@
         <div class="taglist">
             {% for tag in tags %}
                 <form class="tagform" action="{{ url_for('event.add_tag_event', id_event=event.id_event) }}" method="post" style="display: inline;">
-                    {% if tag.id_tag not in event_tags|map(attribute='id_tag') %}
+                    {% if tag.id_tag not in event.tags|map(attribute='id_tag') %}
                     <input type="hidden" name="tag" value="{{ tag.id_tag }}">
                         <button class="add-tag" type="submit" name="add_tag">
                         <svg class="plussvg" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
@@ -93,7 +93,7 @@
 
     <div class="admin-section">
         <h2>Historique de l'événement</h2>
-        <form class="btnform" action="{{ url_for('event.export_interviews_pdf', id_event=event.id_event) }}" method="post">
+        <form class="btnform" target="_blank" action="{{ url_for('event.export_interviews_pdf', id_event=event.id_event) }}" method="post">
         <a href="{{ url_for('event.view_interviews', id_event=event.id_event) }}">
             <button type="button">Voir les entretiens</button>
         </a>
