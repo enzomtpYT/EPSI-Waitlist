@@ -19,12 +19,16 @@
         <div class="resizer" id="resizer"></div>
         <div class="infoeditor">
             <input type="file" onchange="ImportCSV(event)" hidden id="fileInput" accept=".csv">
-            <div class="listsection" display="none">
-                <h2>Voir</h2>
-                <div class="tablewrap" style="flex-grow: 1;">
-                    <table><thead><tr></tr></thead><tbody></tbody></table>
+            <div class="listsection">
+                <h2 style="display: none;">Voir les données</h2>
+                <div class="tablewrap" style="flex-grow: 1; display: none;">
+                    <table style="height: fit-content;"><thead><tr></tr></thead><tbody></tbody></table>
                 </div>
-                <button><i class="fa-regular fa-check"></i> Confirmer</button>
+                <button style="display: none;"><i class="fa-regular fa-check"></i> Confirmer</button>
+                <div class="chosedata">
+                    <i class="fa-regular fa-file-arrow-down"></i>
+                    <h1>Choisir ou importer des données</h1>
+                </div>
             </div>
         </div>
     </div>
@@ -135,6 +139,11 @@ function ImportCSV(ev) {
             });
             tbody.appendChild(tr);
             candidates.push(cand);
+            // Show table, button and h2 and then hide the h1
+            document.querySelector(".listsection .tablewrap").style.display = "flex";
+            document.querySelector(".listsection button").style.display = "block";
+            document.querySelector(".listsection h2").style.display = "block";
+            document.querySelector(".listsection .chosedata").style.display = "none";
         });
     };
     reader.readAsText(file);
