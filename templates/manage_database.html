@@ -34,7 +34,7 @@
 let candidates = []
 
 function importCSV(event) {
-    event.preventDefault();    
+    event.preventDefault();
 }
 
 const dropzone = document.getElementById("dropzone");
@@ -104,18 +104,37 @@ function ImportCSV(ev) {
 
         // Populate rows
         lines.slice(1).forEach((line) => {
-            let cand = {}
+            let cand = {};
             const tr = document.createElement("tr");
             const cells = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
             if (!cells) return;
-            cells.forEach((cell) => {
+            cells.forEach((cell, index) => {
                 const td = document.createElement("td");
-                td.textContent = cell.replace(/(^"|"$)/g, ''); // Remove surrounding quotes if any
+                td.textContent = cell.replace(/(^"|"$)/g, '');
                 tr.appendChild(td);
-                console.log(cells.indexOf(cell))
+                switch (index) {
+                    case 0:
+                        cand.lastname = cell.replace(/(^"|"$)/g, '');
+                        break;
+                    case 1:
+                        cand.name = cell.replace(/(^"|"$)/g, '');
+                        break;
+                    case 2:
+                        cand.email = cell.replace(/(^"|"$)/g, '');
+                        break;
+                    case 3:
+                        cand.username = cell.replace(/(^"|"$)/g, '');
+                        break;
+                    case 4:
+                        tags = cell.replace(/(^"|"$)/g, '');
+                        cand.tags = tags.split(",");
+                        break;
+                    case 5:
+                        cand.schoolyear = cell.replace(/(^"|"$)/g, '');
+                }
             });
             tbody.appendChild(tr);
-            candidates.push(cand)
+            candidates.push(cand);
         });
     };
     reader.readAsText(file);
