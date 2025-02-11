@@ -144,7 +144,6 @@ button {
     font-size: 1rem;
     width: fit-content;
     transition: .1s ease-in-out;
-    gap: .5rem;
 }
 
 button:hover {

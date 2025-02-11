@@ -31,8 +31,10 @@
 </div>
 
 <script>
-function importCSV() {
-    
+let candidates = []
+
+function importCSV(event) {
+    event.preventDefault();    
 }
 
 const dropzone = document.getElementById("dropzone");
@@ -89,6 +91,7 @@ function ImportCSV(ev) {
         // Clear existing table content
         thead.innerHTML = "";
         tbody.innerHTML = "";
+        candidates = []
 
         // Populate headers
         const tr = document.createElement("tr");
@@ -101,14 +104,18 @@ function ImportCSV(ev) {
 
         // Populate rows
         lines.slice(1).forEach((line) => {
+            let cand = {}
             const tr = document.createElement("tr");
             const cells = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+            if (!cells) return;
             cells.forEach((cell) => {
-            const td = document.createElement("td");
-            td.textContent = cell.replace(/(^"|"$)/g, ''); // Remove surrounding quotes if any
-            tr.appendChild(td);
+                const td = document.createElement("td");
+                td.textContent = cell.replace(/(^"|"$)/g, ''); // Remove surrounding quotes if any
+                tr.appendChild(td);
+                console.log(cells.indexOf(cell))
             });
             tbody.appendChild(tr);
+            candidates.push(cand)
         });
     };
     reader.readAsText(file);
