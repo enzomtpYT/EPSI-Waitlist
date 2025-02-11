@@ -19,9 +19,12 @@
         <div class="resizer" id="resizer"></div>
         <div class="infoeditor">
             <input type="file" onchange="ImportCSV(event)" hidden id="fileInput" accept=".csv">
-            <div class="tab-pane fade" id="archive-section">
-                <h2>Voir l'archive de la base de données par année</h2>
-                <!-- Add your archive viewing content here -->
+            <div class="listsection" display="none">
+                <h2>Voir</h2>
+                <div class="tablewrap" style="flex-grow: 1;">
+                    <table><thead><tr></tr></thead><tbody></tbody></table>
+                </div>
+                <button><i class="fa-regular fa-check"></i> Confirmer</button>
             </div>
         </div>
     </div>
@@ -79,9 +82,15 @@ function ImportCSV(ev) {
         const data = e.target.result;
         const lines = data.split("\n");
         const headers = lines[0].split(",");
-        const table = document.createElement("table");
-        const thead = document.createElement("thead");
-        const tbody = document.createElement("tbody");
+        const table = document.querySelector(".infoeditor table");
+        const thead = table.querySelector("thead");
+        const tbody = table.querySelector("tbody");
+
+        // Clear existing table content
+        thead.innerHTML = "";
+        tbody.innerHTML = "";
+
+        // Populate headers
         const tr = document.createElement("tr");
         headers.forEach((header) => {
             const th = document.createElement("th");
@@ -89,18 +98,18 @@ function ImportCSV(ev) {
             tr.appendChild(th);
         });
         thead.appendChild(tr);
-        table.appendChild(thead);
+
+        // Populate rows
         lines.slice(1).forEach((line) => {
             const tr = document.createElement("tr");
-            line.split(",").forEach((cell) => {
-                const td = document.createElement("td");
-                td.textContent = cell;
-                tr.appendChild(td);
+            const cells = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+            cells.forEach((cell) => {
+            const td = document.createElement("td");
+            td.textContent = cell.replace(/(^"|"$)/g, ''); // Remove surrounding quotes if any
+            tr.appendChild(td);
             });
             tbody.appendChild(tr);
         });
-        table.appendChild(tbody);
-        document.querySelector(".infoeditor").appendChild(table);
     };
     reader.readAsText(file);
 }
