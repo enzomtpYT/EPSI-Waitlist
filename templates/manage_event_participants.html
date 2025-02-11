@@ -171,11 +171,13 @@ function toggletag(tag) {
 
     let allTagElements = document.querySelectorAll(".cand tbody tr");
     allTagElements.forEach(tagElement => {
-        const hasAllSelectedTags = !selectedTags.every(selectedTag => tagElement.classList.contains(`tag-${selectedTag}`));
+        const noTagSelected = selectedTags.length === 0;
+        const hasAllSelectedTags = selectedTags.some(selectedTag => tagElement.classList.contains(`tag-${selectedTag}`));
         const isChecked = tagElement.querySelector(".checkbox").checked;
         const isAttendSelected = document.querySelector('#attend').classList.contains("selectag");
+        console.log(hasAllSelectedTags, isChecked, isAttendSelected);
 
-        const isActive = hasAllSelectedTags || (isChecked && isAttendSelected);
+        const isActive = hasAllSelectedTags || (isChecked && isAttendSelected) || noTagSelected;
         tagElement.style.display = isActive ? "table-row" : "none";
     });
 }
