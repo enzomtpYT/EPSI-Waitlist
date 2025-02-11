@@ -76,6 +76,14 @@ def get_list():
     if error:
         return jsonify({"error": error}), 400
     return jsonify(datas)
+@api_bp.route('/api/import_csv', methods=['POST'])
+def import_csv():
+    data = request.get_json()
+    if data:
+        error = api.import_csv(data)
+    if error:
+        return jsonify({"error": error}), 400
+    return jsonify({"success": True}), 200
 
 @api_bp.route('/api/skip_candidate', methods=['POST'])
 def skip_candidate():

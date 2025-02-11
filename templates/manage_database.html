@@ -24,7 +24,7 @@
                 <div class="tablewrap" style="flex-grow: 1; display: none;">
                     <table style="height: fit-content;"><thead><tr></tr></thead><tbody></tbody></table>
                 </div>
-                <button style="display: none;"><i class="fa-regular fa-check"></i> Confirmer</button>
+                <button onclick="submit()" style="display: none;"><i class="fa-regular fa-check"></i> Confirmer</button>
                 <div class="chosedata">
                     <i class="fa-regular fa-file-arrow-down"></i>
                     <h1>Choisir ou importer des données</h1>
@@ -37,8 +37,28 @@
 <script>
 let candidates = []
 
-function importCSV(event) {
-    event.preventDefault();
+function submit() {
+    if (confirm("Êtes-vous sûr de vouloir importer ces données ?")) {
+        fetch("{{ url_for('api.import_csv') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(candidates)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                popup('success', 'Les données ont été importées avec succès');
+            } else {
+                popup('danger', 'Une erreur s\'est produite lors de l\'importation des données');
+            }
+        })
+        .catch(error => {
+            popup('danger', 'Une erreur s\'est produite lors de l\'importation des données');
+            console.error('Error:', error);
+        });
+    }
 }
 
 const dropzone = document.getElementById("dropzone");

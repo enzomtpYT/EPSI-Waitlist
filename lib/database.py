@@ -23,22 +23,65 @@ def get_db_connection():
 
 today = datetime.date.today()
 
-def insert_from_csv_row(row):
+def import_csv(jsoncsv):
     conn = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
         cursor = conn.cursor()
-        lastname_candidate, name_candidate, email_candidate = row
-        cursor.execute('''
-        INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate)
-        VALUES (%s, %s, %s, %s)
-        ''', (lastname_candidate, name_candidate, email_candidate))
+        for entry in jsoncsv:
+            # Determine username
+            username = entry['username'] if entry['username'] else entry['email']
+
+            # Create or update user
+            cursor.execute('''
+            INSERT INTO "User" (username) VALUES (%s)
+            ON CONFLICT (username) DO NOTHING RETURNING id_user
+            ''', (username,))
+            user_id = cursor.fetchone()
+            if user_id is None:
+                cursor.execute('SELECT id_user FROM "User" WHERE username = %s', (username,))
+                user_id = cursor.fetchone()[0]
+            else:
+                user_id = user_id[0]
+
+            # Create or update candidate
+            cursor.execute('''
+            INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate, id_user)
+            VALUES (%s, %s, %s, %s)
+            ON CONFLICT (email_candidate) DO NOTHING RETURNING id_candidate
+            ''', (entry['lastname'], entry['name'], entry['email'], user_id))
+            candidate_id = cursor.fetchone()
+            if candidate_id is None:
+                cursor.execute('SELECT id_candidate FROM Candidate WHERE email_candidate = %s', (entry['email'],))
+                candidate_id = cursor.fetchone()[0]
+            else:
+                candidate_id = candidate_id[0]
+
+            # Create or update tags
+            for tag_name in entry['tags']:
+                cursor.execute('''
+                INSERT INTO Tag (name_tag) VALUES (%s)
+                ON CONFLICT (name_tag) DO NOTHING RETURNING id_tag
+                ''', (tag_name,))
+                tag_id = cursor.fetchone()
+                if tag_id is None:
+                    cursor.execute('SELECT id_tag FROM Tag WHERE name_tag = %s', (tag_name,))
+                    tag_id = cursor.fetchone()[0]
+                else:
+                    tag_id = tag_id[0]
+
+                # Associate tag with candidate
+                cursor.execute('''
+                INSERT INTO Candidate_tag (id_candidate, id_tag) VALUES (%s, %s)
+                ON CONFLICT (id_candidate, id_tag) DO NOTHING
+                ''', (candidate_id, tag_id))
+
         conn.commit()
         return None
     except psycopg2.Error as e:
-        print(f"Erreur lors de l'insertion dans la base de données: {e}")
-        return "Erreur lors de l'insertion dans la base de données"
+        print(f"Erreur lors de l'importation des données CSV: {e}")
+        return "Erreur lors de l'importation des données CSV"
     finally:
         conn.close()
 

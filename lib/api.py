@@ -157,6 +157,10 @@ def api_interviews(session_token):
         events[name]['interviews'].append(interview_dict)
     return events, None
 
+def import_csv(datas):
+    error = database.import_csv(datas)
+    return error
+
 def get_candidates():
     candidates, error = database.get_all_candidates()
     if error:
