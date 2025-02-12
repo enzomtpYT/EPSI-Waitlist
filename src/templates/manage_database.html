@@ -200,9 +200,81 @@ function buildManagement(data) {
     });
 }
 
-function viewArchive(archive) {
-    // Implement the logic to view the data from the selected archive
-    console.log("Viewing archive:", archive);
+function viewArchive(archives) {
+    fetch(`{{ url_for('api.get_archives') }}?archives=${archives}`)
+        .then(response => {
+            if (!response.ok) {
+                popup('danger', 'Une erreur est survenue lors de la récupération des données');
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const table = document.querySelector(".infoeditor table");
+            const thead = table.querySelector("thead");
+            const tbody = table.querySelector("tbody");
+
+            // Clear existing table content
+            thead.innerHTML = "";
+            tbody.innerHTML = "";
+
+            // Populate headers
+            const headers = ["Nom", "Prénom", "Email", "Actions"];
+            const tr = document.createElement("tr");
+            headers.forEach((header) => {
+                const th = document.createElement("th");
+                th.textContent = header;
+                tr.appendChild(th);
+            });
+            thead.appendChild(tr);
+
+            // Populate rows
+            data.forEach((cand) => {
+                const tr = document.createElement("tr");
+                const lastnameTd = document.createElement("td");
+                lastnameTd.textContent = cand.lastname;
+                tr.appendChild(lastnameTd);
+
+                const nameTd = document.createElement("td");
+                nameTd.textContent = cand.name;
+                tr.appendChild(nameTd);
+
+                const emailTd = document.createElement("td");
+                emailTd.textContent = cand.email;
+                tr.appendChild(emailTd);
+
+                const actionTd = document.createElement("td");
+                const button = document.createElement("button");
+                button.textContent = "Voir Historique";
+                button.onclick = () => {
+                    fetch(`{{ url_for('api.get_candidate_interviews') }}?candidate_id=${cand.id}`)
+                        .then(response => response.json())
+                        .then(interviews => {
+                            let history = "Historique des entretiens:\n";
+                            interviews.forEach(interview => {
+                                history += `Date: ${interview.date}, Commentaire: ${interview.comment}\n`;
+                            });
+                            alert(history);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching interviews:', error);
+                            popup('danger', 'Une erreur est survenue lors de la récupération de l\'historique des entretiens');
+                        });
+                };
+                actionTd.appendChild(button);
+                tr.appendChild(actionTd);
+
+                tbody.appendChild(tr);
+            });
+
+            // Show table
+            document.querySelector(".listsection .tablewrap").style.display = "flex";
+            document.querySelector(".listsection h2").style.display = "block";
+            document.querySelector(".listsection .chosedata").style.display = "none";
+        })
+        .catch(error => {
+            console.error('Error fetching archive:', error);
+        });
 }
 
 // Call fetchArchives on page load
