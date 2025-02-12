@@ -748,9 +748,12 @@ def get_candidate_email(id_candidate):
     finally:
         conn.close()
 
-def get_all_candidates():
+def get_all_candidates(schema='public'):
     """
     Récupère tous les candidats de la base de données.
+
+    Args:
+        schema (str): Le schéma de la base de données à utiliser.
 
     Returns:
         tuple: Un tuple contenant une liste de candidats et un message d'erreur si une erreur est survenue.
@@ -761,7 +764,8 @@ def get_all_candidates():
 
     try:
         cursor = conn.cursor(cursor_factory=RealDictCursor)
-        cursor.execute('SELECT * FROM Candidate')
+        cursor.execute(f'SET search_path TO {schema}')
+        cursor.execute(f'SELECT * FROM Candidate')
         candidates = cursor.fetchall()
 
         if candidates:
@@ -774,7 +778,7 @@ def get_all_candidates():
         return None, "Erreur requête base de données"
 
     finally:
-        # Fermes la connexion à la base de données
+        # Ferme la connexion à la base de données
         conn.close()
 
 def get_candidate(candidate_id):
