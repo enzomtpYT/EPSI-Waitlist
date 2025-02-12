@@ -85,6 +85,25 @@ def import_csv(jsoncsv):
     finally:
         conn.close()
 
+def get_archived_schemas():
+    conn = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+    try:
+        cursor = conn.cursor()
+        cursor.execute('''
+        SELECT schema_name
+        FROM information_schema.schemata
+        WHERE schema_name = 'public' OR schema_name LIKE 'archive_%'
+        ''')
+        archives = [row[0] for row in cursor.fetchall()]
+        return archives, None
+    except psycopg2.Error as e:
+        print(f"Erreur lors de la récupération des schémas archivés: {e}")
+        return None, "Erreur lors de la récupération des schémas archivés"
+    finally:
+        conn.close()
+
 # Event functions
 
 def create_event(name, date, has_timeslots, start_time_event=None, end_time_event=None):
