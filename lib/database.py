@@ -23,6 +23,73 @@ def get_db_connection():
 
 today = datetime.date.today()
 
+def copy_schema(target_schema, source_schema="public"):
+    """
+    Copie les tables et les contraintes d'un schéma source vers un schéma cible.
+    
+    Args:
+        target_schema (str): Le nom du schéma cible.
+        source_schema="public" (str): Le nom du schéma source.
+        
+    Returns:
+        str: Un message d'erreur si une erreur survient, None sinon.
+    """
+    # Connect to the PostgreSQL database
+    conn = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    cur = conn.cursor()
+
+    # Create the target schema
+    cur.execute(f"DROP SCHEMA IF EXISTS {target_schema} CASCADE;")
+    cur.execute(f"CREATE SCHEMA {target_schema};")
+
+    # Copy tables from the source schema to the target schema
+    cur.execute(f"""
+    DO $$ 
+    DECLARE 
+        r RECORD; 
+        table_exists BOOLEAN;
+    BEGIN
+      -- Loop through all tables in the source schema and copy them to the target schema
+      FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = '{source_schema}') LOOP
+        -- Check if table already exists in the target schema
+        SELECT EXISTS (
+            SELECT 1 
+            FROM pg_tables 
+            WHERE schemaname = '{target_schema}' 
+            AND tablename = r.tablename
+        ) INTO table_exists;
+        
+        -- If table does not exist in target schema, create it with data
+        IF NOT table_exists THEN
+            EXECUTE format('CREATE TABLE {target_schema}.%I AS TABLE {source_schema}.%I', r.tablename, r.tablename);
+        END IF;
+      END LOOP;
+      
+      -- Loop through constraints and copy them to the target schema
+      FOR r IN (SELECT conname, conrelid::regclass AS tablename, pg_get_constraintdef(oid) AS condef
+                FROM pg_constraint
+                WHERE connamespace = (SELECT oid FROM pg_namespace WHERE nspname = '{source_schema}')) LOOP
+        -- Ensure the table exists in the target schema before adding the constraint
+        IF EXISTS (
+            SELECT 1 
+            FROM pg_tables 
+            WHERE schemaname = '{target_schema}' 
+            AND tablename = r.tablename::text
+        ) THEN
+            EXECUTE format('ALTER TABLE "{target_schema}".%I ADD CONSTRAINT %I %s', r.tablename::text, r.conname, r.condef);
+        END IF;
+      END LOOP;
+    END $$;
+    """)
+
+    # Commit the transaction and close the connection
+    conn.commit()
+    cur.close()
+    conn.close()
+    return None
+
 def import_csv(jsoncsv):
     conn = get_db_connection()
     if conn is None:
