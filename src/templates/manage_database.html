@@ -13,11 +13,7 @@
     <div class="tabmanagment">
         <div class="sideItemList">
             <button class="listbtn" onclick="document.querySelector('#fileInput').click()"><i class="fa-regular fa-file-arrow-down"></i> Importer un CSV</button>
-            {# <button class="listbtn" onclick="exportCSV()"><i class="fa-regular fa-file-arrow-up"></i> Exporter un CSV</button> #}
             <button class="listbtn" onclick="reload()"><i class="fa-regular fa-rotate-right"></i> Recharger la liste</button>
-            <ul id="archiveList">
-                <!-- Archive list will be populated here -->
-            </ul>
         </div>
         <div class="resizer" id="resizer"></div>
         <div class="infoeditor">
@@ -183,17 +179,7 @@ function fetchArchives() {
             return response.json();
         })
         .then(data => {
-            const archiveList = document.getElementById("archiveList");
-            archiveList.innerHTML = "";
-            data.archives.forEach(archive => {
-                const li = document.createElement("li");
-                li.textContent = archive;
-                li.onclick = () => viewArchive(archive);
-                archiveList.appendChild(li);
-            });
-        })
-        .then(data => {
-            buildManagement(data);
+            buildManagement(data.archives);
         })
         .catch(error => {
             console.error('Error fetching archives:', error);
@@ -212,8 +198,6 @@ function buildManagement(data) {
         if (num === 0) item.click();
         num++;
     });
-    document.querySelector('#loading').style.display = 'none';
-    document.querySelector('.tabmanagment').style.display = 'flex';
 }
 
 function viewArchive(archive) {
@@ -224,7 +208,6 @@ function viewArchive(archive) {
 // Call fetchArchives on page load
 document.addEventListener("DOMContentLoaded", function() {
     fetchArchives();
-    buildManagement();
 });
 
 </script>
