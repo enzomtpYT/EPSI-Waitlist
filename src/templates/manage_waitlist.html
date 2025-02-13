@@ -13,7 +13,7 @@
             {% for participant in participants %}
             <div class="column">
                 <label class="interv" for="part{{ participant.id_participant }}">{{ participant.name_participant }}</label>
-                <select name="part{{ participant.id_participant }}" id="part{{ participant.id_participant }}" multiple size="{{ candidates|length+1 }}">
+                <select style="overflow-x: scroll;" name="part{{ participant.id_participant }}" id="part{{ participant.id_participant }}" multiple size="{{ candidates|length+1 }}">
                     {% for candidate in candidates %}
                         {% if candidate.id_candidate in existing_interviews[participant.id_participant] %}
                             <option class="listopt" value="cand{{ candidate.id_candidate }}" selected>{{ candidate.lastname_candidate }} {{ candidate.name_candidate }}</option>
