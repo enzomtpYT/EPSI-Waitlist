@@ -1,14 +1,1 @@
 CSS pour les pages event a fix (manage_event & create_event)
-
-"Ajouter un candidat à la liste d'attente" >
-    + intervenant qui n'étaient pas séléctionnés sont quand même dans l'event
-    + affiche tous les élèves alors qu'ils ne sont pas censé y être
-
-historique de l'event > voir les entretiens > pop up est invisible et bouton retour est invisible
-
-manage_database > quand on choisit le schema public, les données s'affichent mais le schéma n'apparait pas comme selectionné
-    + si aucun schéma n'est selectionné mais qu'on clique sur public, les données ne s'affichent pas
-
-import de csv à fix >
-    + quand on glisse un csv il s'affiche correctement mais il y a un bouton retour au lieu de confirmer l'import
-    + si on a cliqué sur un schéma et qu'on clique sur importer un csv ensuite la page d'import ne s'affiche pas
