@@ -822,7 +822,7 @@ def get_candidate_email(id_candidate):
     finally:
         conn.close()
 
-def get_all_candidates(schema='public'):
+def get_all_candidates():
     """
     Récupère tous les candidats de la base de données.
 
@@ -838,7 +838,6 @@ def get_all_candidates(schema='public'):
 
     try:
         cursor = conn.cursor(cursor_factory=RealDictCursor)
-        cursor.execute(f'SET search_path TO {schema}')
         cursor.execute(f'SELECT * FROM Candidate')
         candidates = cursor.fetchall()
 

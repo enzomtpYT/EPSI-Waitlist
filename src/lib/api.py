@@ -161,8 +161,8 @@ def import_csv(datas):
     error = database.import_csv(datas)
     return error
 
-def get_candidates(schema='public'):
-    candidates, error = database.get_all_candidates(schema)
+def get_candidates():
+    candidates, error = database.get_all_candidates()
     if error:
         return None, error
 
