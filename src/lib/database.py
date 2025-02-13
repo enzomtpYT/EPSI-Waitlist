@@ -807,7 +807,7 @@ def create_candidate(lastname, name, email):
 
         # Insere le candidat dans la base de données
         cursor.execute('INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate, id_user) VALUES (%s, %s, %s, %s) RETURNING id_candidate', (lastname, name, email, user_id))
-        candidate_id = cursor.fetchone()['id_user']
+        candidate_id = cursor.fetchone()['id_candidate']
 
         # Assigne le rôle "candidate" à l'utilisateur
         cursor.execute('INSERT INTO User_role (id_user, id_role) VALUES (%s, (SELECT id_role FROM Role WHERE name_role = %s))', (user_id, 'candidate'))
