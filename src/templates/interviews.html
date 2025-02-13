@@ -24,7 +24,7 @@
                 <td>{{ interview.name_candidate }} {{ interview.lastname_candidate }}</td>
                 <td>{% if interview.duration_interview is not none %}{{ interview.duration_interview }}{% else %}&nbsp;{% endif %}</td>
                 <td class="actionbtn">
-                    <button type="button" class="feedback-btn" data-feedback-candidate="{{ interview.feedback_candidate }}" data-feedback-participant="{{ interview.feedback_participant }}">
+                    <button onclick="openfeedbacks(this)" type="button" class="feedback-btn" data-feedback-candidate="{{ interview.feedback_candidate }}" data-feedback-participant="{{ interview.feedback_participant }}">
                         Voir les feedbacks
                     </button>
                 </td>
@@ -43,12 +43,12 @@
 
 <div id="feedbackModal" class="modal">
     <div class="modal-content">
-        <span class="close">&times;</span>
+        <i class="fa-regular fa-x close" onclick="toggleElement(this.parentElement.parentElement)"></i>
         <h2>Feedback de l'entretien</h2>
-        <p><strong>Feedback de l'intervenant :</strong></p>
-        <p id="participantFeedback"></p>
-        <p><strong>Feedback du candidat :</strong></p>
-        <p id="candidateFeedback"></p>
+        <h3 id="partfeedtitle">Feedback de l'intervenant :</h3>
+        <div class="feedb" id="participantFeedback"></div>
+        <h3 id="candfeedtitle">Feedback du candidat :</h3>
+        <div class="feedb" id="candidateFeedback"></div>
     </div>
 </div>
 
@@ -56,29 +56,43 @@
 // Get the modal
 var modal = document.getElementById("feedbackModal");
 
-// Get the <span> element that closes the modal
-var span = document.getElementsByClassName("close")[0];
+function openfeedbacks(el) {
+    var participantFeedbackEl = document.getElementById('participantFeedback');
+    var candidateFeedbackEl = document.getElementById('candidateFeedback');
+    var partfeedtitle = document.getElementById('partfeedtitle');
+    var candfeedtitle = document.getElementById('candfeedtitle');
+    var participantFeedback = el.getAttribute('data-feedback-participant');
+    var candidateFeedback = el.getAttribute('data-feedback-candidate');
 
-// When the user clicks on the button, open the modal
-document.querySelectorAll('.feedback-btn').forEach(button => {
-    button.onclick = function() {
-        var participantFeedback = this.getAttribute('data-feedback-participant');
-        var candidateFeedback = this.getAttribute('data-feedback-candidate');
-        document.getElementById('participantFeedback').innerText = participantFeedback;
-        document.getElementById('candidateFeedback').innerText = candidateFeedback;
-        modal.style.display = "flex";
+    if (participantFeedback === null) {
+        participantFeedbackEl.style.display = 'none';
+        partfeedtitle.style.display = 'none';
+    } else {
+        participantFeedbackEl.style.display = 'flex';
+        partfeedtitle.style.display = 'block';
+        mark(participantFeedbackEl, participantFeedback);
     }
-});
 
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
-    modal.style.display = "none";
+    if (candidateFeedback === null) {
+        candidateFeedbackEl.style.display = 'none';
+        candfeedtitle.style.display = 'none';
+    } else {
+        candidateFeedbackEl.style.display = 'flex';
+        candfeedtitle.style.display = 'block';
+        mark(candidateFeedbackEl, candidateFeedback);
+    }
+
+    if (candidateFeedback === null && participantFeedback === null) {
+        popup('info', 'Aucun feedback n\'a été enregistré pour cet entretien');
+    } else {
+        toggleElement(modal);
+    }
 }
 
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
     if (event.target == modal) {
-        modal.style.display = "none";
+        toggleElement(modal);
     }
 }
 </script>
