@@ -46,9 +46,9 @@ def copy_schema(target_schema, source_schema="public"):
 
     # Copy tables from the source schema to the target schema
     cursor.execute(f"""
-    DO $$
-    DECLARE
-        r RECORD;
+    DO $$ 
+    DECLARE 
+        r RECORD; 
         table_exists BOOLEAN;
     BEGIN
       -- Loop through all tables in the source schema and copy them to the target schema
@@ -236,7 +236,7 @@ def get_archived_schemas():
         WHERE schema_name = 'public' OR schema_name LIKE 'archive_%'
         ''')
         schemas = [row['schema_name'] for row in cursor.fetchall()]
-
+        
         result = []
         for schema in schemas:
             cursor.execute(f'''
@@ -2888,14 +2888,14 @@ def get_employee(employee_id):
         # Ferme la connexion à la base de données
         conn.close()
 
-def edit_employee(lastname_employee, name_employee, email_employee, role, id_employee):
+def edit_employee(lastname, name, email, role, id_employee):
     """
     Met à jour les informations d'un employé, y compris son rôle.
 
     Args:
-        lastname_employee (str): Le nom de famille de l'employé.
-        name_employee (str): Le prénom de l'employé.
-        email_employee (str): L'adresse email de l'employé.
+        lastname (str): Le nom de famille de l'employé.
+        name (str): Le prénom de l'employé.
+        email (str): L'adresse email de l'employé.
         role (str): Le rôle de l'employé.
         id_employee (int): L'identifiant de l'employé.
 
@@ -2908,12 +2908,11 @@ def edit_employee(lastname_employee, name_employee, email_employee, role, id_emp
     try:
 
         # Met à jour les informations de l'employé dans la table Employee
-        cursor = conn.cursor()
         cursor.execute('''
         UPDATE Employee
         SET lastname_employee = %s, name_employee = %s, email_employee = %s
         WHERE id_employee = %s
-        ''', (lastname_employee, name_employee, email_employee, id_employee))
+        ''', (lastname, name, email, id_employee))
 
         # Récupère l'id_role correspondant au nom du rôle
         cursor.execute('SELECT id_role FROM Role WHERE name_role = %s', (role,))
@@ -2926,7 +2925,7 @@ def edit_employee(lastname_employee, name_employee, email_employee, role, id_emp
         UPDATE User_role
         SET id_role = %s
         WHERE id_user = (SELECT id_user FROM Employee WHERE id_employee = %s)
-        ''', (role_id['id_user'], id_employee))
+        ''', (role_id['id_role'], id_employee))
 
         conn.commit()
         return None
