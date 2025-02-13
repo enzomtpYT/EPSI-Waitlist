@@ -24,6 +24,8 @@ def manage_event_participants_api_args():
     if id_event is None:
         return jsonify({"error": "Missing id_event parameter"}), 400
     datas, error = api.get_event_participants(id_event)
+    if error:
+        return jsonify({"error": error}), 400
     return jsonify(datas)
 
 @api_bp.route('/api/process_event_participants', methods=['POST'])

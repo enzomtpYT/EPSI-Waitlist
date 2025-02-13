@@ -16,10 +16,11 @@ def get_db_connection():
     try:
         conn = psycopg2.connect(os.getenv('db_url'))
         conn.autocommit = True
-        return conn
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        return conn, cursor
     except psycopg2.Error as e:
         print(f"Erreur base de données: {e}")
-        return None
+        return None, None
 
 today = datetime.date.today()
 
@@ -35,17 +36,16 @@ def copy_schema(target_schema, source_schema="public"):
         str: Un message d'erreur si une erreur survient, None sinon.
     """
     # Connect to the PostgreSQL database
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
-    cur = conn.cursor()
 
     # Create the target schema
-    cur.execute(f"DROP SCHEMA IF EXISTS {target_schema} CASCADE;")
-    cur.execute(f"CREATE SCHEMA {target_schema};")
+    cursor.execute(f"DROP SCHEMA IF EXISTS {target_schema} CASCADE;")
+    cursor.execute(f"CREATE SCHEMA {target_schema};")
 
     # Copy tables from the source schema to the target schema
-    cur.execute(f"""
+    cursor.execute(f"""
     DO $$ 
     DECLARE 
         r RECORD; 
@@ -86,16 +86,15 @@ def copy_schema(target_schema, source_schema="public"):
 
     # Commit the transaction and close the connection
     conn.commit()
-    cur.close()
+    cursor.close()
     conn.close()
     return None
 
 def import_csv(jsoncsv):
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         for entry in jsoncsv:
             # Determine username
             username = entry['username'] if entry['username'] else entry['email']
@@ -153,17 +152,16 @@ def import_csv(jsoncsv):
         conn.close()
 
 def get_archived_schemas():
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('''
         SELECT schema_name
         FROM information_schema.schemata
         WHERE schema_name = 'public' OR schema_name LIKE 'archive_%'
         ''')
-        archives = [row[0] for row in cursor.fetchall()]
+        archives = [row['schema_name'] for row in cursor.fetchall()]
         return archives, None
     except psycopg2.Error as e:
         print(f"Erreur lors de la récupération des schémas archivés: {e}")
@@ -187,11 +185,10 @@ def create_event(name, date, has_timeslots, start_time_event=None, end_time_even
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('INSERT INTO Event (name_event, date_event, has_timeslots, start_time_event, end_time_event) VALUES (%s, %s, %s, %s, %s) RETURNING id_event', (name, date, has_timeslots, start_time_event, end_time_event))
         event_id = cursor.fetchone()[0]
         return event_id, None
@@ -209,11 +206,10 @@ def get_all_events():
         list: Une liste de dictionnaires représentant les événements.
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('SELECT * FROM Event')
         events = cursor.fetchall()
         if events:
@@ -246,11 +242,10 @@ def get_event(event_id):
         dict: Un dictionnaire représentant l'événement, ses créneaux horaires et ses tags.
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('SELECT * FROM Event WHERE id_event = %s', (event_id,))
         event = cursor.fetchone()
         if event['has_timeslots']:
@@ -287,11 +282,10 @@ def edit_event(name, date, id_event, has_timeslots, start_time_event=None, end_t
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('UPDATE Event SET name_event = %s, date_event = %s, has_timeslots = %s, start_time_event = %s, end_time_event = %s WHERE id_event = %s', (name, date, has_timeslots, start_time_event, end_time_event, id_event))
     except psycopg2.Error as e:
         print(f"Erreur lors de la mise à jour de l'événnement: {e}")
@@ -313,11 +307,10 @@ def add_timeslot_to_event(id_event, start_timeslot, end_timeslot, nbr_spots):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('''
         INSERT INTO Timeslot (id_event, start_timeslot, end_timeslot, nbr_spots_timeslot)
         VALUES (%s, %s, %s, %s)
@@ -343,11 +336,10 @@ def edit_timeslot(start_timeslot, end_timeslot, nbr_spots, id_timeslot):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('''
         UPDATE Timeslot SET start_timeslot = %s, end_timeslot = %s, nbr_spots_timeslot = %s WHERE id_timeslot = %s
         ''', (start_timeslot, end_timeslot, nbr_spots, id_timeslot))
@@ -369,11 +361,10 @@ def delete_timeslot(id_timeslot):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute("DELETE FROM Timeslot WHERE id_timeslot = %s", (id_timeslot,))
         conn.commit()
         return None
@@ -393,11 +384,10 @@ def delete_event(id_event):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute("DELETE FROM Event WHERE id_event = %s", (id_event,))
     except psycopg2.Error as e:
         print(f"Erreur lors de la suppression de l'événement: {e}")
@@ -416,11 +406,10 @@ def get_event_interviews(id_event):
     Returns:
         tuple: Un tuple contenant l'événement, les interviews et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('SELECT * FROM Event WHERE id_event = %s', (id_event,))
         event = cursor.fetchone()
         cursor.execute('''
@@ -446,11 +435,10 @@ def get_today_events():
     Returns:
         tuple: Un tuple contenant l'identifiant de l'événement et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('SELECT id_event FROM Event WHERE date_event = %s', (today,))
         events = cursor.fetchall()
         if events:
@@ -473,11 +461,10 @@ def get_event_candidates(id_event):
     Returns:
         tuple: Un tuple contenant une liste de candidats et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
         SELECT Candidate.*, Attends.priority
         FROM Candidate
@@ -502,11 +489,10 @@ def get_event_participants(id_event):
     Returns:
         tuple: Un tuple contenant une liste de participants et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
         SELECT Participant.*
         FROM Participant
@@ -533,11 +519,10 @@ def upsert_event_attends(id_event, id_candidate, priority):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('''
         INSERT INTO Attends (id_event, id_candidate, priority)
         VALUES (%s, %s, %s)
@@ -562,11 +547,10 @@ def upsert_event_participates(id_event, id_participant):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('''
         INSERT INTO Participates (id_event, id_participant)
         VALUES (%s, %s)
@@ -591,11 +575,10 @@ def get_event_details(id_event):
         dict: Un dictionnaire contenant les détails de l'événement, les candidats, les participants et les tags.
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
 
         # Récupère les informations de l'événement et les tags associés en une seule requête
         cursor.execute('''
@@ -608,6 +591,12 @@ def get_event_details(id_event):
         GROUP BY Event.id_event
         ''', (id_event,))
         event = cursor.fetchone()
+        # Convert datetime.time objects to strings
+        if event:
+            if 'start_time_event' in event and isinstance(event['start_time_event'], datetime.time):
+                event['start_time_event'] = event['start_time_event'].strftime('%H:%M:%S')
+            if 'end_time_event' in event and isinstance(event['end_time_event'], datetime.time):
+                event['end_time_event'] = event['end_time_event'].strftime('%H:%M:%S')
 
         # Récupère tous les candidats et leurs tags en une seule requête
         cursor.execute('''
@@ -663,11 +652,10 @@ def get_event_interview_candidate(todayevent, id_participant):
     Returns:
         tuple: Un tuple contenant une liste de candidats et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
         SELECT Interview.id_interview, Interview.id_candidate, Interview.id_participant, Interview.start_time_interview, Candidate.lastname_candidate, Candidate.name_candidate, Attends.priority
         FROM Interview
@@ -697,11 +685,10 @@ def create_candidate(lastname, name, email):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
 
         # Insère l'utilisateur dans la table User
         cursor.execute('INSERT INTO "User" (username) VALUES (%s) RETURNING id_user', (email,))
@@ -734,11 +721,10 @@ def get_candidate_email(id_candidate):
     Returns:
         str: L'adresse email du candidat.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None
     try:
-        cursor = conn.cursor()
         cursor.execute('SELECT email_candidate FROM Candidate WHERE id_candidate = %s', (id_candidate,))
         candidate = cursor.fetchone()
         return candidate[0] if candidate else None
@@ -758,12 +744,11 @@ def get_all_candidates():
     Returns:
         tuple: Un tuple contenant une liste de candidats et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
 
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute(f'SELECT * FROM Candidate')
         candidates = cursor.fetchall()
 
@@ -790,12 +775,11 @@ def get_candidate(candidate_id):
     Returns:
         tuple: Un tuple contenant le candidat et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         # Si la connexion échoue, renvoie une erreur
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
         SELECT Candidate.*, "User".username
         FROM Candidate
@@ -825,12 +809,11 @@ def edit_candidate(lastname, name, email, id_candidate):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
 
     try:
-        cursor = conn.cursor()
         # Met à jour le candidat dans la base de données
         cursor.execute('UPDATE Candidate SET lastname_candidate = %s, name_candidate = %s, email_candidate = %s WHERE id_candidate = %s', (lastname, name, email, id_candidate))
         # Sauvegarde les modifications
@@ -853,12 +836,11 @@ def delete_candidate(id_candidate):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         # Si la connexion échoue, renvoie une erreur
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         # Supprime l'utilisateur associé au candidat (candidat supprimé en cascade)
         cursor.execute('DELETE FROM "User" WHERE id_user = (SELECT id_user FROM Candidate WHERE id_candidate = %s)', (id_candidate,))
         # Sauvegarde les modifications
@@ -882,12 +864,11 @@ def get_candidate_events(id_candidate):
     Returns:
         tuple: Un tuple contenant une liste d'événements et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
 
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         # Renvoie les événements du candidat
         cursor.execute('''
         SELECT Event.id_event, Event.name_event, Event.date_event
@@ -915,12 +896,11 @@ def get_candidate_interviews(id_candidate):
     Returns:
         tuple: Un tuple contenant une liste d'interviews et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
 
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         # Renvoie les entretiens du candidat
         cursor.execute('''
         SELECT Interview.id_interview, Event.name_event, Event.date_event, Participant.name_participant, Interview.feedback_candidate, Interview.feedback_participant, Interview.duration_interview
@@ -947,12 +927,11 @@ def get_last_added_candidate():
     Returns:
         tuple: Un tuple contenant le candidat et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         # Si la connexion échoue, renvoie une erreur
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         # Renvoie le dernier candidat ajouté
         cursor.execute('SELECT * FROM Candidate ORDER BY id_candidate DESC LIMIT 1')
         candidate = cursor.fetchone()
@@ -976,12 +955,11 @@ def remove_candidate_from_all_interviews_for_event(id_event, id_candidate):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         # Si la connexion échoue, renvoie une erreur
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         # Exécute la requête pour supprimer le candidat de tous les entretiens associés à l'événement
         cursor.execute("DELETE FROM Interview WHERE id_event = %s AND id_candidate = %s", (id_event, id_candidate))
         # Sauvegarde les modifications
@@ -1006,12 +984,11 @@ def add_candidate_to_event(id_event, id_candidate):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         # Si la connexion échoue, renvoie une erreur
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         # Exécute la requête pour ajouter le candidat à l'événement
         cursor.execute('INSERT INTO Attends (id_event, id_candidate) VALUES (%s, %s)', (id_event, id_candidate))
         # Sauvegarde les modifications
@@ -1036,12 +1013,11 @@ def delete_candidate_from_event(id_event, id_candidate):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         # Si la connexion échoue, renvoie une erreur
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         # Exécute la requête pour supprimer le candidat de l'événement
         cursor.execute("DELETE FROM Attends WHERE id_event = %s AND id_candidate = %s", (id_event, id_candidate))
         # Sauvegarde les modifications
@@ -1068,11 +1044,10 @@ def create_participant(name, email):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, None, "Erreur base de données"
     try:
-        cursor = conn.cursor()
 
         # Insère l'utilisateur dans la table User
         cursor.execute('INSERT INTO "User" (username) VALUES (%s) RETURNING id_user', (email,))
@@ -1102,11 +1077,10 @@ def get_all_participants():
     Returns:
         tuple: Un tuple contenant une liste de participants et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('SELECT * FROM Participant')
         participants = cursor.fetchall()
         if participants:
@@ -1129,11 +1103,10 @@ def get_participant(participant_id):
     Returns:
         tuple: Un tuple contenant le participant et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
         SELECT Participant.*, "User".username
         FROM Participant
@@ -1158,11 +1131,10 @@ def get_participant_email(id_participant):
     Returns:
         str: L'adresse email de l'intervenant.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None
     try:
-        cursor = conn.cursor()
         cursor.execute('SELECT email_participant FROM Participant WHERE id_participant = %s', (id_participant,))
         participant = cursor.fetchone()
         return participant['email_participant']
@@ -1184,11 +1156,10 @@ def edit_participant(name, email, id_participant):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('UPDATE Participant SET name_participant = %s, email_participant = %s WHERE id_participant = %s', (name, email, id_participant))
         conn.commit()
     except psycopg2.Error as e:
@@ -1208,11 +1179,10 @@ def delete_participant(id_participant):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         # Supprime l'utilisateur associé au participant (participant supprimé en cascade)
         cursor.execute('DELETE FROM "User" WHERE id_user = (SELECT id_user FROM Participant WHERE id_participant = %s)', (id_participant,))
         conn.commit()
@@ -1233,11 +1203,10 @@ def get_participant_events(id_participant):
     Returns:
         tuple: Un tuple contenant une liste d'événements et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
         SELECT Event.id_event, Event.name_event, Event.date_event
         FROM Event
@@ -1262,11 +1231,10 @@ def get_participant_interviews(id_participant):
     Returns:
         tuple: Un tuple contenant une liste d'interviews et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
         SELECT Interview.id_interview, Event.name_event, Event.date_event, Candidate.lastname_candidate, Candidate.name_candidate, Interview.feedback_participant, Interview.feedback_candidate, Interview.duration_interview
         FROM Interview
@@ -1290,11 +1258,10 @@ def get_last_added_participant():
     Returns:
         tuple: Un tuple contenant le participant et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('SELECT * FROM Participant ORDER BY id_participant DESC LIMIT 1')
         participant = cursor.fetchone()
         return participant, None
@@ -1315,11 +1282,10 @@ def delete_participant_from_event(id_event, id_participant):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute("DELETE FROM Participates WHERE id_event = %s AND id_participant = %s", (id_event, id_participant))
         conn.commit()
     except psycopg2.Error as e:
@@ -1340,11 +1306,10 @@ def add_participant_to_event(id_event, id_participant):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('INSERT INTO Participates (id_event, id_participant) VALUES (%s, %s)', (id_event, id_participant))
         conn.commit()
     except psycopg2.Error as e:
@@ -1366,11 +1331,10 @@ def get_user_past_interviews(session_token):
     Returns:
         tuple: Un tuple contenant une liste d'entretiens et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('SELECT * FROM "User" WHERE session_token = %s', (session_token,))
         user = cursor.fetchone()
         if user:
@@ -1423,11 +1387,10 @@ def create_interview(id_event, id_participant, id_candidate):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('INSERT INTO Interview (id_event, id_participant, id_candidate, happened) VALUES (%s, %s, %s, FALSE)', (id_event, id_participant, id_candidate))
         conn.commit()
     except psycopg2.Error as e:
@@ -1447,11 +1410,10 @@ def get_interview(id_interview):
     Returns:
         tuple: Un tuple contenant l'interview et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('SELECT * FROM Interview WHERE id_interview = %s', (id_interview,))
         interview = cursor.fetchone()
         return interview, None
@@ -1473,11 +1435,10 @@ def editstart_interview(id_interview, start_time):
     Returns:
         tuple: Un tuple contenant l'identifiant de l'entretien et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('''
         UPDATE Interview
         SET start_time_interview = %s
@@ -1506,11 +1467,10 @@ def end_interview(interview_id, status):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         end_time = datetime.datetime.now()
         cursor.execute('''
         UPDATE Interview
@@ -1536,11 +1496,10 @@ def get_candidate_from_event_participants_inverviews(id_event, id_participant):
     Returns:
         tuple: Un tuple contenant une liste d'interviews et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
         SELECT Interview.id_interview, Candidate.lastname_candidate, Candidate.name_candidate, Candidate.id_candidate
         FROM Interview
@@ -1565,11 +1524,10 @@ def delete_interview(id_interview):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute("DELETE FROM Interview WHERE id_interview = %s", (id_interview,))
         conn.commit()
     except psycopg2.Error as e:
@@ -1591,11 +1549,10 @@ def get_interview_by_candidate_event_participant(id_candidate, id_event, id_part
     Returns:
         tuple: Un tuple contenant l'entretien et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
         SELECT * FROM Interview
         WHERE id_candidate = %s AND id_event = %s AND id_participant = %s
@@ -1620,11 +1577,10 @@ def create_tag(name):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('INSERT INTO Tag (name_tag) VALUES (%s)', (name,))
         conn.commit()
         return None
@@ -1641,11 +1597,10 @@ def get_all_tags():
     Returns:
         tuple: Un tuple contenant une liste de tags et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('SELECT * FROM Tag')
         tags = cursor.fetchall()
         if tags:
@@ -1668,11 +1623,10 @@ def get_tag(tag_id):
     Returns:
         tuple: Un tuple contenant le tag et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('SELECT * FROM Tag WHERE id_tag = %s', (tag_id,))
         tag = cursor.fetchone()
         return tag, None
@@ -1693,11 +1647,10 @@ def edit_tag(name, id_tag):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('UPDATE Tag SET name_tag = %s WHERE id_tag = %s', (name, id_tag))
         conn.commit()
     except psycopg2.Error as e:
@@ -1717,11 +1670,10 @@ def delete_tag(id_tag):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute("DELETE FROM Tag WHERE id_tag = %s", (id_tag,))
         conn.commit()
     except psycopg2.Error as e:
@@ -1741,9 +1693,8 @@ def get_candidate_tags(id_candidate):
     Returns:
         tuple: Un tuple contenant une liste de tags et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
         SELECT Tag.id_tag, Tag.name_tag
         FROM Tag
@@ -1769,9 +1720,8 @@ def add_tag_to_candidate(id_candidate, id_tag):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     try:
-        cursor = conn.cursor()
         cursor.execute('INSERT INTO Candidate_tag (id_candidate, id_tag) VALUES (%s, %s)', (id_candidate, id_tag))
         conn.commit()
         return None
@@ -1792,9 +1742,8 @@ def remove_tag_from_candidate(id_candidate, id_tag):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     try:
-        cursor = conn.cursor()
         cursor.execute('DELETE FROM Candidate_tag WHERE id_candidate = %s AND id_tag = %s', (id_candidate, id_tag))
         conn.commit()
         return None
@@ -1814,9 +1763,8 @@ def get_participant_tags(id_participant):
     Returns:
         tuple: Un tuple contenant une liste de tags et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
         SELECT Tag.id_tag, Tag.name_tag
         FROM Tag
@@ -1842,9 +1790,8 @@ def add_tag_to_participant(id_participant, id_tag):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     try:
-        cursor = conn.cursor()
         cursor.execute('INSERT INTO Participant_tag (id_participant, id_tag) VALUES (%s, %s)', (id_participant, id_tag))
         conn.commit()
         return None
@@ -1865,9 +1812,8 @@ def remove_tag_from_participant(id_participant, id_tag):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     try:
-        cursor = conn.cursor()
         cursor.execute('DELETE FROM Participant_tag WHERE id_participant = %s AND id_tag = %s', (id_participant, id_tag))
         conn.commit()
         return None
@@ -1887,9 +1833,8 @@ def get_event_tags(id_event):
     Returns:
         tuple: Un tuple contenant une liste de tags et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
         SELECT Tag.*
         FROM Tag
@@ -1915,9 +1860,8 @@ def add_tag_to_event(id_event, id_tag):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     try:
-        cursor = conn.cursor()
         cursor.execute('INSERT INTO Event_tag (id_event, id_tag) VALUES (%s, %s)', (id_event, id_tag))
         conn.commit()
         return None
@@ -1938,9 +1882,8 @@ def remove_tag_from_event(id_event, id_tag):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     try:
-        cursor = conn.cursor()
         cursor.execute('DELETE FROM Event_tag WHERE id_event = %s AND id_tag = %s', (id_event, id_tag))
         conn.commit()
         return None
@@ -1957,11 +1900,10 @@ def get_last_added_event():
     Returns:
         tuple: Un tuple contenant l'événement et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('SELECT * FROM Event ORDER BY id_event DESC LIMIT 1')
         event = cursor.fetchone()
         return event, None
@@ -1985,11 +1927,10 @@ def edit_attends(id_candidat, id_event, priority):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('UPDATE Attends SET priority = %s WHERE id_candidate = %s AND id_event = %s', (priority, id_candidat, id_event))
         conn.commit()
     except psycopg2.Error as e:
@@ -2011,11 +1952,10 @@ def create_attends(id_candidate, id_event, priority):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('INSERT INTO Attends (id_candidate, id_event, priority) VALUES (%s, %s, %s)', (id_candidate, id_event, priority))
         conn.commit()
     except psycopg2.Error as e:
@@ -2036,11 +1976,10 @@ def delete_attends(id_candidate, id_event):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute("DELETE FROM Attends WHERE id_candidate = %s AND id_event = %s", (id_candidate, id_event))
         conn.commit()
     except psycopg2.Error as e:
@@ -2061,11 +2000,10 @@ def create_participates(id_participant, id_event):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('INSERT INTO Participates (id_participant, id_event) VALUES (%s, %s)', (id_participant, id_event))
         conn.commit()
     except psycopg2.Error as e:
@@ -2086,11 +2024,10 @@ def delete_participates(id_event, id_participant):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute("DELETE FROM Participates WHERE id_participant = %s AND id_event = %s", (id_participant, id_event))
         conn.commit()
     except psycopg2.Error as e:
@@ -2112,11 +2049,10 @@ def auth_get_session(username):
     Returns:
         tuple: Un tuple contenant la session et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('SELECT session_token FROM "User" WHERE username = %s', (username,))
         session = cursor.fetchone()
         return session[0], None
@@ -2136,11 +2072,10 @@ def auth_get_hashedpassword(username):
     Returns:
         tuple: Un tuple contenant le mot de passe hashé et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('SELECT password_user FROM "User" WHERE username = %s', (username,))
         password_user = cursor.fetchone()
         return password_user, None
@@ -2162,11 +2097,10 @@ def update_user_password(username, password, session_token):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('UPDATE "User" SET password_user = %s, session_token = %s WHERE username = %s', (password, session_token, username))
         conn.commit()
         return None
@@ -2188,11 +2122,10 @@ def auth_update_password(password, session_token, id_user):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('UPDATE "User" SET password_user = %s, session_token = %s WHERE id_user = %s', (password, session_token, id_user))
         conn.commit()
         return None
@@ -2213,11 +2146,10 @@ def auth_update_username(username, id_user):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('UPDATE "User" SET username = %s WHERE id_user = %s', (username, id_user))
         conn.commit()
         return None
@@ -2240,11 +2172,10 @@ def auth_register_candidate(id_candidate, username, password_user, session_token
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('INSERT INTO "User" (username, password_user, session_token) VALUES (%s, %s, %s)', (username, password_user, session_token))
         conn.commit()
         # get latest user id
@@ -2273,11 +2204,10 @@ def auth_register_employee(id_employee, username, password_user, session_token):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('INSERT INTO "User" (username, password_user, session_token) VALUES (%s, %s, %s)', (username, password_user, session_token))
         conn.commit()
         # get latest user id
@@ -2308,9 +2238,8 @@ def get_user_permissions(user_id):
     Raises:
         psycopg2.Error: Si une erreur de base de données survient lors de l'exécution de la requête.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
         SELECT Permission.name_permission
         FROM Permission
@@ -2336,11 +2265,10 @@ def get_user_role_with_token(session_token):
     Returns:
         tuple: Un tuple contenant le rôle et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
         SELECT Role.name_role
         FROM Role
@@ -2375,9 +2303,8 @@ def auth_get_perms_from_session(session_token):
     Raises:
         psycopg2.Error: Si une erreur de base de données survient lors de l'exécution de la requête.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
         SELECT Permission.name_permission
         FROM Permission
@@ -2404,9 +2331,8 @@ def auth_is_superuser(session_token):
     Returns:
         bool: True si l'utilisateur est un super-utilisateur, False sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     try:
-        cursor = conn.cursor()
         cursor.execute('''
         SELECT Role.name_role
         FROM Role
@@ -2432,9 +2358,8 @@ def auth_get_user_type(session_token):
     Returns:
         str: Le type d'utilisateur ("candidat", "participant" ou "employee"), ou None si non trouvé.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
         SELECT Candidate.id_candidate
         FROM Candidate
@@ -2479,11 +2404,10 @@ def auth_get_type_id(session_token):
     Returns:
         tuple: Un tuple contenant l'id du type utilisateur et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
         SELECT Candidate.id_candidate
         FROM Candidate
@@ -2528,12 +2452,11 @@ def get_user_role(user_id):
     Returns:
         str: Le nom du rôle associé à l'utilisateur, ou None si une erreur est survenue ou si le rôle n'est pas trouvé.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         print("Erreur base de données")
         return None
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
         SELECT Role.name_role
         FROM Role
@@ -2562,11 +2485,10 @@ def update_user_role(user_id, role_name):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('''
         UPDATE User_role
         SET id_role = (SELECT id_role FROM Role WHERE name_role = %s)
@@ -2591,11 +2513,10 @@ def get_profile_info(session_token):
     Returns:
         tuple: Un tuple contenant les informations de profil (nom d'utilisateur, email, (plus tard: CV, biographie), type d'utilisateur (particpant, candidat, etc..) et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
         SELECT "User".username, Candidate.email_candidate AS email
         FROM "User"
@@ -2645,11 +2566,10 @@ def update_profile_info(oldusername, newusername, email):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('''
         UPDATE "User"
         SET username = %s
@@ -2685,11 +2605,10 @@ def get_user(user_id):
     Returns:
         tuple: Un tuple contenant l'utilisateur et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('SELECT * FROM "User" WHERE id_user = %s', (user_id,))
         user = cursor.fetchone()
         return user, None
@@ -2710,11 +2629,10 @@ def update_username_with_id(user_id, username):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         cursor.execute('UPDATE "User" SET username = %s WHERE id_user = %s', (username, user_id))
         conn.commit()
         return None
@@ -2738,11 +2656,10 @@ def create_employee(lastname, name, email, role):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, None, "Erreur base de données"
     try:
-        cursor = conn.cursor()
 
         # Insère l'utilisateur dans la table User
         cursor.execute('INSERT INTO "User" (username) VALUES (%s) RETURNING id_user', (email,))
@@ -2781,11 +2698,10 @@ def get_employee_email(id_employee):
     Returns:
         str: L'adresse email de l'employé.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None
     try:
-        cursor = conn.cursor()
         cursor.execute('SELECT email_employee FROM Employee WHERE id_employee = %s', (id_employee,))
         employee = cursor.fetchone()
         return employee[0] if employee else None
@@ -2802,12 +2718,11 @@ def get_all_employees():
     Returns:
         tuple: Un tuple contenant une liste d'employés et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
 
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         # Renvoie tous les employés de la base de données
         cursor.execute('''
         SELECT "User".id_user, "User".username, Employee.*, Role.name_role
@@ -2840,12 +2755,11 @@ def get_employee(employee_id):
     Returns:
         tuple: Un tuple contenant l'employé et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         # Si la connexion échoue, renvoie une erreur
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         # Exécute la requête pour récupérer l'employé et le nom d'utilisateur
         cursor.execute('''
         SELECT Employee.*, "User".username
@@ -2877,11 +2791,10 @@ def edit_employee(lastname, name, email, role, id_employee):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
 
         # Met à jour les informations de l'employé dans la table Employee
         cursor.execute('''
@@ -2921,12 +2834,11 @@ def delete_employee(id_employee):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         # Si la connexion échoue, renvoie une erreur
         return "Erreur base de données"
     try:
-        cursor = conn.cursor()
         # Supprime l'utilisateur associé à l'employé (employé supprimé en cascade)
         cursor.execute('DELETE FROM "User" WHERE id_user = (SELECT id_user FROM Employee WHERE id_employee = %s)', (id_employee,))
         # Sauvegarde les modifications
@@ -2950,11 +2862,10 @@ def get_employee_interviews(id_employee):
     Returns:
         tuple: Un tuple contenant une liste d'interviews et un message d'erreur si une erreur est survenue.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('''
         SELECT Interview.id_interview, Event.name_event, Event.date_event, Candidate.lastname_candidate, Candidate.name_candidate, Interview.feedback_employee, Interview.feedback_candidate, Interview.duration_interview
         FROM Interview
@@ -2985,12 +2896,11 @@ def update_feedback(id_interview, feedback, type):
     Returns:
         str: Un message d'erreur si une erreur est survenue, None sinon.
     """
-    conn = get_db_connection()
+    conn, cursor = get_db_connection()
     if conn is None:
         return "Erreur base de données"
 
     try:
-        cursor = conn.cursor()
         if type == "candidate":
             cursor.execute('UPDATE Interview SET feedback_candidate = %s WHERE id_interview = %s', (feedback, id_interview))
         elif type == "participant":
