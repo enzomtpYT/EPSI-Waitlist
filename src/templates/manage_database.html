@@ -24,7 +24,7 @@
                     <table style="height: fit-content;"><thead><tr></tr></thead><tbody></tbody></table>
                 </div>
                 <button class="backbtn" style="display: none;"><i class="fa-regular fa-arrow-left"></i> Retour</button>
-                <button onclick="submit()" style="display: none;"><i class="fa-regular fa-check"></i> Confirmer</button>
+                <button class="submit" onclick="submit()" style="display: none;"><i class="fa-regular fa-check"></i> Confirmer</button>
                 <div onclick="document.querySelector('#fileInput').click()" class="chosedata">
                     <i class="fa-regular fa-file-arrow-down"></i>
                     <h1>Choisir ou importer des données</h1>
@@ -124,6 +124,7 @@ function ImportCSV(ev) {
     const file = ev.target.files[0];
     const reader = new FileReader();
     reader.onload = function(e) {
+        document.querySelectorAll('.itemlist').forEach(item => { item.classList.remove('selected'); });
         backBtn = document.querySelector(".listsection .backbtn");
         backBtn.style.display = "none";
         const data = e.target.result;
@@ -182,7 +183,7 @@ function ImportCSV(ev) {
             candidates.push(cand);
             // Show table, button and h2 and then hide the h1
             document.querySelector(".listsection .tablewrap").style.display = "flex";
-            document.querySelector(".listsection button").style.display = "block";
+            document.querySelector(".listsection .submit").style.display = "block";
             document.querySelector(".listsection h2").style.display = "block";
             document.querySelector(".listsection .chosedata").style.display = "none";
         });
@@ -286,6 +287,7 @@ function viewArchive(archives) {
 
         const tagsTd = document.createElement("td");
         cand.tags.forEach(tag => {
+            if (tag === "" || tag === null) return;
             const tagElement = document.createElement("p");
             tagElement.classList.add("display-tag");
             tagElement.textContent = tag.name_tag;
