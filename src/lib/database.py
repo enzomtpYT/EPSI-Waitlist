@@ -181,9 +181,9 @@ def import_csv(jsoncsv):
             user_id = cursor.fetchone()
             if user_id is None:
                 cursor.execute('SELECT id_user FROM "User" WHERE username = %s', (username,))
-                user_id = cursor.fetchone()[0]
+                user_id = cursor.fetchone()['id_user']
             else:
-                user_id = user_id[0]
+                user_id = user_id['id_user']
 
             # Create or update candidate
             cursor.execute('''
@@ -194,9 +194,9 @@ def import_csv(jsoncsv):
             candidate_id = cursor.fetchone()
             if candidate_id is None:
                 cursor.execute('SELECT id_candidate FROM Candidate WHERE email_candidate = %s', (entry['email'],))
-                candidate_id = cursor.fetchone()[0]
+                candidate_id = cursor.fetchone()['id_candidate']
             else:
-                candidate_id = candidate_id[0]
+                candidate_id = candidate_id['id_candidate']
 
             # Create or update tags
             for tag_name in entry['tags']:
@@ -207,9 +207,9 @@ def import_csv(jsoncsv):
                 tag_id = cursor.fetchone()
                 if tag_id is None:
                     cursor.execute('SELECT id_tag FROM Tag WHERE name_tag = %s', (tag_name,))
-                    tag_id = cursor.fetchone()[0]
+                    tag_id = cursor.fetchone()['id_tag']
                 else:
-                    tag_id = tag_id[0]
+                    tag_id = tag_id['id_tag']
 
                 # Associate tag with candidate
                 cursor.execute('''
@@ -301,7 +301,7 @@ def create_event(name, date, has_timeslots, start_time_event=None, end_time_even
         return "Erreur base de données"
     try:
         cursor.execute('INSERT INTO Event (name_event, date_event, has_timeslots, start_time_event, end_time_event) VALUES (%s, %s, %s, %s, %s) RETURNING id_event', (name, date, has_timeslots, start_time_event, end_time_event))
-        event_id = cursor.fetchone()[0]
+        event_id = cursor.fetchone()['id_event']
         return event_id, None
     except psycopg2.Error as e:
         print(f"Erreur lors de la création de l'événement: {e}")
@@ -553,7 +553,7 @@ def get_today_events():
         cursor.execute('SELECT id_event FROM Event WHERE date_event = %s', (today,))
         events = cursor.fetchall()
         if events:
-            return events[0]['id_event'], None
+            return events['id_event'], None
         else:
             return None, "Pas d'événement aujourd'hui"
     except psycopg2.Error as e:
@@ -803,11 +803,11 @@ def create_candidate(lastname, name, email):
 
         # Insère l'utilisateur dans la table User
         cursor.execute('INSERT INTO "User" (username) VALUES (%s) RETURNING id_user', (email,))
-        user_id = cursor.fetchone()[0]
+        user_id = cursor.fetchone()['id_user']
 
         # Insere le candidat dans la base de données
         cursor.execute('INSERT INTO Candidate (lastname_candidate, name_candidate, email_candidate, id_user) VALUES (%s, %s, %s, %s) RETURNING id_candidate', (lastname, name, email, user_id))
-        candidate_id = cursor.fetchone()[0]
+        candidate_id = cursor.fetchone()['id_user']
 
         # Assigne le rôle "candidate" à l'utilisateur
         cursor.execute('INSERT INTO User_role (id_user, id_role) VALUES (%s, (SELECT id_role FROM Role WHERE name_role = %s))', (user_id, 'candidate'))
@@ -838,7 +838,7 @@ def get_candidate_email(id_candidate):
     try:
         cursor.execute('SELECT email_candidate FROM Candidate WHERE id_candidate = %s', (id_candidate,))
         candidate = cursor.fetchone()
-        return candidate[0] if candidate else None
+        return candidate['email_candidate'] if candidate else None
     except psycopg2.Error as e:
         print(f"Erreur requête base de données: {e}")
         return None
@@ -1162,11 +1162,11 @@ def create_participant(name, email):
 
         # Insère l'utilisateur dans la table User
         cursor.execute('INSERT INTO "User" (username) VALUES (%s) RETURNING id_user', (email,))
-        user_id = cursor.fetchone()[0]
+        user_id = cursor.fetchone()['id_user']
 
         # Insere l'intervenant dans la base de données
         cursor.execute('INSERT INTO Participant (name_participant, email_participant, id_user) VALUES (%s, %s, %s) RETURNING id_participant', (name, email, user_id))
-        participant_id = cursor.fetchone()[0]
+        participant_id = cursor.fetchone()['id_participant']
 
         # Assigne le rôle "participant" à l'utilisateur
         cursor.execute('INSERT INTO User_role (id_user, id_role) VALUES (%s, (SELECT id_role FROM Role WHERE name_role = %s))', (user_id, 'participant'))
@@ -1559,7 +1559,7 @@ def editstart_interview(id_interview, start_time):
         conn.commit()
         updated_id = cursor.fetchone()
         if updated_id:
-            return updated_id[0], None
+            return updated_id['id_interview'], None
         else:
             return None, "Entretien non trouvé ou déjà démarré"
     except psycopg2.Error as e:
@@ -2293,7 +2293,7 @@ def auth_register_candidate(id_candidate, username, password_user, session_token
         cursor.execute('SELECT id_user FROM "User" WHERE username = %s', (username,))
         user_id = cursor.fetchone()
         # add user to candidate table
-        cursor.execute('UPDATE Candidate SET id_user = %s WHERE id_candidate = %s', (user_id[0], id_candidate))
+        cursor.execute('UPDATE Candidate SET id_user = %s WHERE id_candidate = %s', (user_id['id_user'], id_candidate))
         conn.commit()
         return None
     except psycopg2.Error as e:
@@ -2325,7 +2325,7 @@ def auth_register_employee(id_employee, username, password_user, session_token):
         cursor.execute('SELECT id_user FROM "User" WHERE username = %s', (username,))
         user_id = cursor.fetchone()
         # add user to employee table
-        cursor.execute('UPDATE Employee SET id_user = %s WHERE id_employee = %s', (user_id[0], id_employee))
+        cursor.execute('UPDATE Employee SET id_user = %s WHERE id_employee = %s', (user_id['id_user'], id_employee))
         conn.commit()
         return None
     except psycopg2.Error as e:
@@ -2774,11 +2774,11 @@ def create_employee(lastname, name, email, role):
 
         # Insère l'utilisateur dans la table User
         cursor.execute('INSERT INTO "User" (username) VALUES (%s) RETURNING id_user', (email,))
-        user_id = cursor.fetchone()[0]
+        user_id = cursor.fetchone()['id_user']
 
         # Insere l'employé dans la base de données
         cursor.execute('INSERT INTO Employee (lastname_employee, name_employee, email_employee, id_user) VALUES (%s, %s, %s, %s) RETURNING id_employee', (lastname, name, email, user_id))
-        employee_id = cursor.fetchone()[0]
+        employee_id = cursor.fetchone()['id_employee']
 
         # Récupère l'id_role correspondant au nom du rôle
         cursor.execute('SELECT id_role FROM Role WHERE name_role = %s', (role,))
@@ -2787,7 +2787,7 @@ def create_employee(lastname, name, email, role):
             return None, None, "Rôle non trouvé"
 
         # Insere l'association de l'employé avec le rôle dans la table User_role
-        cursor.execute('INSERT INTO User_role (id_user, id_role) VALUES (%s, %s)', (user_id, role_id[0]))
+        cursor.execute('INSERT INTO User_role (id_user, id_role) VALUES (%s, %s)', (user_id, role_id['id_role']))
 
         # Sauvegarde les modifications
         conn.commit()
@@ -2815,7 +2815,7 @@ def get_employee_email(id_employee):
     try:
         cursor.execute('SELECT email_employee FROM Employee WHERE id_employee = %s', (id_employee,))
         employee = cursor.fetchone()
-        return employee[0] if employee else None
+        return employee['id_employee'] if employee else None
     except psycopg2.Error as e:
         print(f"Erreur requête base de données: {e}")
         return None
@@ -2925,7 +2925,7 @@ def edit_employee(lastname, name, email, role, id_employee):
         UPDATE User_role
         SET id_role = %s
         WHERE id_user = (SELECT id_user FROM Employee WHERE id_employee = %s)
-        ''', (role_id[0], id_employee))
+        ''', (role_id['id_user'], id_employee))
 
         conn.commit()
         return None
