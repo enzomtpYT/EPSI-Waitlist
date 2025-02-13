@@ -2166,7 +2166,7 @@ def auth_get_session(username):
     try:
         cursor.execute('SELECT session_token FROM "User" WHERE username = %s', (username,))
         session = cursor.fetchone()
-        return session[0], None
+        return session['session_token'], None
     except psycopg2.Error as e:
         print(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
