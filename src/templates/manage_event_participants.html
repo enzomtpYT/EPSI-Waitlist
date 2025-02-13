@@ -86,6 +86,7 @@ function buildListsAndTags(datas) {
             tr.classList.add(`tag-${tag.id_tag}`);
         }
         tr.id = `${candidate.id_candidate}`;
+        tr.style.display = "none";
         tr.innerHTML = `
             <td>${candidate.lastname_candidate}</td>
             <td>${candidate.name_candidate}</td>
@@ -109,6 +110,10 @@ function buildListsAndTags(datas) {
             let tagElements = document.querySelectorAll(`.tag-${tag.id_tag}`);
             tagElements.forEach(tagElement => {
                 tagElement.style.display = "table-row";
+                let checkbox = tagElement.querySelector('input[type=checkbox]');
+                if (checkbox) {
+                    checkbox.checked = true;
+                }
             });
         } else {
             // Make the class tag-{ tag.id_tag } invisible
