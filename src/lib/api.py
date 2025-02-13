@@ -133,9 +133,9 @@ def process_event_participants(datas):
             error = database.delete_attends(candidate["id_candidate"], datas["id_event"])
         if error:
             return error
-    
+
     threading.Thread(target=updatecache_all, args=(datas["id_event"], "events")).start()
-    
+
     return None
 
 def api_interviews(session_token):
@@ -297,15 +297,15 @@ def start_interview(data):
             start_time = datetime.datetime.strptime(data.get('start_time'), "%Y-%m-%dT%H:%M:%S.%fZ")
         except ValueError:
             return jsonify({"error": "Invalid start_time format"}), 400
-    
+
     id_interview = data.get('id_interview')
     if not id_interview:
         return jsonify({"error": "Missing id_interview parameter"}), 400
-    
+
     updated_id, error = database.editstart_interview(id_interview, start_time)
-    
+
     updatecache_all(data.get('id_event'), "events")
-    
+
     if error:
         return jsonify({"error": error}), 400
 
@@ -315,23 +315,23 @@ def end_interview(data):
         error = database.end_interview(interview_id, status=True)
         if error:
             return jsonify({"error": error}), 400
-        updatecache_all(data.get('id_event'), "events")        
+        updatecache_all(data.get('id_event'), "events")
 
 def skip_candidate(event_id, name_participant):
     """" Skip le candidat actuel et le met en 2 ème position dans le cache """
-    
+
     event_id = str(event_id)
     if cache["events"].get(event_id) is None:
         return "Aucun évenement avec cet id"
-    
+
     event = cache["events"][event_id]
     event = event.to_dict()
     if event.get("interviews") is None:
         return "Aucun entretien trouvé"
-    
+
     if event["interviews"].get(name_participant) is None:
         return "Aucun participant trouvé"
-    
+
     interviews = event["interviews"][name_participant]
     if len(interviews) < 2:
         return "Pas assez de candidats"
@@ -372,11 +372,11 @@ def add(type, data):
                 database.add_tag_to_participant(participant_id, tag["id_tag"])
             username = data.get("username")
             password = data.get("password")
-            if username is not None:
+            if username not in (None, ''):
                 error = database.auth_update_username(username, user_id)
                 if error:
                     return error
-            if password is not None:
+            if password not in (None, ''):
                 error = auth.update_user_pass(password, user_id)
                 if error:
                     return error
@@ -396,11 +396,11 @@ def add(type, data):
                 database.add_tag_to_candidate(candidate_id, tag["id_tag"])
             username = data.get("username")
             password = data.get("password")
-            if username is not None:
+            if username not in (None, ''):
                 error = database.auth_update_username(username, user_id)
                 if error:
                     return error
-            if password is not None:
+            if password not in (None, ''):
                 error = auth.update_user_pass(password, user_id)
                 if error:
                     return error
@@ -418,11 +418,11 @@ def add(type, data):
         if error is None:
             username = data.get("username")
             password = data.get("password")
-            if username is not None:
+            if username not in (None, ''):
                 error = database.auth_update_username(username, user_id)
                 if error:
                     return error
-            if password is not None:
+            if password not in (None, ''):
                 error = auth.update_user_pass(password, user_id)
                 if error:
                     return error
