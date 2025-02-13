@@ -235,8 +235,35 @@ def get_archived_schemas():
         FROM information_schema.schemata
         WHERE schema_name = 'public' OR schema_name LIKE 'archive_%'
         ''')
-        archives = [row['schema_name'] for row in cursor.fetchall()]
-        return archives, None
+        schemas = [row['schema_name'] for row in cursor.fetchall()]
+        
+        result = []
+        for schema in schemas:
+            cursor.execute(f'''
+            SELECT Candidate.*, json_agg(DISTINCT Tag.*) AS tags, json_agg(DISTINCT Interview.*) AS interviews
+            FROM {schema}.Candidate
+            LEFT JOIN {schema}.Candidate_tag ON Candidate.id_candidate = Candidate_tag.id_candidate
+            LEFT JOIN {schema}.Tag ON Candidate_tag.id_tag = Tag.id_tag
+            LEFT JOIN {schema}.Interview ON Candidate.id_candidate = Interview.id_candidate
+            GROUP BY Candidate.id_candidate
+            ''')
+            candidates = cursor.fetchall()
+            for candidate in candidates:
+                if candidate['interviews']:
+                    for interview in candidate['interviews']:
+                        if interview:
+                            cursor.execute(f'''
+                            SELECT Event.*
+                            FROM {schema}.Event
+                            WHERE Event.id_event = %s
+                            ''', (interview['id_event'],))
+                            event = cursor.fetchone()
+                            interview['event'] = event
+            result.append({
+                'schema_name': schema,
+                'candidates': candidates
+            })
+        return result, None
     except psycopg2.Error as e:
         print(f"Erreur lors de la récupération des schémas archivés: {e}")
         return None, "Erreur lors de la récupération des schémas archivés"

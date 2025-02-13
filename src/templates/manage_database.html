@@ -170,6 +170,28 @@ function ImportCSV(ev) {
 
 // Fetch and display the list of archived schemas
 function fetchArchives() {
+    // Reset the table and sideItemList
+
+    let sideItemList = document.querySelector('.sideItemList');
+    const table = document.querySelector(".infoeditor table");
+    const thead = table.querySelector("thead");
+    const tbody = table.querySelector("tbody");
+    sideItemList.innerHTML = `
+        <button class="listbtn" onclick="document.querySelector('#fileInput').click()"><i class="fa-regular fa-file-arrow-down"></i> Importer un CSV</button>
+        <button class="listbtn" onclick="fetchArchives()"><i class="fa-regular fa-rotate-right"></i> Recharger la liste</button>
+    `;
+
+    // Hide table
+
+    document.querySelector(".listsection .tablewrap").style.display = "none";
+    document.querySelector(".listsection h2").style.display = "none";
+    document.querySelector(".listsection .chosedata").style.display = "flex";
+
+    // Clear existing table content
+    thead.innerHTML = "";
+    tbody.innerHTML = "";
+
+
     fetch("{{ url_for('api.get_archives') }}")
         .then(response => {
             if (!response.ok) {
@@ -179,7 +201,7 @@ function fetchArchives() {
             return response.json();
         })
         .then(data => {
-            buildManagement(data.archives);
+            buildManagement(data);
         })
         .catch(error => {
             console.error('Error fetching archives:', error);
@@ -188,97 +210,82 @@ function fetchArchives() {
 
 function buildManagement(data) {
     let sideItemList = document.querySelector('.sideItemList');
-    sideItemList.innerHTML = `
-        <button class="listbtn" onclick="document.querySelector('#fileInput').click()"><i class="fa-regular fa-file-arrow-down"></i> Importer un CSV</button>
-        <button class="listbtn" onclick="fetchArchives()"><i class="fa-regular fa-rotate-right"></i> Recharger la liste</button>
-    `;
-    num = 0;
     data.forEach(schema => {
         let item = document.createElement('div');
         item.classList.add('itemlist');
-        item.onclick = function() { viewArchive(schema); this.classList.add('selected'); document.querySelectorAll('.itemlist').forEach(item => { if (item !== this) item.classList.remove('selected'); }); };
-        item.innerHTML = `<i class="fa-regular fa-database"></i><p>${schema}</p>`;
+        item.onclick = function() { viewArchive(schema.candidates); this.classList.add('selected'); document.querySelectorAll('.itemlist').forEach(item => { if (item !== this) item.classList.remove('selected'); }); };
+        item.innerHTML = `<i class="fa-regular fa-database"></i><p>${schema.schema_name}</p>`;
         sideItemList.appendChild(item);
-        if (num === 0) item.click();
-        num++;
     });
 }
 
 function viewArchive(archives) {
-    fetch(`{{ url_for('api.get_archives') }}?archives=${archives}`)
-        .then(response => {
-            if (!response.ok) {
-                popup('danger', 'Une erreur est survenue lors de la récupération des données');
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            const table = document.querySelector(".infoeditor table");
-            const thead = table.querySelector("thead");
-            const tbody = table.querySelector("tbody");
+    const table = document.querySelector(".infoeditor table");
+    const thead = table.querySelector("thead");
+    const tbody = table.querySelector("tbody");
 
-            // Clear existing table content
-            thead.innerHTML = "";
-            tbody.innerHTML = "";
+    // Clear existing table content
 
-            // Populate headers
-            const headers = ["Nom", "Prénom", "Email", "Actions"];
-            const tr = document.createElement("tr");
-            headers.forEach((header) => {
-                const th = document.createElement("th");
-                th.textContent = header;
-                tr.appendChild(th);
-            });
-            thead.appendChild(tr);
+    thead.innerHTML = "";
+    tbody.innerHTML = "";
 
-            // Populate rows
-            data.forEach((cand) => {
-                const tr = document.createElement("tr");
-                const lastnameTd = document.createElement("td");
-                lastnameTd.textContent = cand.lastname;
-                tr.appendChild(lastnameTd);
+    // Populate headers
 
-                const nameTd = document.createElement("td");
-                nameTd.textContent = cand.name;
-                tr.appendChild(nameTd);
+    const headers = ["Nom", "Prénom", "Email", "Tags", "Actions"];
+    const tr = document.createElement("tr");
+    headers.forEach((header) => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        tr.appendChild(th);
+    });
 
-                const emailTd = document.createElement("td");
-                emailTd.textContent = cand.email;
-                tr.appendChild(emailTd);
+    thead.appendChild(tr);
 
-                const actionTd = document.createElement("td");
-                const button = document.createElement("button");
-                button.textContent = "Voir Historique";
-                button.onclick = () => {
-                    fetch(`{{ url_for('api.get_candidate_interviews') }}?candidate_id=${cand.id}`)
-                        .then(response => response.json())
-                        .then(interviews => {
-                            let history = "Historique des entretiens:\n";
-                            interviews.forEach(interview => {
-                                history += `Date: ${interview.date}, Commentaire: ${interview.comment}\n`;
-                            });
-                            alert(history);
-                        })
-                        .catch(error => {
-                            console.error('Error fetching interviews:', error);
-                            popup('danger', 'Une erreur est survenue lors de la récupération de l\'historique des entretiens');
-                        });
-                };
-                actionTd.appendChild(button);
-                tr.appendChild(actionTd);
+    // Populate rows
 
-                tbody.appendChild(tr);
-            });
+    archives.forEach((cand) => {
+        const tr = document.createElement("tr");
 
-            // Show table
-            document.querySelector(".listsection .tablewrap").style.display = "flex";
-            document.querySelector(".listsection h2").style.display = "block";
-            document.querySelector(".listsection .chosedata").style.display = "none";
-        })
-        .catch(error => {
-            console.error('Error fetching archive:', error);
+        const lastnameTd = document.createElement("td");
+        lastnameTd.textContent = cand.lastname_candidate;
+        tr.appendChild(lastnameTd);
+
+        const nameTd = document.createElement("td");
+        nameTd.textContent = cand.name_candidate;
+        tr.appendChild(nameTd);
+
+        const emailTd = document.createElement("td");
+        emailTd.textContent = cand.email_candidate;
+        tr.appendChild(emailTd);
+
+        const tagsTd = document.createElement("td");
+        cand.tags.forEach(tag => {
+            const tagElement = document.createElement("p");
+            tagElement.classList.add("display-tag");
+            tagElement.textContent = tag.name_tag;
+            tagsTd.appendChild(tagElement);
         });
+        tr.appendChild(tagsTd);
+
+        const actionTd = document.createElement("td");
+        const button = document.createElement("button");
+        button.textContent = "Voir Historique";
+
+        button.onclick = () => {
+            popup('info', cand.interviews);
+        };
+
+        actionTd.appendChild(button);
+        tr.appendChild(actionTd);
+        tbody.appendChild(tr);
+
+    });
+
+    // Show table
+
+    document.querySelector(".listsection .tablewrap").style.display = "flex";
+    document.querySelector(".listsection h2").style.display = "block";
+    document.querySelector(".listsection .chosedata").style.display = "none";
 }
 
 // Call fetchArchives on page load

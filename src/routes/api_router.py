@@ -192,7 +192,7 @@ def get_archives():
     archives, error = database.get_archived_schemas()
     if error:
         return jsonify({"success": False, "error": error}), 500
-    return jsonify({"success": True, "archives": archives})
+    return jsonify(archives)
 
 @api_bp.route("/api/get_candidate_interviews", methods=['GET'])
 def get_candidate_interviews():
