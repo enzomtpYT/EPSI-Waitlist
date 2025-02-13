@@ -247,6 +247,7 @@ function buildManagement(data) {
 function viewArchive(archives) {
     backBtn = document.querySelector(".listsection .backbtn");
     backBtn.style.display = "none";
+    document.querySelector(".listsection .submit").style.display = "none";
     const table = document.querySelector(".infoeditor table");
     const thead = table.querySelector("thead");
     const tbody = table.querySelector("tbody");
