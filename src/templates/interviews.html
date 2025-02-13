@@ -36,9 +36,7 @@
     <p>Aucun entretien trouvé pour cet événement.</p>
     {% endif %}
 
-    <a href="{{ url_for('event.edit_event', id_event=event_id) }}">
-        <button style="margin-top: 1rem;" type="button">Retour</button>
-    </a>
+    <button onclick="window.location.href='{{ url_for('event.edit_event', id_event=event_id) }}'" style="color: white;" type="button">Retour</button>
 </div>
 
 <div id="feedbackModal" class="modal">
