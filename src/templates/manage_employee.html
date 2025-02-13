@@ -241,6 +241,7 @@ function done(event) {
         name_role: document.querySelector('#role').value
     };
 
+    let url = '';
     if (document.querySelector('#id_employee').value != '') {
         url = '{{ url_for('api.update_api', type='employee') }}';
     } else {
