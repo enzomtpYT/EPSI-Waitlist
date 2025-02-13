@@ -252,6 +252,7 @@ def get_archived_schemas():
                 if candidate['interviews']:
                     for interview in candidate['interviews']:
                         if interview:
+                            # Event info
                             cursor.execute(f'''
                             SELECT Event.*
                             FROM {schema}.Event
@@ -259,6 +260,15 @@ def get_archived_schemas():
                             ''', (interview['id_event'],))
                             event = cursor.fetchone()
                             interview['event'] = event
+                            # Participant
+                            cursor.execute(f'''
+                            SELECT Participant.*
+                            FROM {schema}.Participant
+                            JOIN {schema}.Interview ON Participant.id_participant = Interview.id_participant
+                            WHERE Interview.id_interview = %s
+                            ''', (interview['id_interview'],))
+                            participant = cursor.fetchone()
+                            interview['participant'] = participant
             result.append({
                 'schema_name': schema,
                 'candidates': candidates

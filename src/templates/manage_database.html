@@ -23,6 +23,7 @@
                 <div class="tablewrap" style="flex-grow: 1; display: none;">
                     <table style="height: fit-content;"><thead><tr></tr></thead><tbody></tbody></table>
                 </div>
+                <button class="backbtn" style="display: none;"><i class="fa-regular fa-arrow-left"></i> Retour</button>
                 <button onclick="submit()" style="display: none;"><i class="fa-regular fa-check"></i> Confirmer</button>
                 <div onclick="document.querySelector('#fileInput').click()" class="chosedata">
                     <i class="fa-regular fa-file-arrow-down"></i>
@@ -33,8 +34,27 @@
     </div>
 </div>
 
+<div id="feedbackModal" class="modal">
+    <div class="modal-content">
+        <i class="fa-regular fa-x close" onclick="toggleElement(this.parentElement.parentElement)"></i>
+        <h2>Feedback de l'entretien</h2>
+        <h3 id="partfeedtitle">Feedback de l'intervenant :</h3>
+        <div class="feedb" id="participantFeedback"></div>
+        <h3 id="candfeedtitle">Feedback du candidat :</h3>
+        <div class="feedb" id="candidateFeedback"></div>
+    </div>
+</div>
+
 <script>
 let candidates = []
+var modal = document.getElementById("feedbackModal");
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        toggleElement(modal);
+    }
+}
 
 function submit() {
     if (confirm("Êtes-vous sûr de vouloir importer ces données ?")) {
@@ -104,6 +124,8 @@ function ImportCSV(ev) {
     const file = ev.target.files[0];
     const reader = new FileReader();
     reader.onload = function(e) {
+        backBtn = document.querySelector(".listsection .backbtn");
+        backBtn.style.display = "none";
         const data = e.target.result;
         const lines = data.split("\n");
         const headers = lines[0].split(",");
@@ -209,6 +231,8 @@ function fetchArchives() {
 }
 
 function buildManagement(data) {
+    backBtn = document.querySelector(".listsection .backbtn");
+    backBtn.style.display = "none";
     let sideItemList = document.querySelector('.sideItemList');
     data.forEach(schema => {
         let item = document.createElement('div');
@@ -220,6 +244,8 @@ function buildManagement(data) {
 }
 
 function viewArchive(archives) {
+    backBtn = document.querySelector(".listsection .backbtn");
+    backBtn.style.display = "none";
     const table = document.querySelector(".infoeditor table");
     const thead = table.querySelector("thead");
     const tbody = table.querySelector("tbody");
@@ -272,7 +298,7 @@ function viewArchive(archives) {
         button.textContent = "Voir Historique";
 
         button.onclick = () => {
-            popup('info', cand.interviews);
+            viewInterview(cand.interviews);
         };
 
         actionTd.appendChild(button);
@@ -292,6 +318,93 @@ function viewArchive(archives) {
 document.addEventListener("DOMContentLoaded", function() {
     fetchArchives();
 });
+
+function viewInterview(interviews) {
+    backBtn = document.querySelector(".listsection .backbtn");
+    backBtn.style.display = "block";
+    backBtn.onclick = () => {
+        document.querySelector('.itemlist.selected').click();
+    };
+    const table = document.querySelector(".infoeditor table");
+    const thead = table.querySelector("thead");
+    const tbody = table.querySelector("tbody");
+
+    // Clear existing table content
+
+    thead.innerHTML = "";
+    tbody.innerHTML = "";
+
+    // Populate headers
+
+    const headers = ["Événement", "Date", "Intervenant", "Actions"];
+    const tr = document.createElement("tr");
+    headers.forEach((header) => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        tr.appendChild(th);
+    });
+
+    thead.appendChild(tr);
+
+    interviews.forEach(interview => {
+        const tr = document.createElement("tr");
+
+        const eventTd = document.createElement("td");
+        eventTd.textContent = interview.event.name_event;
+        tr.appendChild(eventTd);
+
+        const dateTd = document.createElement("td");
+        dateTd.textContent = interview.event.date_event;
+        tr.appendChild(dateTd);
+
+        const interviewerTd = document.createElement("td");
+        interviewerTd.textContent = interview.participant.name_participant;
+        tr.appendChild(interviewerTd);
+
+        const actionTd = document.createElement("td");
+        const button = document.createElement("button");
+        button.textContent = "Voir Feedbacks";
+
+        button.onclick = () => {
+            openfeedbacks(interview.feedback_participant, interview.feedback_candidate);
+        };
+
+        actionTd.appendChild(button);
+        tr.appendChild(actionTd);
+        tbody.appendChild(tr);
+    });
+}
+
+function openfeedbacks(participantFeedback, candidateFeedback) {
+    var participantFeedbackEl = document.getElementById('participantFeedback');
+    var candidateFeedbackEl = document.getElementById('candidateFeedback');
+    var partfeedtitle = document.getElementById('partfeedtitle');
+    var candfeedtitle = document.getElementById('candfeedtitle');
+
+    if (participantFeedback === null) {
+        participantFeedbackEl.style.display = 'none';
+        partfeedtitle.style.display = 'none';
+    } else {
+        participantFeedbackEl.style.display = 'flex';
+        partfeedtitle.style.display = 'block';
+        mark(participantFeedbackEl, participantFeedback);
+    }
+
+    if (candidateFeedback === null) {
+        candidateFeedbackEl.style.display = 'none';
+        candfeedtitle.style.display = 'none';
+    } else {
+        candidateFeedbackEl.style.display = 'flex';
+        candfeedtitle.style.display = 'block';
+        mark(candidateFeedbackEl, candidateFeedback);
+    }
+
+    if (candidateFeedback === null && participantFeedback === null) {
+        popup('info', 'Aucun feedback n\'a été enregistré pour cet entretien');
+    } else {
+        toggleElement(modal);
+    }
+}
 
 </script>
 {% endblock %}
