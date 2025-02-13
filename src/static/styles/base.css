@@ -17,6 +17,33 @@
     font-family: 'Roboto';
 }
 
+/* Custom Scrollbar */
+
+/* ===== Scrollbar CSS ===== */
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #99999955 #00000011;
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #00000011;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #99999955;
+  border-radius: 8px;
+  border: 1px solid #00000055;
+}
+
+/* End Custom Scrollbar */
+
 .background {
     z-index: -1;
     position: fixed;
