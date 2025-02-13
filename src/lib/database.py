@@ -27,11 +27,11 @@ today = datetime.date.today()
 def copy_schema(target_schema, source_schema="public"):
     """
     Copie les tables et les contraintes d'un schéma source vers un schéma cible.
-    
+
     Args:
         target_schema (str): Le nom du schéma cible.
         source_schema="public" (str): Le nom du schéma source.
-        
+
     Returns:
         str: Un message d'erreur si une erreur survient, None sinon.
     """
@@ -55,27 +55,27 @@ def copy_schema(target_schema, source_schema="public"):
       FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = '{source_schema}') LOOP
         -- Check if table already exists in the target schema
         SELECT EXISTS (
-            SELECT 1 
-            FROM pg_tables 
-            WHERE schemaname = '{target_schema}' 
+            SELECT 1
+            FROM pg_tables
+            WHERE schemaname = '{target_schema}'
             AND tablename = r.tablename
         ) INTO table_exists;
-        
+
         -- If table does not exist in target schema, create it with data
         IF NOT table_exists THEN
             EXECUTE format('CREATE TABLE {target_schema}.%I AS TABLE {source_schema}.%I', r.tablename, r.tablename);
         END IF;
       END LOOP;
-      
+
       -- Loop through constraints and copy them to the target schema
       FOR r IN (SELECT conname, conrelid::regclass AS tablename, pg_get_constraintdef(oid) AS condef
                 FROM pg_constraint
                 WHERE connamespace = (SELECT oid FROM pg_namespace WHERE nspname = '{source_schema}')) LOOP
         -- Ensure the table exists in the target schema before adding the constraint
         IF EXISTS (
-            SELECT 1 
-            FROM pg_tables 
-            WHERE schemaname = '{target_schema}' 
+            SELECT 1
+            FROM pg_tables
+            WHERE schemaname = '{target_schema}'
             AND tablename = r.tablename::text
         ) THEN
             EXECUTE format('ALTER TABLE "{target_schema}".%I ADD CONSTRAINT %I %s', r.tablename::text, r.conname, r.condef);
@@ -83,6 +83,80 @@ def copy_schema(target_schema, source_schema="public"):
       END LOOP;
     END $$;
     """)
+
+    # Commit the transaction after copying the schema
+    conn.commit()
+
+    # Drop constraints related to "User", "permission", "role", "user_role", and "role_permission" tables if they exist
+    cursor.execute(f"""
+    DO $$
+    DECLARE
+        r RECORD;
+    BEGIN
+        -- Drop foreign key constraints referencing "User" table
+        IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = '{target_schema}' AND tablename = 'User') THEN
+            FOR r IN (SELECT conname, conrelid::regclass AS tablename
+                      FROM pg_constraint
+                      WHERE confrelid = '{target_schema}."User"'::regclass) LOOP
+                EXECUTE format('ALTER TABLE "{target_schema}".%I DROP CONSTRAINT %I', r.tablename, r.conname);
+            END LOOP;
+        END IF;
+
+        -- Drop foreign key constraints referencing "permission" table
+        IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = '{target_schema}' AND tablename = 'permission') THEN
+            FOR r IN (SELECT conname, conrelid::regclass AS tablename
+                      FROM pg_constraint
+                      WHERE confrelid = '{target_schema}."permission"'::regclass) LOOP
+                EXECUTE format('ALTER TABLE "{target_schema}".%I DROP CONSTRAINT %I', r.tablename, r.conname);
+            END LOOP;
+        END IF;
+
+        -- Drop foreign key constraints referencing "role" table
+        IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = '{target_schema}' AND tablename = 'role') THEN
+            FOR r IN (SELECT conname, conrelid::regclass AS tablename
+                      FROM pg_constraint
+                      WHERE confrelid = '{target_schema}."role"'::regclass) LOOP
+                EXECUTE format('ALTER TABLE "{target_schema}".%I DROP CONSTRAINT %I', r.tablename, r.conname);
+            END LOOP;
+        END IF;
+
+        -- Drop foreign key constraints referencing "user_role" table
+        IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = '{target_schema}' AND tablename = 'user_role') THEN
+            FOR r IN (SELECT conname, conrelid::regclass AS tablename
+                      FROM pg_constraint
+                      WHERE confrelid = '{target_schema}."user_role"'::regclass) LOOP
+                EXECUTE format('ALTER TABLE "{target_schema}".%I DROP CONSTRAINT %I', r.tablename, r.conname);
+            END LOOP;
+        END IF;
+
+        -- Drop foreign key constraints referencing "role_permission" table
+        IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = '{target_schema}' AND tablename = 'role_permission') THEN
+            FOR r IN (SELECT conname, conrelid::regclass AS tablename
+                      FROM pg_constraint
+                      WHERE confrelid = '{target_schema}."role_permission"'::regclass) LOOP
+                EXECUTE format('ALTER TABLE "{target_schema}".%I DROP CONSTRAINT %I', r.tablename, r.conname);
+            END LOOP;
+        END IF;
+    END $$;
+    """)
+
+    # Delete the column id_user from the tables employee, candidate, and participant if they exist
+    for table in ["employee", "candidate", "participant"]:
+        cursor.execute(f"""
+        DO $$
+        BEGIN
+            IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = '{target_schema}' AND tablename = '{table}') THEN
+                EXECUTE 'ALTER TABLE {target_schema}."{table}" DROP COLUMN IF EXISTS id_user;';
+            END IF;
+        END $$;
+        """)
+
+    # Drop the "User", "permission", "role", "user_role", and "role_permission" tables
+    cursor.execute(f"DROP TABLE IF EXISTS {target_schema}.\"User\" CASCADE;")
+    cursor.execute(f"DROP TABLE IF EXISTS {target_schema}.\"permission\" CASCADE;")
+    cursor.execute(f"DROP TABLE IF EXISTS {target_schema}.\"role\" CASCADE;")
+    cursor.execute(f"DROP TABLE IF EXISTS {target_schema}.\"user_role\" CASCADE;")
+    cursor.execute(f"DROP TABLE IF EXISTS {target_schema}.\"role_permission\" CASCADE;")
 
     # Commit the transaction and close the connection
     conn.commit()

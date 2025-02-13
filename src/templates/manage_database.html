@@ -13,7 +13,7 @@
     <div class="tabmanagment">
         <div class="sideItemList">
             <button class="listbtn" onclick="document.querySelector('#fileInput').click()"><i class="fa-regular fa-file-arrow-down"></i> Importer un CSV</button>
-            <button class="listbtn" onclick="reload()"><i class="fa-regular fa-rotate-right"></i> Recharger la liste</button>
+            <button class="listbtn" onclick="fetchArchives()"><i class="fa-regular fa-rotate-right"></i> Recharger la liste</button>
         </div>
         <div class="resizer" id="resizer"></div>
         <div class="infoeditor">
@@ -188,6 +188,10 @@ function fetchArchives() {
 
 function buildManagement(data) {
     let sideItemList = document.querySelector('.sideItemList');
+    sideItemList.innerHTML = `
+        <button class="listbtn" onclick="document.querySelector('#fileInput').click()"><i class="fa-regular fa-file-arrow-down"></i> Importer un CSV</button>
+        <button class="listbtn" onclick="fetchArchives()"><i class="fa-regular fa-rotate-right"></i> Recharger la liste</button>
+    `;
     num = 0;
     data.forEach(schema => {
         let item = document.createElement('div');
