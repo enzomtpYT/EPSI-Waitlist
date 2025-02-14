@@ -164,7 +164,7 @@ let selectedTags = [];
 
 function getPartdatas(e, id_event) {
     e.preventDefault();
-    fetch("{{ url_for('api.manage_event_participants_api_args') }}", {
+    fetch("{{ url_for('api.manage_event_participants_api') }}", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -267,7 +267,7 @@ function submitwaitlist(){
 }
 
 function getwaitlistdata(event){
-    fetch("{{ url_for('api.manage_event_participants_api_args') }}", {
+    fetch("{{ url_for('api.manage_event_participants_api') }}", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

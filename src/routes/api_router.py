@@ -3,15 +3,8 @@ from lib import api, database
 
 api_bp = Blueprint('api', __name__)
 
-@api_bp.route('/api/get_event_participants/<int:id_event>', methods=['GET'])
-def manage_event_participants_api(id_event):
-    datas, error = api.get_event_participants(id_event)
-    if error:
-        return jsonify({"error": error}), 400
-    return jsonify(datas)
-
 @api_bp.route('/api/get_event_participants', methods=['GET', 'POST'])
-def manage_event_participants_api_args():
+def manage_event_participants_api():
     id_event = None
     if request.method == 'GET':
         id_event = request.args.get('id_event')
@@ -105,6 +98,7 @@ def get_list():
     if error:
         return jsonify({"error": error}), 400
     return jsonify(datas)
+
 @api_bp.route('/api/import_csv', methods=['POST'])
 def import_csv():
     data = request.get_json()
