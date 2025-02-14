@@ -282,7 +282,7 @@ def get_archived_schemas():
 
 # Event functions
 
-def create_event(name, date, has_timeslots, start_time_event=None, end_time_event=None):
+def create_event(name, date, has_timeslots=False, start_time_event=None, end_time_event=None, tags=[]):
     """
     Crée un nouvel événement dans la base de données.
 
@@ -302,6 +302,9 @@ def create_event(name, date, has_timeslots, start_time_event=None, end_time_even
     try:
         cursor.execute('INSERT INTO Event (name_event, date_event, has_timeslots, start_time_event, end_time_event) VALUES (%s, %s, %s, %s, %s) RETURNING id_event', (name, date, has_timeslots, start_time_event, end_time_event))
         event_id = cursor.fetchone()['id_event']
+        if tags:
+            for tag in tags:
+                cursor.execute('INSERT INTO Event_tag (id_event, id_tag) VALUES (%s, %s)', (event_id, tag['id_tag']))
         return event_id, None
     except psycopg2.Error as e:
         print(f"Erreur lors de la création de l'événement: {e}")

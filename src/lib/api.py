@@ -394,11 +394,21 @@ def delete(type, id):
     return error
 
 def add(type, data):
+    error = None
+    
     if type == "event":
-        error = database.add_event(data)
+        name_event = data.get("name_event")
+        start_time_event = data.get("start_time_event")
+        end_time_event = data.get("end_time_event")
+        date_event = data.get("date_event")
+        selected_tags = data.get("tags")
+        if name_event is None or start_time_event is None or end_time_event is None or date_event is None:
+            return "Champs manquants"
+        event_id, error = database.create_event(name_event, date_event, start_time_event=start_time_event, end_time_event=end_time_event, tags=selected_tags)
+        return error
+                
     elif type == "participant":
 
-        error = None
         name_participant = data.get("name_participant")
         email_participant = data.get("email_participant")
         selected_tags = data.get("tags")
@@ -421,7 +431,6 @@ def add(type, data):
 
     elif type == "candidate":
 
-        error = None
         lastname_candidate = data.get("lastname_candidate")
         name_candidate = data.get("name_candidate")
         email_candidate = data.get("email_candidate")
@@ -445,7 +454,6 @@ def add(type, data):
 
     elif type == "employee":
 
-        error = None
         lastname_employee = data.get("lastname_employee")
         name_employee = data.get("name_employee")
         email_employee = data.get("email_employee")
