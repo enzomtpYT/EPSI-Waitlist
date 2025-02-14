@@ -336,8 +336,10 @@ def get_all_events():
                 event['tags'] = tags
                 # Get Interviews
                 cursor.execute('''
-                SELECT Interview.*
+                SELECT Interview.*, Participant.name_participant, Candidate.lastname_candidate, Candidate.name_candidate
                 FROM Interview
+                JOIN Participant ON Interview.id_participant = Participant.id_participant
+                JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
                 WHERE Interview.id_event = %s
                 ''', (event['id_event'],))
                 interviews = cursor.fetchall()

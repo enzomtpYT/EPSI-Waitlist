@@ -1,48 +1,349 @@
 {% extends "base.html" %}
 
-{% block title %}Admin - Gérer Événements{% endblock %}
+{% block title %}Admin - Gérer Événement{% endblock %}
 
-{% block content %}
-<h1 class="title">Gérer les événements</h1>
+{% block content %} 
+<div class="tableContent">
+    <h1 style="margin-left: 1rem;">Gérer les Événements</h1>
+    <h2 style="margin-left: 1rem;" id="loading">Chargement...</h2>
+    <div class="tabmanagment" style="display: none;">
 
-<div class="admin-section">
-    <h2>Liste des événements</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Nom</th>
-                <th>Date</th>
-                <th>Tags</th>
-                <th>Lien</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for event in events %}
-            <tr>
-                <td>{{ event.name_event }}</td>
-                <td>{{ event.date_event }}</td>
-                <td class="taggrid">
-                    {% for tag in event.tags %}
-                        {% if tag.name_tag %}
-                            <p class="display-tag">{{ tag.name_tag }}</p>
-                        {% endif %}
-                    {% endfor %}
-                </td>
-                <td><a class="link" href="{{ url_for('list.manage_list_id', id=event.id_event) }}">Voir liste</a></td>
-                <td class="actionbtn">
-                    <a href="/admin/manage_event/event/{{ event.id_event }}">
-                        <button type="button">Éditer</button>
-                    </a>
-                    <form action="/admin/manage_event/{{ event.id_event }}/delete" method="post" style="display:inline;">
-                        <button class="delete" type="submit" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');">Supprimer</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <div class="sideItemList">
+            <button class="listbtn" onclick="showNew()"><i class="fa-regular fa-calendar-circle-plus"></i> Créer un Événement</button>
+            <button class="listbtn" onclick="loadData()"><i class="fa-regular fa-rotate-right"></i> Recharger la liste</button>
+        </div>
+
+        <div class="resizer" id="resizer"></div>
+
+        <div class="infoeditor">
+            <form id="candform" style="display: none;">
+                <label for="name_event">Nom :</label>
+                <input type="text" id="name_event" name="name_event" value="">
+    
+                <label for="date_event">Date :</label>
+                <input type="date" id="date_event" name="date_event" value="">
+    
+                <label for="start_time_event">Heure de début :</label>
+                <input type="time" id="start_time_event" name="start_time_event" value="">
+    
+                <label for="end_time_event">Heure de fin :</label>
+                <input type="time" id="end_time_event" name="end_time_event" value="">
+    
+                <div>
+                    <button id="confirmbtn" onclick="done(event)"><i class="fa-regular fa-save"></i> Enregistrer</button>
+                    <button class="delete"><i class="fa-regular fa-trash"></i> Supprimer</button>
+                </div>
+
+                <input type="hidden" id="id_event" name="id_event" value="">
+                <input type="hidden" id="tags" name="tags" value="">
+            </form>
+
+            <div class="sectionmanagetag">
+                <div class="sectionremovetags"></div>
+                <div class="sectionaddtags"></div>
+            </div>
+
+            <div class="listsection" display="none">
+                <h2>Liste des entretiens</h2>
+                <h3>Aucun entretiens trouvé</h3>
+                <div class="tablewrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Candidat</th>
+                                <th>Intervenant</th>
+                                <th>Durée de l'entretien</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-{% endblock %}
+<div id="feedbackModal" class="modal">
+    <div class="modal-content">
+        <i class="fa-regular fa-x close" onclick="toggleElement(this.parentElement.parentElement)"></i>
+        <h2>Feedback de l'entretien</h2>
+        <h3 id="partfeedtitle">Feedback de l'intervenant :</h3>
+        <div class="feedb" id="participantFeedback"></div>
+        <h3 id="candfeedtitle">Feedback du candidat :</h3>
+        <div class="feedb" id="candidateFeedback"></div>
+    </div>
+</div>
 
+<script>
+let AllTags = null;
+
+function loadData() {
+    document.querySelector('#candform').style.display = 'none';
+    document.querySelector('.sectionmanagetag').style.display = 'none';
+    document.querySelector('.listsection').style.display = 'none';
+    document.querySelectorAll('.itemlist').forEach(item => item.remove());
+    document.querySelectorAll('.sectionaddtags button').forEach(tag => tag.remove());
+    document.querySelectorAll('.sectionremovetags button').forEach(tag => tag.remove());
+    fetch('{{ url_for('api.get_tags') }}')
+        .then(response => {
+            if (!response.ok) {
+                popup('danger', 'Une erreur est survenue lors de la récupération des données');
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(datas => {
+            AllTags = datas;
+        })
+        .catch(error => {
+            popup('danger', 'Une erreur est survenue lors de la récupération des données');
+            console.error('Error:', error);
+        });
+    fetch('{{ url_for('api.get_events') }}')
+        .then(response => {
+            if (!response.ok) {
+                popup('danger', 'Une erreur est survenue lors de la récupération des données');
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(datas => {
+            buildManagement(datas, AllTags);
+        })
+        .catch(error => {
+            popup('danger', 'Une erreur est survenue lors de la récupération des données');
+            console.error('Error:', error);
+        });
+}
+
+function showInfos(infos) {
+    document.querySelector('#name_event').value = infos.name_event;
+    document.querySelector('#date_event').value = infos.date_event;
+    document.querySelector('#start_time_event').value = infos.start_time_event;
+    document.querySelector('#end_time_event').value = infos.end_time_event;
+    document.querySelector('#id_event').value = infos.id_event;
+    document.querySelector('#tags').value = JSON.stringify(infos.tags);
+    document.querySelector('#confirmbtn').innerHTML = '<i class="fa-regular fa-save"></i> Enregistrer';
+    document.querySelector('#candform').style.display = 'flex';
+    document.querySelector('.sectionmanagetag').style.display = 'flex';
+    document.querySelector('.delete').onclick = function() {
+        deleteType('event', infos.id_event, event);
+        showNew();
+    };
+    document.querySelector('.delete').style.display = 'inline';
+    document.querySelector('.sectionremovetags').innerHTML = '';
+    document.querySelector('.sectionaddtags').innerHTML = '';
+    infos.tags.forEach(tag => {
+        let tagButton = document.createElement('button');
+        tagButton.classList.add('remove-tag');
+        tagButton.dataset.tagid = tag.id_tag;
+        tagButton.innerHTML = `<i class="fa-regular fa-xmark"></i> ${tag.name_tag}`;
+        tagButton.onclick = function() {
+            removeTag(tag, this);
+        };
+        document.querySelector('.sectionremovetags').appendChild(tagButton);
+    });
+    AllTags.forEach(tag => {
+        if (!infos.tags.some(userTag => userTag.id_tag === tag.id_tag)) {
+            let tagButton = document.createElement('button');
+            tagButton.classList.add('add-tag');
+            tagButton.dataset.tagid = tag.id_tag;
+            tagButton.innerHTML = `<i class="fa-regular fa-plus"></i> ${tag.name_tag}`;
+            tagButton.onclick = function() {
+                addTag(tag, this);
+            };
+            document.querySelector('.sectionaddtags').appendChild(tagButton);
+        }
+    });
+    document.querySelector('.listsection table tbody').innerHTML = '';
+    if (infos.interviews.length === 0) {
+        document.querySelector('.listsection table').style.display = 'none';
+        document.querySelector('.listsection h3').style.display = 'block';        
+    } else {
+        document.querySelector('.listsection table').style.display = 'table';
+        document.querySelector('.listsection h3').style.display = 'none';
+        infos.interviews.forEach(interview => {
+            let tr = document.createElement('tr');
+            tr.innerHTML = `<td>${interview.name_candidate} ${interview.lastname_candidate}</td><td>${interview.name_participant}</td><td>${formatDuration(interview.duration_interview)}</td>`;
+            let td = document.createElement('td');
+            td.classList.add('actionbtn');
+            let button = document.createElement('button');
+            button.onclick = function() { openfeedback(this, interview); };
+            button.classList.add('feedback-btn');
+            button.innerHTML = 'Voir les feedbacks';
+            td.appendChild(button);
+            tr.appendChild(td);
+            document.querySelector('.listsection table tbody').appendChild(tr);
+            console.log(interview);
+        });
+    }
+    document.querySelector('.listsection').style.display = 'flex';
+}
+
+function showNew() {
+    document.querySelectorAll('.itemlist').forEach(item => { item.classList.remove('selected'); });
+    document.querySelector('#name_event').value = '';
+    document.querySelector('.listsection').style.display = 'none';
+    document.querySelector('#date_event').value = '';
+    document.querySelector('#start_time_event').value = '';
+    document.querySelector('#end_time_event').value = '';
+    document.querySelector('#id_event').value = '';
+    document.querySelector('#tags').value = JSON.stringify([]);
+    document.querySelector('#confirmbtn').innerHTML = '<i class="fa-regular fa-save"></i> Enregistrer';
+    document.querySelector('#candform').style.display = 'flex';
+    document.querySelector('.sectionmanagetag').style.display = 'flex';
+    document.querySelector('.delete').style.display = 'none';
+    document.querySelector('.sectionremovetags').innerHTML = '';
+    document.querySelector('.listsection table tbody').innerHTML = '';
+    document.querySelector('.sectionaddtags').innerHTML = '';
+    AllTags.forEach(tag => {
+        let tagButton = document.createElement('button');
+        tagButton.classList.add('add-tag');
+        tagButton.dataset.tagid = tag.id_tag;
+        tagButton.innerHTML = `<i class="fa-regular fa-plus"></i> ${tag.name_tag}`;
+        tagButton.onclick = function() {
+            addTag(tag, this);
+        };
+        document.querySelector('.sectionaddtags').appendChild(tagButton);
+    });
+}
+
+function openfeedback(btn, inter) {
+    let modal = document.querySelector('#feedbackModal');
+    let participantFeedbackEl = modal.querySelector('#participantFeedback');
+    let candidateFeedbackEl = modal.querySelector('#candidateFeedback');
+    let partfeedtitle = modal.querySelector('#partfeedtitle');
+    let candfeedtitle = modal.querySelector('#candfeedtitle');
+    console.log(inter);
+    let participantFeedback = inter.feedback_participant;
+    let candidateFeedback = inter.feedback_candidate;
+
+
+    if (participantFeedback === null) {
+        participantFeedbackEl.style.display = 'none';
+        partfeedtitle.style.display = 'none';
+    } else {
+        participantFeedbackEl.style.display = 'flex';
+        partfeedtitle.style.display = 'block';
+        mark(participantFeedbackEl, participantFeedback);
+    }
+
+    if (candidateFeedback === null) {
+        candidateFeedbackEl.style.display = 'none';
+        candfeedtitle.style.display = 'none';
+    } else {
+        candidateFeedbackEl.style.display = 'flex';
+        candfeedtitle.style.display = 'block';
+        mark(candidateFeedbackEl, candidateFeedback);
+    }
+
+    if (candidateFeedback === null && participantFeedback === null) {
+        popup('info', 'Aucun feedback n\'a été enregistré pour cet entretien');
+    } else {
+        toggleElement(modal);
+    }
+}
+
+function buildManagement(datas, tags) {
+    let sideItemList = document.querySelector('.sideItemList');
+    num = 0;
+    datas.forEach(event => {
+        let item = document.createElement('div');
+        item.classList.add('itemlist');
+        item.onclick = function() { showInfos(event); this.classList.add('selected'); document.querySelectorAll('.itemlist').forEach(item => { if (item !== this) item.classList.remove('selected'); }); };
+        item.id = `deleteElement-${event.id_event}-event`;
+        item.innerHTML = `<i class="fa-regular fa-user"></i><p>${event.name_event}</p>`;
+        sideItemList.appendChild(item);
+        if (num === 0) item.click();
+        num++;
+    });
+    document.querySelector('#loading').style.display = 'none';
+    document.querySelector('.tabmanagment').style.display = 'flex';
+}
+
+function addTag(tag, button) {
+    let tags = JSON.parse(document.querySelector('#tags').value);
+    tags.push(tag);
+    document.querySelector('#tags').value = JSON.stringify(tags);
+    let tagButton = document.createElement('button');
+    tagButton.classList.add('remove-tag');
+    tagButton.dataset.tagid = tag.id_tag;
+    tagButton.innerHTML = `<i class="fa-regular fa-xmark"></i> ${tag.name_tag}`;
+    tagButton.onclick = function() {
+        removeTag(tag, this);
+    };
+    document.querySelector('.sectionremovetags').appendChild(tagButton);
+    if (button) button.remove();
+}
+
+function removeTag(tag, button) {
+    let tags = JSON.parse(document.querySelector('#tags').value);
+    tags = tags.filter(t => t.id_tag !== tag.id_tag);
+    document.querySelector('#tags').value = JSON.stringify(tags);
+    let tagButton = document.createElement('button');
+    tagButton.classList.add('add-tag');
+    tagButton.dataset.tagid = tag.id_tag;
+    tagButton.innerHTML = `<i class="fa-regular fa-plus"></i> ${tag.name_tag}`;
+    tagButton.onclick = function() {
+        addTag(tag, this);
+    };
+    document.querySelector('.sectionaddtags').appendChild(tagButton);
+    if (button) button.remove();
+}
+
+function done(e) {
+    e.preventDefault();
+    let event = {
+        id_event: document.querySelector('#id_event').value,
+        name_event: document.querySelector('#name_event').value,
+        date_event: document.querySelector('#date_event').value,
+        start_time_event: document.querySelector('#start_time_event').value,
+        end_time_event: document.querySelector('#end_time_event').value,
+        tags: JSON.parse(document.querySelector('#tags').value)
+    };
+
+    if (document.querySelector('#id_event').value != '') {
+        url = '{{ url_for('api.update_api', type='event') }}';
+    } else {
+        url = '{{ url_for('api.add_api', type='event') }}';
+    }
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(event)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                popup('danger', 'Une erreur est survenue lors de l\'enregistrement des données: ' + (data.message || 'Erreur inconnue'));
+            });
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        popup('success', 'Événement enregistré avec succès');
+        loadData();
+    })
+    .catch(error => {
+        popup('danger', 'Une erreur est survenue lors de l\'enregistrement des données');
+        console.error('Error:', error);
+    });
+}
+
+modal = document.getElementById('feedbackModal');
+
+window.onclick = function(e) {
+    if (e.target == modal) {
+        toggleElement(modal);
+    }
+}
+
+loadData();
+</script>
+{% endblock %}
