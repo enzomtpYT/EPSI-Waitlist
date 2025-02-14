@@ -28,6 +28,13 @@ def manage_event_participants_api_args():
         return jsonify({"error": error}), 400
     return jsonify(datas)
 
+@api_bp.route('/api/get_events', methods=['GET'])
+def get_events():
+    datas, error = api.get_events()
+    if error:
+        return jsonify({"error": error}), 400
+    return jsonify(datas)
+
 @api_bp.route('/api/process_event_participants', methods=['POST'])
 def process_event_participants():
     data = request.get_json()

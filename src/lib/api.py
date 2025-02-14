@@ -59,6 +59,15 @@ class CacheProxy(MutableMapping):
         for k, v in self.proxied_dict.items():
             return v.to_dict() if isinstance(v, CacheProxy) else v
 
+def timefixer(item):
+    if isinstance(item, (datetime.time, datetime.datetime, datetime.date)):
+        return item.strftime('%H:%M:%S' if isinstance(item, datetime.time) else '%Y-%m-%d %H:%M:%S' if isinstance(item, datetime.datetime) else '%Y-%m-%d')
+    elif isinstance(item, dict):
+        return {key: timefixer(value) for key, value in item.items()}
+    elif isinstance(item, list):
+        return [timefixer(element) for element in item]
+    return item
+
 cache = CacheManager()
 
 def updatecache_event(id):
@@ -113,6 +122,13 @@ def get_event_participants(id_event):
     if error:
         return None, error
     return datas, None
+
+def get_events():
+    events, error = database.get_all_events()
+    if error:
+        return None, error
+
+    return timefixer(events), None
 
 def process_event_participants(datas):
     participants = datas.get("participants", [])

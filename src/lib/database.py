@@ -325,14 +325,42 @@ def get_all_events():
         events = cursor.fetchall()
         if events:
             for event in events:
+                # Get tags
                 cursor.execute('''
-                SELECT Tag.id_tag
+                SELECT Tag.*
                 FROM Tag
                 JOIN Event_tag ON Tag.id_tag = Event_tag.id_tag
                 WHERE Event_tag.id_event = %s
                 ''', (event['id_event'],))
                 tags = cursor.fetchall()
-                event['tags'] = [tag['id_tag'] for tag in tags]
+                event['tags'] = tags
+                # Get Interviews
+                cursor.execute('''
+                SELECT Interview.*
+                FROM Interview
+                WHERE Interview.id_event = %s
+                ''', (event['id_event'],))
+                interviews = cursor.fetchall()
+                event['interviews'] = interviews
+                # Add all events attendees (participants/candidates)
+                attendees = {'participants': [], 'candidates': []}
+                cursor.execute('''
+                SELECT Attends.id_candidate, Attends.priority, Candidate.lastname_candidate, Candidate.name_candidate
+                FROM Attends
+                JOIN Candidate ON Attends.id_candidate = Candidate.id_candidate
+                WHERE Attends.id_event = %s
+                ''', (event['id_event'],))
+                candidates = cursor.fetchall()
+                attendees['candidates'] = candidates
+                cursor.execute('''
+                SELECT Participates.id_participant, Participant.name_participant
+                FROM Participates
+                JOIN Participant ON Participates.id_participant = Participant.id_participant
+                WHERE Participates.id_event = %s
+                ''', (event['id_event'],))
+                participants = cursor.fetchall()
+                attendees['participants'] = participants
+                event['attendees'] = attendees
             return events, None
         else:
             return None, "Pas d'événement aujourd'hui"
