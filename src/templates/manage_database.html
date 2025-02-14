@@ -349,33 +349,45 @@ function viewInterview(interviews) {
 
     thead.appendChild(tr);
 
-    interviews.forEach(interview => {
+// Filter interviews to include only those with "happened" set to true
+    const filteredInterviews = interviews.filter(interview => interview.happened === true);
+
+    if (filteredInterviews.length === 0) {
         const tr = document.createElement("tr");
-
-        const eventTd = document.createElement("td");
-        eventTd.textContent = interview.event.name_event;
-        tr.appendChild(eventTd);
-
-        const dateTd = document.createElement("td");
-        dateTd.textContent = interview.event.date_event;
-        tr.appendChild(dateTd);
-
-        const interviewerTd = document.createElement("td");
-        interviewerTd.textContent = interview.participant.name_participant;
-        tr.appendChild(interviewerTd);
-
-        const actionTd = document.createElement("td");
-        const button = document.createElement("button");
-        button.textContent = "Voir Feedbacks";
-
-        button.onclick = () => {
-            openfeedbacks(interview.feedback_participant, interview.feedback_candidate);
-        };
-
-        actionTd.appendChild(button);
-        tr.appendChild(actionTd);
+        const td = document.createElement("td");
+        td.colSpan = 4;
+        td.textContent = "Aucun entretien trouvé.";
+        tr.appendChild(td);
         tbody.appendChild(tr);
-    });
+    } else {
+        filteredInterviews.forEach(interview => {
+            const tr = document.createElement("tr");
+
+            const eventTd = document.createElement("td");
+            eventTd.textContent = interview.event.name_event;
+            tr.appendChild(eventTd);
+
+            const dateTd = document.createElement("td");
+            dateTd.textContent = interview.event.date_event;
+            tr.appendChild(dateTd);
+
+            const interviewerTd = document.createElement("td");
+            interviewerTd.textContent = interview.participant.name_participant;
+            tr.appendChild(interviewerTd);
+
+            const actionTd = document.createElement("td");
+            const button = document.createElement("button");
+            button.textContent = "Voir Feedbacks";
+
+            button.onclick = () => {
+                openfeedbacks(interview.feedback_participant, interview.feedback_candidate);
+            };
+
+            actionTd.appendChild(button);
+            tr.appendChild(actionTd);
+            tbody.appendChild(tr);
+        });
+    }
 }
 
 function openfeedbacks(participantFeedback, candidateFeedback) {
