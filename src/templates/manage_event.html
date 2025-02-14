@@ -34,7 +34,7 @@
                         <button id="confirmbtn" onclick="done(event)"><i class="fa-regular fa-save"></i> Enregistrer</button>
                         <button class="delete"><i class="fa-regular fa-trash"></i> Supprimer</button>
                     </div>
-                    <div>
+                    <div class="actionsbttn">
                         <button onclick="getPartdatas(event, document.querySelector('#id_event').value)"><i class="fa-regular fa-user"></i> Gérer les participants</button>
                         <button class="openmanagewaitlist"><i class="fa-regular fa-edit"></i> Editer la liste</button>
                         <button class="openlist"><i class="fa-regular fa-external-link"></i> Voir la liste</button>
@@ -506,6 +506,7 @@ function showInfos(infos) {
     document.querySelector('#start_time_event').value = infos.start_time_event;
     document.querySelector('#end_time_event').value = infos.end_time_event;
     document.querySelector('#id_event').value = infos.id_event;
+    document.querySelector('actionsbttn').display = 'flex';
     document.querySelector('#tags').value = JSON.stringify(infos.tags);
     document.querySelector('#confirmbtn').innerHTML = '<i class="fa-regular fa-save"></i> Enregistrer';
     document.querySelector('#candform').style.display = 'flex';
@@ -589,6 +590,7 @@ function showNew() {
     document.querySelector('.sectionremovetags').innerHTML = '';
     document.querySelector('.listsection table tbody').innerHTML = '';
     document.querySelector('.sectionaddtags').innerHTML = '';
+    document.querySelector('actionsbttn').display = 'none';
     AllTags.forEach(tag => {
         let tagButton = document.createElement('button');
         tagButton.classList.add('add-tag');
