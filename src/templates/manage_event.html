@@ -607,7 +607,7 @@ function showNew() {
 function downloadpdf(e) {
     e.preventDefault();
     let id_event = document.querySelector('#id_event').value;
-    fetch("{{ url_for('api.download_pdf') }}", {
+    fetch("{{ url_for('api.download_pdf_event') }}", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
