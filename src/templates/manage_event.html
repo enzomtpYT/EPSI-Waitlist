@@ -555,17 +555,19 @@ function showInfos(infos) {
         document.querySelector('.listsection table').style.display = 'table';
         document.querySelector('.listsection h3').style.display = 'none';
         infos.interviews.forEach(interview => {
-            let tr = document.createElement('tr');
-            tr.innerHTML = `<td>${interview.name_candidate} ${interview.lastname_candidate}</td><td>${interview.name_participant}</td><td>${formatDuration(interview.duration_interview)}</td>`;
-            let td = document.createElement('td');
-            td.classList.add('actionbtn');
-            let button = document.createElement('button');
-            button.onclick = function() { openfeedback(this, interview); };
-            button.classList.add('feedback-btn');
-            button.innerHTML = 'Voir les feedbacks';
-            td.appendChild(button);
-            tr.appendChild(td);
-            document.querySelector('.listsection table tbody').appendChild(tr);
+            if (interview.happened || interview.feedback_participant || interview.feedback_candidate || interview.duration_interview || interview.end_time_interview || interview.start_time_interview) {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `<td>${interview.name_candidate} ${interview.lastname_candidate}</td><td>${interview.name_participant}</td><td>${formatDuration(interview.duration_interview)}</td>`;
+                let td = document.createElement('td');
+                td.classList.add('actionbtn');
+                let button = document.createElement('button');
+                button.onclick = function() { openfeedback(this, interview); };
+                button.classList.add('feedback-btn');
+                button.innerHTML = 'Voir les feedbacks';
+                td.appendChild(button);
+                tr.appendChild(td);
+                document.querySelector('.listsection table tbody').appendChild(tr);
+            }
         });
     }
     document.querySelector('.listsection').style.display = 'flex';
