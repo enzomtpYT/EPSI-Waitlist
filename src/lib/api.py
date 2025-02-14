@@ -1,7 +1,8 @@
 from lib import database, auth
-from flask import jsonify
+from flask import jsonify, make_response
 import datetime, random, threading
 from collections.abc import MutableMapping
+from fpdf import FPDF
 
 class CacheManager(MutableMapping):
     def __init__(self):
@@ -65,6 +66,48 @@ def timefixer(item):
     return item
 
 cache = CacheManager()
+
+def generate_pdf(id_event):
+    event, error = database.get_event(id_event)
+    if error:
+        return None, error
+    if not event:
+        return None, "Aucun évenement avec cet id"
+
+    class PDF(FPDF):
+        def __init__(self, name_event):
+            super().__init__()
+            self.name_event = name_event
+
+        def header(self):
+            self.set_font('Arial', 'B', 12)
+            self.cell(0, 10, f'Événement : {self.name_event}', 0, 1, 'C')
+
+    pdf = PDF(event.get('name_event', 'N/A') if event else 'N/A')
+    pdf.add_page()
+    pdf.set_font('Arial', '', 12)
+
+    pdf.cell(0, 10, f"Date de l'événement : {event.get('date_event', 'N/A')}", 0, 1)
+    if event.get('tags'):
+        tag_names = ", ".join(tag.get('name_tag', 'N/A') for tag in event['tags'])
+        pdf.cell(0, 10, f"Tags de l'événement : {tag_names}", 0, 1)
+    pdf.ln(10)
+
+    for interview in event.get('interviews', []):
+        pdf.cell(0, 10, f"Intervenant : {interview.get('name_participant', 'N/A')}", 0, 1)
+        pdf.cell(0, 10, f"Candidat : {interview.get('name_candidate', 'N/A')} {interview.get('lastname_candidate', 'N/A')}", 0, 1)
+        feedback_participant = interview.get('feedback_participant')
+        if feedback_participant:
+            pdf.cell(0, 10, f"Feedback intervenant : {feedback_participant}", 0, 1)
+
+        feedback_candidate = interview.get('feedback_candidate')
+        if feedback_candidate:
+            pdf.cell(0, 10, f"Feedback candidat : {feedback_candidate}", 0, 1)
+        pdf.ln(10)
+
+    response = make_response(pdf.output(dest='S').encode('latin1'))
+    response.headers['Content-Type'] = 'application/pdf'
+    return response, None
 
 def updatecache_event(id):
     cached = cache["events"].get(str(id))

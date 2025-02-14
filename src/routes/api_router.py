@@ -160,6 +160,20 @@ def update_api(type):
         return jsonify({"Erreur: ": error}), 400
     return jsonify({"success": True}), 200
 
+@api_bp.route("/api/download_pdf", methods=['POST'])
+def download_pdf_event():
+    data = request.get_json()
+    
+    if data and 'id_event' in data:
+        try:
+            pdf, error = api.generate_pdf(data['id_event'])
+            if error:
+                return jsonify({"error": error}), 400
+            return pdf
+        except Exception as e:
+            print(f"Erreur dans download_pdf_event: {e}")
+            return None
+
 @api_bp.route("/api/get_candidates", methods=['GET'])
 def get_candidates():
     datas, error = api.get_candidates()

@@ -385,6 +385,16 @@ def get_event(event_id):
         ''', (event_id,))
         tags = cursor.fetchall()
         event['tags'] = [dict(tag) for tag in tags]
+        # Add event interviews
+        cursor.execute('''
+        SELECT Interview.*, Participant.name_participant, Candidate.lastname_candidate, Candidate.name_candidate
+        FROM Interview
+        JOIN Participant ON Interview.id_participant = Participant.id_participant
+        JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
+        WHERE Interview.id_event = %s
+        ''', (event_id,))
+        interviews = cursor.fetchall()
+        event['interviews'] = interviews
         return event, None
     except psycopg2.Error as e:
         print(f"Erreur requête base de données: {e}")
