@@ -243,6 +243,11 @@
     margin-inline: 0;
 }
 
+.actionsbttn {
+    display: flex;
+    gap: 3px;
+}
+
 /* Manage event participants */
 
 .managecontent, .managewaitlist {
