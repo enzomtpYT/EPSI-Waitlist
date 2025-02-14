@@ -36,6 +36,7 @@
                     </div>
                     <div>
                         <button onclick="getPartdatas(event, document.querySelector('#id_event').value)"><i class="fa-regular fa-user"></i> Gérer les participants</button>
+                        <button class="openlist"><i class="fa-regular fa-external-link"></i> Voir la liste</button>
                     </div>
                 </div>
 
@@ -383,6 +384,10 @@ function showInfos(infos) {
     document.querySelector('.delete').style.display = 'inline';
     document.querySelector('.sectionremovetags').innerHTML = '';
     document.querySelector('.sectionaddtags').innerHTML = '';
+    document.querySelector('.openlist').onclick = function(event) {
+        event.preventDefault();
+        window.open('/list/' + infos.id_event + '/manage', '_blank');
+    };
     infos.tags.forEach(tag => {
         let tagButton = document.createElement('button');
         tagButton.classList.add('remove-tag');
