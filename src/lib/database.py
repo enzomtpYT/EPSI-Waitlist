@@ -531,38 +531,6 @@ def delete_event(id_event):
         conn.close()
     return None
 
-def get_event_interviews(id_event):
-    """
-    Récupère les interviews associées à un événement.
-
-    Args:
-        id_event (int): L'identifiant de l'événement.
-
-    Returns:
-        tuple: Un tuple contenant l'événement, les interviews et un message d'erreur si une erreur est survenue.
-    """
-    conn, cursor = get_db_connection()
-    if conn is None:
-        return None, None, "Erreur base de données"
-    try:
-        cursor.execute('SELECT * FROM Event WHERE id_event = %s', (id_event,))
-        event = cursor.fetchone()
-        cursor.execute('''
-        SELECT Interview.id_interview, Participant.name_participant, Candidate.lastname_candidate, Candidate.name_candidate, Interview.feedback_participant, Interview.feedback_candidate, Interview.duration_interview
-        FROM Interview
-        JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
-        JOIN Participant ON Interview.id_participant = Participant.id_participant
-        JOIN Event ON Interview.id_event = Event.id_event
-        WHERE Interview.id_event = %s AND Interview.happened = TRUE
-        ''', (id_event,))
-        interviews = cursor.fetchall()
-        return event, interviews, None
-    except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
-        return None, None, "Erreur requête base de données"
-    finally:
-        conn.close()
-
 def get_today_events():
     """
     Récupère les événements prévus pour aujourd'hui.
@@ -855,29 +823,6 @@ def create_candidate(lastname, name, email):
         # Fermes la connexion à la base de données
         conn.close()
 
-def get_candidate_email(id_candidate):
-    """
-    Récupère l'adresse email d'un candidat en utilisant son identifiant.
-
-    Args:
-        id_candidate (int): L'identifiant du candidat.
-
-    Returns:
-        str: L'adresse email du candidat.
-    """
-    conn, cursor = get_db_connection()
-    if conn is None:
-        return None
-    try:
-        cursor.execute('SELECT email_candidate FROM Candidate WHERE id_candidate = %s', (id_candidate,))
-        candidate = cursor.fetchone()
-        return candidate['email_candidate'] if candidate else None
-    except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
-        return None
-    finally:
-        conn.close()
-
 def get_all_candidates():
     """
     Récupère tous les candidats de la base de données.
@@ -1117,35 +1062,6 @@ def remove_candidate_from_all_interviews_for_event(id_event, id_candidate):
         conn.close()
     return None
 
-def add_candidate_to_event(id_event, id_candidate):
-    """
-    Ajoute un candidat à un événement.
-
-    Args:
-        id_event (int): L'identifiant de l'événement.
-        id_candidate (int): L'identifiant du candidat.
-
-    Returns:
-        str: Un message d'erreur si une erreur est survenue, None sinon.
-    """
-    conn, cursor = get_db_connection()
-    if conn is None:
-        # Si la connexion échoue, renvoie une erreur
-        return "Erreur base de données"
-    try:
-        # Exécute la requête pour ajouter le candidat à l'événement
-        cursor.execute('INSERT INTO Attends (id_event, id_candidate) VALUES (%s, %s)', (id_event, id_candidate))
-        # Sauvegarde les modifications
-        conn.commit()
-    except psycopg2.Error as e:
-        # Gère les erreurs de requête SQL
-        print(f"Erreur lors de l'ajout du candidat à l'événement: {e}")
-        return "Erreur lors de l'ajout du candidat à l'événement"
-    finally:
-        # Ferme la connexion à la base de données
-        conn.close()
-    return None
-
 def delete_candidate_from_event(id_event, id_candidate):
     """
     Supprime un candidat d'un événement.
@@ -1265,29 +1181,6 @@ def get_participant(participant_id):
     finally:
         conn.close()
 
-def get_participant_email(id_participant):
-    """
-    Récupère l'adresse email d'un intervenant en utilisant son identifiant.
-
-    Args:
-        id_participant (int): L'identifiant de l'intervenant.
-
-    Returns:
-        str: L'adresse email de l'intervenant.
-    """
-    conn, cursor = get_db_connection()
-    if conn is None:
-        return None
-    try:
-        cursor.execute('SELECT email_participant FROM Participant WHERE id_participant = %s', (id_participant,))
-        participant = cursor.fetchone()
-        return participant['email_participant']
-    except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
-        return None
-    finally:
-        conn.close()
-
 def edit_participant(name, email, id_participant):
     """
     Met à jour un participant dans la base de données.
@@ -1394,74 +1287,6 @@ def get_participant_interviews(id_participant):
         return None, "Erreur requête base de données"
     finally:
         conn.close()
-
-def get_last_added_participant():
-    """
-    Récupère le dernier participant ajouté à la base de données.
-
-    Returns:
-        tuple: Un tuple contenant le participant et un message d'erreur si une erreur est survenue.
-    """
-    conn, cursor = get_db_connection()
-    if conn is None:
-        return None, "Erreur base de données"
-    try:
-        cursor.execute('SELECT * FROM Participant ORDER BY id_participant DESC LIMIT 1')
-        participant = cursor.fetchone()
-        return participant, None
-    except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
-        return None, "Erreur requête base de données"
-    finally:
-        conn.close()
-
-def delete_participant_from_event(id_event, id_participant):
-    """
-    Supprime un participant d'un événement.
-
-    Args:
-        id_event (int): L'identifiant de l'événement.
-        id_participant (int): L'identifiant du participant.
-
-    Returns:
-        str: Un message d'erreur si une erreur est survenue, None sinon.
-    """
-    conn, cursor = get_db_connection()
-    if conn is None:
-        return "Erreur base de données"
-    try:
-        cursor.execute("DELETE FROM Participates WHERE id_event = %s AND id_participant = %s", (id_event, id_participant))
-        conn.commit()
-    except psycopg2.Error as e:
-        print(f"Erreur lors de la suppression de l'intervenant: {e}")
-        return "Erreur lors de la suppression de l'intervenant"
-    finally:
-        conn.close()
-    return None
-
-def add_participant_to_event(id_event, id_participant):
-    """
-    Ajoute un participant à un événement.
-
-    Args:
-        id_event (int): L'identifiant de l'événement.
-        id_participant (int): L'identifiant du participant.
-
-    Returns:
-        str: Un message d'erreur si une erreur est survenue, None sinon.
-    """
-    conn, cursor = get_db_connection()
-    if conn is None:
-        return "Erreur base de données"
-    try:
-        cursor.execute('INSERT INTO Participates (id_event, id_participant) VALUES (%s, %s)', (id_event, id_participant))
-        conn.commit()
-    except psycopg2.Error as e:
-        print(f"Erreur lors de l'ajout de l'intervenant à l'événement: {e}")
-        return "Erreur lors de l'ajout de l'intervenant à l'événement"
-    finally:
-        conn.close()
-    return None
 
 # Interview functions
 
@@ -1633,35 +1458,6 @@ def end_interview(interview_id, status):
     finally:
         conn.close()
 
-def get_candidate_from_event_participants_inverviews(id_event, id_participant):
-    """
-    Récupère les candidats associés aux interviews d'un participant pour un événement.
-
-    Args:
-        id_event (int): L'identifiant de l'événement.
-        id_participant (int): L'identifiant du participant.
-
-    Returns:
-        tuple: Un tuple contenant une liste d'interviews et un message d'erreur si une erreur est survenue.
-    """
-    conn, cursor = get_db_connection()
-    if conn is None:
-        return None, "Erreur base de données"
-    try:
-        cursor.execute('''
-        SELECT Interview.id_interview, Candidate.lastname_candidate, Candidate.name_candidate, Candidate.id_candidate
-        FROM Interview
-        JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
-        WHERE Interview.id_event = %s AND Interview.id_participant = %s
-        ''', (id_event, id_participant))
-        interviews = cursor.fetchall()
-        return interviews, None
-    except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
-        return None, "Erreur requête base de données"
-    finally:
-        conn.close()
-
 def delete_interview(id_interview):
     """
     Supprime un interview de la base de données en utilisant son identifiant.
@@ -1684,34 +1480,6 @@ def delete_interview(id_interview):
     finally:
         conn.close()
     return None
-
-def get_interview_by_candidate_event_participant(id_candidate, id_event, id_participant):
-    """
-    Récupère un entretien en utilisant l'identifiant du candidat, de l'événement et du participant.
-
-    Args:
-        id_candidate (int): L'identifiant du candidat.
-        id_event (int): L'identifiant de l'événement.
-        id_participant (int): L'identifiant du participant.
-
-    Returns:
-        tuple: Un tuple contenant l'entretien et un message d'erreur si une erreur est survenue.
-    """
-    conn, cursor = get_db_connection()
-    if conn is None:
-        return None, "Erreur base de données"
-    try:
-        cursor.execute('''
-        SELECT * FROM Interview
-        WHERE id_candidate = %s AND id_event = %s AND id_participant = %s
-        ''', (id_candidate, id_event, id_participant))
-        interview = cursor.fetchone()
-        return interview, None
-    except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
-        return None, "Erreur requête base de données"
-    finally:
-        conn.close()
 
 # Tag functions
 
@@ -2041,77 +1809,7 @@ def remove_tag_from_event(id_event, id_tag):
     finally:
         conn.close()
 
-def get_last_added_event():
-    """
-    Récupère le dernier événement ajouté à la base de données.
-
-    Returns:
-        tuple: Un tuple contenant l'événement et un message d'erreur si une erreur est survenue.
-    """
-    conn, cursor = get_db_connection()
-    if conn is None:
-        return None, "Erreur base de données"
-    try:
-        cursor.execute('SELECT * FROM Event ORDER BY id_event DESC LIMIT 1')
-        event = cursor.fetchone()
-        return event, None
-    except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
-        return None, "Erreur requête base de données"
-    finally:
-        conn.close()
-
 # Attends and Participates functions
-
-def edit_attends(id_candidat, id_event, priority):
-    """
-    Met à jour la priorité d'un candidat pour un événement.
-
-    Args:
-        id_candidat (int): L'identifiant du candidat.
-        id_event (int): L'identifiant de l'événement.
-        priority (int): La priorité du candidat pour l'événement.
-
-    Returns:
-        str: Un message d'erreur si une erreur est survenue, None sinon.
-    """
-    conn, cursor = get_db_connection()
-    if conn is None:
-        return "Erreur base de données"
-    try:
-        cursor.execute('UPDATE Attends SET priority = %s WHERE id_candidate = %s AND id_event = %s', (priority, id_candidat, id_event))
-        conn.commit()
-    except psycopg2.Error as e:
-        print(f"Erreur lors de la mise à jour de la priorité du candidat: {e}")
-        return "Erreur lors de la mise à jour de la priorité du candidat"
-    finally:
-        conn.close()
-    return None
-
-def create_attends(id_candidate, id_event, priority):
-    """
-    Crée une nouvelle participation dans la base de données.
-
-    Args:
-        id_candidate (int): L'identifiant du candidat.
-        id_event (int): L'identifiant de l'événement.
-        priority (int): La priorité du candidat pour l'événement.
-
-    Returns:
-        str: Un message d'erreur si une erreur est survenue, None sinon.
-    """
-    conn, cursor = get_db_connection()
-    if conn is None:
-        return "Erreur base de données"
-    try:
-        cursor.execute('INSERT INTO Attends (id_candidate, id_event, priority) VALUES (%s, %s, %s)', (id_candidate, id_event, priority))
-        conn.commit()
-    except psycopg2.Error as e:
-        print(f"Erreur lors de la création de la participation (Candidat): {e}")
-        return "Erreur lors de la création de la participation (Candidat)"
-    finally:
-        conn.close()
-    return None
 
 def delete_attends(id_candidate, id_event):
     """
@@ -2133,30 +1831,6 @@ def delete_attends(id_candidate, id_event):
     except psycopg2.Error as e:
         print(f"Erreur lors de la suppression de la participation: {e}")
         return "Erreur lors de la suppression de la participation"
-    finally:
-        conn.close()
-    return None
-
-def create_participates(id_participant, id_event):
-    """
-    Crée une nouvelle participation dans la base de données.
-
-    Args:
-        id_participant (int): L'identifiant du participant.
-        id_event (int): L'identifiant de l'événement.
-
-    Returns:
-        str: Un message d'erreur si une erreur est survenue, None sinon.
-    """
-    conn, cursor = get_db_connection()
-    if conn is None:
-        return "Erreur base de données"
-    try:
-        cursor.execute('INSERT INTO Participates (id_participant, id_event) VALUES (%s, %s)', (id_participant, id_event))
-        conn.commit()
-    except psycopg2.Error as e:
-        print(f"Erreur lors de la création de la participation (Intervenant): {e}")
-        return "Erreur lors de la création de la participation (Intervenant)"
     finally:
         conn.close()
     return None
@@ -2304,70 +1978,6 @@ def auth_update_username(username, id_user):
     except psycopg2.Error as e:
         print(f"Erreur lors de la mise à jour du nom d'utilisateur de l'utilisateur: {e}")
         return "Erreur lors de la mise à jour du nom d'utilisateur de l'utilisateur"
-    finally:
-        conn.close()
-
-def auth_register_candidate(id_candidate, username, password_user, session_token):
-    """
-    Enregistre un candidat dans la base de données.
-
-    Args:
-        id_candidate (int): L'identifiant du candidat.
-        username (str): Le nom d'utilisateur du candidat.
-        password_user (str): Le mot de passe hashé du candidat.
-        session_token (str): Le jeton de session du candidat.
-
-    Returns:
-        str: Un message d'erreur si une erreur est survenue, None sinon.
-    """
-    conn, cursor = get_db_connection()
-    if conn is None:
-        return "Erreur base de données"
-    try:
-        cursor.execute('INSERT INTO "User" (username, password_user, session_token) VALUES (%s, %s, %s)', (username, password_user, session_token))
-        conn.commit()
-        # get latest user id
-        cursor.execute('SELECT id_user FROM "User" WHERE username = %s', (username,))
-        user_id = cursor.fetchone()
-        # add user to candidate table
-        cursor.execute('UPDATE Candidate SET id_user = %s WHERE id_candidate = %s', (user_id['id_user'], id_candidate))
-        conn.commit()
-        return None
-    except psycopg2.Error as e:
-        print(f"Erreur lors de l'enregistrement du candidat: {e}")
-        return "Erreur lors de l'enregistrement du candidat"
-    finally:
-        conn.close()
-
-def auth_register_employee(id_employee, username, password_user, session_token):
-    """
-    Enregistre un employé dans la base de données.
-
-    Args:
-        id_employee (int): L'identifiant de l'employé.
-        username (str): Le nom d'utilisateur de l'employé.
-        password_user (str): Le mot de passe hashé de l'employé.
-        session_token (str): Le jeton de session de l'employé.
-
-    Returns:
-        str: Un message d'erreur si une erreur est survenue, None sinon.
-    """
-    conn, cursor = get_db_connection()
-    if conn is None:
-        return "Erreur base de données"
-    try:
-        cursor.execute('INSERT INTO "User" (username, password_user, session_token) VALUES (%s, %s, %s)', (username, password_user, session_token))
-        conn.commit()
-        # get latest user id
-        cursor.execute('SELECT id_user FROM "User" WHERE username = %s', (username,))
-        user_id = cursor.fetchone()
-        # add user to employee table
-        cursor.execute('UPDATE Employee SET id_user = %s WHERE id_employee = %s', (user_id['id_user'], id_employee))
-        conn.commit()
-        return None
-    except psycopg2.Error as e:
-        print(f"Erreur lors de l'enregistrement de l'employé: {e}")
-        return "Erreur lors de l'enregistrement de l'employé"
     finally:
         conn.close()
 
@@ -2622,34 +2232,6 @@ def get_user_role(user_id):
     finally:
         conn.close()
 
-def update_user_role(user_id, role_name):
-    """
-    Met à jour le rôle d'un utilisateur dans la base de données.
-
-    Args:
-        user_id (int): L'identifiant de l'utilisateur.
-        role_name (str): Le nouveau rôle de l'utilisateur.
-
-    Returns:
-        str: Un message d'erreur si une erreur est survenue, None sinon.
-    """
-    conn, cursor = get_db_connection()
-    if conn is None:
-        return "Erreur base de données"
-    try:
-        cursor.execute('''
-        UPDATE User_role
-        SET id_role = (SELECT id_role FROM Role WHERE name_role = %s)
-        WHERE id_user = %s
-        ''', (role_name, user_id))
-        conn.commit()
-        return None
-    except psycopg2.Error as e:
-        print(f"Erreur lors de la mise à jour du rôle de l'utilisateur: {e}")
-        return "Erreur lors de la mise à jour du rôle de l'utilisateur"
-    finally:
-        conn.close()
-
 def get_profile_info(session_token):
     """
     Récupère les informations de profil d'un utilisateur
@@ -2766,30 +2348,6 @@ def get_user(user_id):
     finally:
         conn.close()
 
-def update_username_with_id(user_id, username):
-    """
-    Met à jour le nom d'utilisateur d'un utilisateur dans la base de données.
-
-    Args:
-        user_id (int): L'identifiant de l'utilisateur.
-        username (str): Le nouveau nom d'utilisateur de l'utilisateur.
-
-    Returns:
-        str: Un message d'erreur si une erreur est survenue, None sinon.
-    """
-    conn, cursor = get_db_connection()
-    if conn is None:
-        return "Erreur base de données"
-    try:
-        cursor.execute('UPDATE "User" SET username = %s WHERE id_user = %s', (username, user_id))
-        conn.commit()
-        return None
-    except psycopg2.Error as e:
-        print(f"Erreur lors de la mise à jour du nom d'utilisateur de l'utilisateur: {e}")
-        return "Erreur lors de la mise à jour du nom d'utilisateur de l'utilisateur"
-    finally:
-        conn.close()
-
 # Employee functions
 
 def create_employee(lastname, name, email, role):
@@ -2834,29 +2392,6 @@ def create_employee(lastname, name, email, role):
         return None, None, "Erreur lors de la création de l'employé"
     finally:
         # Ferme la connexion à la base de données
-        conn.close()
-
-def get_employee_email(id_employee):
-    """
-    Récupère l'adresse email d'un employé en utilisant son identifiant.
-
-    Args:
-        id_employee (int): L'identifiant de l'employé.
-
-    Returns:
-        str: L'adresse email de l'employé.
-    """
-    conn, cursor = get_db_connection()
-    if conn is None:
-        return None
-    try:
-        cursor.execute('SELECT email_employee FROM Employee WHERE id_employee = %s', (id_employee,))
-        employee = cursor.fetchone()
-        return employee['id_employee'] if employee else None
-    except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
-        return None
-    finally:
         conn.close()
 
 def get_all_employees():
