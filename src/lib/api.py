@@ -9,14 +9,12 @@ class CacheManager(MutableMapping):
 
     def __getitem__(self, key):
         value = self.cache[key]
-        # print(f"Read from cache: {key} -> {value}")
         if isinstance(value, dict):
             value = CacheProxy(self, key, value)
         return value
 
     def __setitem__(self, key, value):
         self.cache[key] = value
-        # print(f"Written to cache: {key} -> {value}")
 
     def __delitem__(self, key):
         del self.cache[key]
@@ -35,7 +33,6 @@ class CacheProxy(MutableMapping):
 
     def __getitem__(self, key):
         value = self.proxied_dict[key]
-        # print(f"Read from cache: {key} -> {value}")
         if isinstance(value, dict):
             value = CacheProxy(self.manager, self.parent_key, self.proxied_dict)
         return value
@@ -43,7 +40,6 @@ class CacheProxy(MutableMapping):
     def __setitem__(self, key, value):
         self.proxied_dict[key] = value
         self.manager[self.parent_key] = self.proxied_dict
-        # print(f"Written to cache: {key} -> {value}")
 
     def __delitem__(self, key):
         del self.proxied_dict[key]
@@ -73,10 +69,8 @@ cache = CacheManager()
 def updatecache_event(id):
     cached = cache["events"].get(str(id))
     if not cached:
-        print(f"Cache for event {id} not found, creating")
         list, error = get_list(id, forced=True)
         if error:
-            print(f"Error while creating cache for event {id}: {error}")
             return
         cache["events"][str(id)] = list
         return
@@ -84,10 +78,7 @@ def updatecache_event(id):
     list, error = get_list(id, forced=True)
     if not error:
         if list != cached:
-            print(f"Cache for event {id} is outdated, updating")
             cache["events"][str(id)] = list
-        else:
-            print(f"Cache for event {id} is up to date")
 
 def updatecache_all(id=None, type=None):
     types = [type] if type is not None else cache.keys()
@@ -96,8 +87,6 @@ def updatecache_all(id=None, type=None):
         for id in ids:
             if type == "events":
                 threading.Thread(target=updatecache_event, args=(id,)).start()
-            else:
-                print("Unknown type")
 
 def weighted_shuffle(arr, weights):
     """
@@ -397,6 +386,7 @@ def add(type, data):
     error = None
     
     if type == "event":
+        
         name_event = data.get("name_event")
         start_time_event = data.get("start_time_event")
         end_time_event = data.get("end_time_event")
@@ -483,7 +473,28 @@ def add(type, data):
 
 def update(type, data):
     if type == "event":
-        error = database.update_event(data)
+        
+        id_event = data.get("id_event")
+        name_event = data.get("name_event")
+        start_time_event = data.get("start_time_event")
+        end_time_event = data.get("end_time_event")
+        date_event = data.get("date_event")
+        newtags = data.get("tags")
+        currenttags, error = database.get_event_tags(id_event)
+        currenttags = [dict(tag) for tag in currenttags]
+        if name_event is None or start_time_event is None or end_time_event is None or date_event is None:
+            return "Champs manquants"
+        error = database.edit_event(name_event, date_event, id_event, start_time_event=start_time_event, end_time_event=end_time_event)
+        if error:
+            return error
+        if newtags is not None:
+            for otag in currenttags:
+                if otag not in newtags:
+                    database.remove_tag_from_event(id_event, otag['id_tag'])
+            for ntag in newtags:
+                if ntag not in currenttags:
+                    database.add_tag_to_event(id_event, ntag['id_tag'])
+        
     elif type == "participant":
 
         id_participant = data.get("id_participant")
@@ -498,7 +509,6 @@ def update(type, data):
         if error:
             return error
         if newtags is not None:
-            print(f'currenttags: {currenttags}\nnwetags: {newtags}')
             for otag in currenttags:
                 if otag not in newtags:
                     database.remove_tag_from_participant(id_participant, otag['id_tag'])
@@ -533,7 +543,6 @@ def update(type, data):
         if error:
             return error
         if newtags is not None:
-            print(f'currenttags: {currenttags}\nnwetags: {newtags}')
             for otag in currenttags:
                 if otag not in newtags:
                     database.remove_tag_from_candidate(id_candidate, otag['id_tag'])

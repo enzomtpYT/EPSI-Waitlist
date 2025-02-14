@@ -392,7 +392,7 @@ def get_event(event_id):
     finally:
         conn.close()
 
-def edit_event(name, date, id_event, has_timeslots, start_time_event=None, end_time_event=None):
+def edit_event(name, date, id_event, has_timeslots=False, start_time_event=None, end_time_event=None):
     """
     Met à jour un événement dans la base de données.
 
