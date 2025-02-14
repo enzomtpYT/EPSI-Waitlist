@@ -4,8 +4,8 @@
 
 {% block content %} 
 <div class="tableContent">
-    <h1 style="margin-left: 1rem;">Gérer les Événements</h1>
-    <h2 style="margin-left: 1rem;" id="loading">Chargement...</h2>
+    <h1 style="padding: 0.5rem">Gérer les Événements</h1>
+    <h2 style="padding-left: 0.5rem;" id="loading">Chargement...</h2>
     <div class="tabmanagment" style="display: none;">
 
         <div class="sideItemList">
@@ -29,9 +29,14 @@
                 <label for="end_time_event">Heure de fin :</label>
                 <input type="time" id="end_time_event" name="end_time_event" value="">
     
-                <div>
-                    <button id="confirmbtn" onclick="done(event)"><i class="fa-regular fa-save"></i> Enregistrer</button>
-                    <button class="delete"><i class="fa-regular fa-trash"></i> Supprimer</button>
+                <div style="display: flex; justify-content: space-between;">
+                    <div>
+                        <button id="confirmbtn" onclick="done(event)"><i class="fa-regular fa-save"></i> Enregistrer</button>
+                        <button class="delete"><i class="fa-regular fa-trash"></i> Supprimer</button>
+                    </div>
+                    <div>
+                        <button onclick="getPartdatas(event, document.querySelector('#id_event').value)"><i class="fa-regular fa-user"></i> Gérer les participants</button>
+                    </div>
                 </div>
 
                 <input type="hidden" id="id_event" name="id_event" value="">
@@ -65,6 +70,68 @@
     </div>
 </div>
 
+<div style="display: none;" class="managecontent">
+    <div style="display: flex; align-items: center; padding: 0.5rem;">
+        <button style="height: fit-content;" onclick="document.querySelector('.managecontent').style.display = 'none'; document.querySelector('.tableContent').style.display = 'flex';">
+            <i class="fa-regular fa-arrow-left"></i> Retour
+        </button>
+
+        <h1 style="flex-grow: 1;" class="title">Chargement...</h1>
+    </div>
+
+
+    <div class="tagnform">
+
+        <div class="tag-section">
+            <h2>Filtrer par tags</h2>
+            <div class="tag-selector">
+                <div class="tagfilter selectag" id="attend">
+                    <i class="fa-regular fa-tag"></i>
+                    <p>Participants</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-sections">
+            <div class="listsection interv">
+                <h2>Ajouter des Intervenants</h2>
+                <div class="tablewrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="listsection cand">
+                <h2>Ajouter des Candidats</h2>
+                <div class="tablewrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Prenom</th>
+                                <th>Poids</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <button onclick="submitparts()" id="submit">Ajouter les participants</button>
+
+        </div>
+    </div>
+</div>
+
 <div id="feedbackModal" class="modal">
     <div class="modal-content">
         <i class="fa-regular fa-x close" onclick="toggleElement(this.parentElement.parentElement)"></i>
@@ -78,6 +145,29 @@
 
 <script>
 let AllTags = null;
+let selectedTags = [];
+
+function getPartdatas(e, id_event) {
+    e.preventDefault();
+    fetch("{{ url_for('api.manage_event_participants_api_args') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({'id_event': id_event})
+    }).then(response => {
+            if (!response.ok) {
+                popup('danger', 'Une erreur est survenue lors de la récupération des données');
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+    }).then(data => {
+        buildManagePart(data);
+    }).catch(error => {
+        popup("danger", "Une erreur est survenue lors du chargement des données.");
+        console.error(error);
+    })
+}
 
 function loadData() {
     document.querySelector('#candform').style.display = 'none';
@@ -117,6 +207,164 @@ function loadData() {
             console.error('Error:', error);
         });
 }
+
+function buildManagePart(datas) {
+    let tagSelector = document.querySelector(".tag-selector");
+    let intervList = document.querySelector(".interv tbody");
+    let candList = document.querySelector(".cand tbody");
+    tagSelector.innerHTML = "";
+    intervList.innerHTML = "";
+    candList.innerHTML = "";
+
+    for (let participant of datas.participants) {
+        let tr = document.createElement("tr");
+        tr.id = `${participant.id_participant}`;
+        tr.innerHTML = `
+            <td>${participant.name_participant}</td>
+            <td>${participant.email_participant}</td>
+            <td>
+                <input class="checkbox" type="checkbox" ${participant.attends ? "checked" : ""}>
+            </td>
+        `;
+        intervList.appendChild(tr);
+    }
+
+    for (let candidate of datas.candidates) {
+        let tr = document.createElement("tr");
+        for (let tag of candidate.tags) {
+            tr.classList.add(`tag-${tag.id_tag}`);
+        }
+        tr.id = `${candidate.id_candidate}`;
+        tr.style.display = "none";
+        tr.innerHTML = `
+            <td>${candidate.lastname_candidate}</td>
+            <td>${candidate.name_candidate}</td>
+            <td>
+                <input type="number" value="${candidate.priority}" min="1" max="100">
+            </td>
+            <td>
+                <input class="checkbox" type="checkbox" ${candidate.attends ? "checked" : ""}>
+            </td>
+        `;
+        candList.appendChild(tr);
+    }
+
+    for (let tag of datas.tags) {
+        let tagDiv = document.createElement("div");
+        tagDiv.classList.add("tagfilter");
+        if (datas.event.tags.some(eventTag => eventTag.id_tag === tag.id_tag)) {
+            tagDiv.classList.add("selectag");
+            selectedTags.push(tag.id_tag);
+            // Make the class tag-{ tag.id_tag } visible
+            let tagElements = document.querySelectorAll(`.tag-${tag.id_tag}`);
+            tagElements.forEach(tagElement => {
+                tagElement.style.display = "table-row";
+                let checkbox = tagElement.querySelector('input[type=checkbox]');
+                if (checkbox) {
+                    checkbox.checked = true;
+                }
+            });
+        } else {
+            // Make the class tag-{ tag.id_tag } invisible
+            let tagElements = document.querySelectorAll(`.tag-${tag.id_tag}`);
+            tagElements.forEach(tagElement => {
+                tagElement.style.display = "none";
+            });
+        }
+        tagDiv.id = tag.id_tag;
+        tagDiv.innerHTML = `
+            <i class="fa-regular fa-tag"></i>
+            <p>${tag.name_tag}</p>
+        `;
+        tagSelector.appendChild(tagDiv);
+    }
+
+    let tags = document.querySelectorAll(".tagfilter");
+    tags.forEach(tag => {
+        tag.addEventListener("click", () => {
+            toggletag(tag);
+        });
+    });
+
+    let title = document.querySelector(".title");
+    title.textContent = `Gérer les participants pour l'événement: ${datas.event.name_event}`;
+    document.querySelector('.managecontent').style.display = 'flex';
+    document.querySelector('.tableContent').style.display = 'none';
+}
+
+function toggletag(tag) {
+    let enabled = tag.classList.toggle("selectag");
+    if (Number.isInteger(parseInt(tag.id))) {
+        if (enabled) {
+            selectedTags.push(parseInt(tag.id));
+        } else {
+            selectedTags = selectedTags.filter(function(id) {
+                return id !== parseInt(tag.id);
+            });
+        }
+    }
+
+    let allTagElements = document.querySelectorAll(".cand tbody tr");
+    allTagElements.forEach(tagElement => {
+        const noTagSelected = selectedTags.length === 0;
+        const hasAllSelectedTags = selectedTags.some(selectedTag => tagElement.classList.contains(`tag-${selectedTag}`));
+        const isChecked = tagElement.querySelector(".checkbox").checked;
+        const isAttendSelected = document.querySelector('#attend').classList.contains("selectag");
+
+        const isActive = hasAllSelectedTags || (isChecked && isAttendSelected) || noTagSelected;
+        tagElement.style.display = isActive ? "table-row" : "none";
+    });
+}
+
+function submitparts(id_event) {
+    datas = {
+        "id_event": id_event,
+        "participants": [],
+        "candidates": []
+    };
+
+    let intervList = document.querySelectorAll(".interv tbody tr");
+    intervList.forEach(interv => {
+        let id = parseInt(interv.id);
+        let attends = interv.querySelector(".checkbox").checked;
+        datas.participants.push({
+            "id_participant": id,
+            "attends": attends
+        });
+    });
+
+    let candList = document.querySelectorAll(".cand tbody tr");
+    candList.forEach(cand => {
+        let id = parseInt(cand.id);
+        let attends = cand.querySelector(".checkbox").checked;
+        let priority = parseInt(cand.querySelector("input[type=number]").value);
+        datas.candidates.push({
+            "id_candidate": id,
+            "attends": attends,
+            "priority": priority
+        });
+    });
+
+    fetch("{{ url_for('api.process_event_participants') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(datas)
+    }).then(response => {
+        if (!response.ok) {
+            popup('danger', 'Une erreur est survenue lors de l\'ajout des participants');
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    }).then(data => {
+        popup('success', 'Les participants ont été ajoutés avec succès');
+    }).catch(error => {
+        popup("danger", "Une erreur est survenue lors de l'ajout des participants.");
+        console.error(error);
+    });
+}
+
 
 function showInfos(infos) {
     document.querySelector('#name_event').value = infos.name_event;
@@ -176,7 +424,6 @@ function showInfos(infos) {
             td.appendChild(button);
             tr.appendChild(td);
             document.querySelector('.listsection table tbody').appendChild(tr);
-            console.log(interview);
         });
     }
     document.querySelector('.listsection').style.display = 'flex';
@@ -216,7 +463,6 @@ function openfeedback(btn, inter) {
     let candidateFeedbackEl = modal.querySelector('#candidateFeedback');
     let partfeedtitle = modal.querySelector('#partfeedtitle');
     let candfeedtitle = modal.querySelector('#candfeedtitle');
-    console.log(inter);
     let participantFeedback = inter.feedback_participant;
     let candidateFeedback = inter.feedback_candidate;
 
