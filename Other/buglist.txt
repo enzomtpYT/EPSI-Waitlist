@@ -1,7 +1,7 @@
 TO fix
 - page liste d'attente buggée (quand on actualise la page erreur côté serveur)
 - page gestion base de données, quand on regarde l'historique d'un étudiant, les interviews qui ne sont pas encore arrivées sont quand même affcihées
-- si on importe un csv mais qu'on le le submit pas et qu'ensuite on clique sur recharger la page, le bouton confirmer reste sur la page, on ne peut ensuite plus imorter un nouveau csv
+- si on importe un csv mais qu'on le submit pas et qu'ensuite on clique sur recharger la page, le bouton confirmer reste sur la page, on ne peut ensuite plus importer un nouveau csv
 - CSS pour les pages event a fix (manage_event & create_event)
 
 TO DO
