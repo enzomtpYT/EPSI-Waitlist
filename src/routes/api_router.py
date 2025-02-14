@@ -28,6 +28,26 @@ def manage_event_participants_api_args():
         return jsonify({"error": error}), 400
     return jsonify(datas)
 
+@api_bp.route('/api/process_event_waitlist', methods=['POST'])
+def process_event_waitlist():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Missing data"}), 400
+
+    id_event = data.get('id_event')
+    participants = data.get('participants')
+
+    if not id_event:
+        return jsonify({"error": "Missing id_event parameter"}), 400
+    if not participants:
+        return jsonify({"error": "Missing participants data"}), 400
+
+    error = api.process_event_waitlist(data)
+    if error:
+        return jsonify({"error": error}), 400
+
+    return jsonify({"success": True}), 200
+
 @api_bp.route('/api/get_events', methods=['GET'])
 def get_events():
     datas, error = api.get_events()

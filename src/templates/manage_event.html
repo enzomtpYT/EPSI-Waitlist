@@ -36,6 +36,7 @@
                     </div>
                     <div>
                         <button onclick="getPartdatas(event, document.querySelector('#id_event').value)"><i class="fa-regular fa-user"></i> Gérer les participants</button>
+                        <button class="openmanagewaitlist"><i class="fa-regular fa-edit"></i> Editer la liste</button>
                         <button class="openlist"><i class="fa-regular fa-external-link"></i> Voir la liste</button>
                     </div>
                 </div>
@@ -133,6 +134,19 @@
     </div>
 </div>
 
+<div class="managewaitlist">
+    <div style="display: flex; align-items: center; padding: 0.5rem;">
+        <button style="height: fit-content;" onclick="document.querySelector('.managewaitlist').style.display = 'none'; document.querySelector('.tableContent').style.display = 'flex';">
+            <i class="fa-regular fa-arrow-left"></i> Retour
+        </button>
+
+        <h1 style="flex-grow: 1;" class="title">Gerer la liste d'attente</h1>
+    </div>
+
+    <div class="list"></div>
+    <button style="margin: 0 auto;" onclick="submitwaitlist()"><i class="fa-regular fa-plus"></i> Ajouter à la liste d'attente</button>
+</div>
+
 <div id="feedbackModal" class="modal">
     <div class="modal-content">
         <i class="fa-regular fa-x close" onclick="toggleElement(this.parentElement.parentElement)"></i>
@@ -207,6 +221,125 @@ function loadData() {
             popup('danger', 'Une erreur est survenue lors de la récupération des données');
             console.error('Error:', error);
         });
+}
+
+function submitwaitlist(){
+    let datas = {
+        "id_event": document.querySelector('#id_event').value,
+        "participants": []
+    };
+
+    let columns = document.querySelectorAll('.column');
+    columns.forEach(column => {
+        let participant = column.querySelector('.interv').textContent;
+        let participantId = column.querySelector('.interv').htmlFor.replace('part', '');
+        let selectedCandidates = column.querySelectorAll('.listopts option:checked');
+        let candidateIds = [];
+        selectedCandidates.forEach(candidate => {
+            candidateIds.push(candidate.value.replace('cand', ''));
+        });
+        datas.participants.push({
+            "id_participant": participantId,
+            "candidates": candidateIds
+        });
+    });
+
+    console.log(datas);
+
+    fetch("{{ url_for('api.process_event_waitlist') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(datas)
+    }).then(response => {
+        if (!response.ok) {
+            popup('danger', 'Une erreur est survenue lors de l\'ajout des participants');
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    }).then(data => {
+        popup('success', 'Les participants ont été ajoutés avec succès');
+    }).catch(error => {
+        popup("danger", "Une erreur est survenue lors de l'ajout des participants.");
+        console.error(error);
+    });
+}
+
+function getwaitlistdata(event){
+    fetch("{{ url_for('api.manage_event_participants_api_args') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({'id_event': event.id_event})
+    })
+    .then(response => {
+        if (!response.ok) {
+            popup('danger', 'Une erreur est survenue lors de la récupération des données');
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        buildManageWaitlist(data, event);
+    })
+    .catch(error => {
+        popup("danger", "Une erreur est survenue lors du chargement des données.");
+        console.error(error);
+    });
+}
+
+function buildManageWaitlist(datas, event) {
+    document.querySelector('.list').innerHTML = '';
+    for (let participant of datas.participants) {
+        if (participant.attends) {
+            let column = document.createElement('div');
+            column.classList.add('column');
+            let label = document.createElement('label');
+            label.htmlFor = `part${participant.id_participant}`;
+            label.textContent = participant.name_participant;
+            label.classList.add('interv');
+            column.appendChild(label);
+            let select = document.createElement('select');
+            select.style.overflowX = 'scroll';
+            select.name = `part${participant.id_participant}`;
+            select.id = `part${participant.id_participant}`;
+            select.multiple = true;
+            select.classList.add('listopts');
+            select.size = 6;
+            for (let candidate of datas.candidates) {
+                if (candidate.attends) {
+                    let option = document.createElement('option');
+                    option.classList.add('listopt');
+                    option.value = `cand${candidate.id_candidate}`;
+                    if (event.interviews.some(interview => interview.id_participant === participant.id_participant && interview.id_candidate === candidate.id_candidate)) {
+                        option.selected = true;
+                    }
+                    option.textContent = `${candidate.lastname_candidate} ${candidate.name_candidate}`;
+                    select.appendChild(option);
+                }
+            }
+            column.appendChild(select);
+            document.querySelector('.list').appendChild(column);
+        }
+    }
+    if (document.querySelector('.list').children.length === 0) {
+        popup('info', 'Aucun participant n\'a été trouvé pour cet événement');
+    } else {
+        let options = [].slice.call(document.querySelectorAll(`.listopt`));
+        options.forEach(function (element) {
+            element.addEventListener("mousedown", 
+                function (e) {
+                    e.preventDefault();
+                    element.parentElement.focus();
+                    this.selected = !this.selected;
+                    return false;
+                }, false );
+        });
+        document.querySelector('.tableContent').style.display = 'none';
+        document.querySelector('.managewaitlist').style.display = 'flex';
+    }
 }
 
 function buildManagePart(datas) {
@@ -388,6 +521,10 @@ function showInfos(infos) {
         event.preventDefault();
         window.open('/list/' + infos.id_event + '/manage', '_blank');
     };
+    document.querySelector('.openmanagewaitlist').onclick = function(event) {
+        event.preventDefault();
+        getwaitlistdata(infos);
+    }
     infos.tags.forEach(tag => {
         let tagButton = document.createElement('button');
         tagButton.classList.add('remove-tag');

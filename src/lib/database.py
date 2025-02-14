@@ -763,7 +763,7 @@ def get_event_details(id_event):
     finally:
         conn.close()
 
-def get_event_interview_candidate(todayevent, id_participant):
+def get_event_interview_candidate(todayevent, id_participant, happened=None):
     """
     Récupère les candidats associés aux interviews d'un participant pour un événement.
 
@@ -778,13 +778,22 @@ def get_event_interview_candidate(todayevent, id_participant):
     if conn is None:
         return None, "Erreur base de données"
     try:
-        cursor.execute('''
-        SELECT Interview.id_interview, Interview.id_candidate, Interview.id_participant, Interview.start_time_interview, Candidate.lastname_candidate, Candidate.name_candidate, Attends.priority
-        FROM Interview
-        JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
-        JOIN Attends ON Interview.id_event = Attends.id_event AND Interview.id_candidate = Attends.id_candidate
-        WHERE Interview.id_event = %s AND id_participant = %s AND happened = %s
-        ''', (todayevent, id_participant, False))
+        if happened is None:
+            cursor.execute('''
+            SELECT Interview.id_interview, Interview.id_candidate, Interview.id_participant, Interview.start_time_interview, Candidate.lastname_candidate, Candidate.name_candidate, Attends.priority
+            FROM Interview
+            JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
+            JOIN Attends ON Interview.id_event = Attends.id_event AND Interview.id_candidate = Attends.id_candidate
+            WHERE Interview.id_event = %s AND id_participant = %s
+            ''', (todayevent, id_participant))
+        else:
+            cursor.execute('''
+            SELECT Interview.id_interview, Interview.id_candidate, Interview.id_participant, Interview.start_time_interview, Candidate.lastname_candidate, Candidate.name_candidate, Attends.priority
+            FROM Interview
+            JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
+            JOIN Attends ON Interview.id_event = Attends.id_event AND Interview.id_candidate = Attends.id_candidate
+            WHERE Interview.id_event = %s AND id_participant = %s AND happened = %s
+            ''', (todayevent, id_participant, happened))
         candid = cursor.fetchall()
         return candid, None
     except psycopg2.Error as e:
@@ -1513,7 +1522,11 @@ def create_interview(id_event, id_participant, id_candidate):
     if conn is None:
         return "Erreur base de données"
     try:
-        cursor.execute('INSERT INTO Interview (id_event, id_participant, id_candidate, happened) VALUES (%s, %s, %s, FALSE)', (id_event, id_participant, id_candidate))
+        cursor.execute('''
+        INSERT INTO Interview (id_event, id_participant, id_candidate, happened)
+        VALUES (%s, %s, %s, FALSE)
+        ON CONFLICT ON CONSTRAINT interview_unique_constraint DO NOTHING
+        ''', (id_event, id_participant, id_candidate))
         conn.commit()
     except psycopg2.Error as e:
         print(f"Erreur lors de la création de l'interview: {e}")

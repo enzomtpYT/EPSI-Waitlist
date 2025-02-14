@@ -123,6 +123,28 @@ def get_event_participants(id_event):
         return None, error
     return datas, None
 
+def process_event_waitlist(datas):
+    participants = datas.get("participants", [])
+
+    for participant in participants:
+        interviews, error = database.get_event_interview_candidate(datas["id_event"], participant["id_participant"])
+        if error:
+            return error
+
+        old_ids = {str(interview["id_candidate"]) for interview in interviews}
+        new_ids = {str(candidate) for candidate in participant["candidates"]}
+
+        # Add new interviews
+        for candidate in new_ids - old_ids:
+            database.create_interview(datas["id_event"], participant["id_participant"], int(candidate))
+
+        # Remove old interviews
+        for interview in interviews:
+            if str(interview["id_candidate"]) not in new_ids:
+                database.delete_interview(interview["id_interview"])
+
+    return None
+
 def get_events():
     events, error = database.get_all_events()
     if error:
