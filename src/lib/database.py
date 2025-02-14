@@ -344,25 +344,6 @@ def get_all_events():
                 ''', (event['id_event'],))
                 interviews = cursor.fetchall()
                 event['interviews'] = interviews
-                # Add all events attendees (participants/candidates)
-                attendees = {'participants': [], 'candidates': []}
-                cursor.execute('''
-                SELECT Attends.id_candidate, Attends.priority, Candidate.lastname_candidate, Candidate.name_candidate
-                FROM Attends
-                JOIN Candidate ON Attends.id_candidate = Candidate.id_candidate
-                WHERE Attends.id_event = %s
-                ''', (event['id_event'],))
-                candidates = cursor.fetchall()
-                attendees['candidates'] = candidates
-                cursor.execute('''
-                SELECT Participates.id_participant, Participant.name_participant
-                FROM Participates
-                JOIN Participant ON Participates.id_participant = Participant.id_participant
-                WHERE Participates.id_event = %s
-                ''', (event['id_event'],))
-                participants = cursor.fetchall()
-                attendees['participants'] = participants
-                event['attendees'] = attendees
             return events, None
         else:
             return None, "Pas d'événement aujourd'hui"
