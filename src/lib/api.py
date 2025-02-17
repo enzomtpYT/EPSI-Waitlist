@@ -351,14 +351,36 @@ def get_list(id, forced=False):
                 if candidatee['start_time_interview'] is not None:
                     order.remove(candidatee)
                     order.insert(0, candidatee)
-                    for candidatee in order:
-                        candidatee['position'] = order.index(candidatee)
-                candidatee['position'] = order.index(candidatee)
             interviews[participant['name_participant']] = order
+        
+        hadswitch = True
+        n = 0
+        while hadswitch:
+            hadswitch = False
+            for part1 in interviews:
+                id1 = interviews[part1][0]["id_candidate"]
+                for part2 in interviews:
+                    if part1 != part2:
+                        id2 = interviews[part2][0]["id_candidate"]
+                        if id2 == id1:
+                            r = 1
+                            if interviews[part1][0]["start_time_interview"]:
+                                if n > 0:
+                                    r = min(int(random.gammavariate(2, 1)), len(interviews[part2]) - 1)
+                                interviews[part2][0], interviews[part2][r] = interviews[part2][r], interviews[part2][0]
+                            else:
+                                if n > 0:
+                                    r = min(int(random.gammavariate(2, 1)), len(interviews[part1]) - 1)
+                                interviews[part1][0], interviews[part1][r] = interviews[part1][r], interviews[part1][0]
+                            hadswitch = True
+            n += 1
+            for interview in interviews.values():
+                for i, candidate in enumerate(interview):
+                    candidate['position'] = i
         event["interviews"] = interviews
     if not forced:
         cache["events"][str(id)] = event
-    return event, None
+    return timefixer(event), None
 
 def start_interview(data):
     start_time = None
