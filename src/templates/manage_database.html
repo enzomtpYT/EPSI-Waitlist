@@ -23,6 +23,7 @@
                 <div class="tablewrap" style="flex-grow: 1; display: none;">
                     <table style="height: fit-content;"><thead><tr></tr></thead><tbody></tbody></table>
                 </div>
+                <button class="archive" onclick="toggleElement(document.querySelector('#inputmodal'))" style="display: none;"><i class="fa-regular fa-box-archive"></i> Archiver</button>
                 <button class="backbtn" style="display: none;"><i class="fa-regular fa-arrow-left"></i> Retour</button>
                 <button class="submit" onclick="submit()" style="display: none;"><i class="fa-regular fa-check"></i> Confirmer</button>
                 <div onclick="document.querySelector('#fileInput').click()" class="chosedata">
@@ -45,14 +46,27 @@
     </div>
 </div>
 
+<div id="inputmodal" class="modal">
+    <div style="width: 30vw; min-width: fit-content;" class="modal-content">
+        <i class="fa-regular fa-x close" onclick="toggleElement(this.parentElement.parentElement)"></i>
+        <h2 id="intitle">Entrez un nom valide pour l'archive:</h2>
+        <input id="infeild" type="text" id="inputfield" required>
+        <button onclick="archiveschema(event)">Confirmer</button>
+    </div>
+</div>
+
 <script>
 let candidates = []
 var modal = document.getElementById("feedbackModal");
+var inputmodal = document.getElementById("inputmodal");
 
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
     if (event.target == modal) {
         toggleElement(modal);
+    }
+    if (event.target == inputmodal) {
+        toggleElement(inputmodal);
     }
 }
 
@@ -127,6 +141,7 @@ function ImportCSV(ev) {
         document.querySelectorAll('.itemlist').forEach(item => { item.classList.remove('selected'); });
         backBtn = document.querySelector(".listsection .backbtn");
         backBtn.style.display = "none";
+        document.querySelector(".listsection .archive").style.display = "none";
         const data = e.target.result;
         const lines = data.split("\n");
         const headers = lines[0].split(",");
@@ -191,6 +206,38 @@ function ImportCSV(ev) {
     reader.readAsText(file);
 }
 
+function archiveschema(e) {
+    e.preventDefault();
+    toggleElement(inputmodal);
+    let schemaName = document.getElementById("infeild").value;
+    if (!schemaName) {
+        popup('danger', 'Veuillez entrer un nom valide pour l\'archive');
+        return;
+    }
+    schemaName = 'archive_' + schemaName.replace(/\s+/g, '_').replace(/[^\w]/g, '').toLowerCase();
+    fetch("{{ url_for('api.archive_schema') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            target: schemaName
+        })
+    }).then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                popup('success', 'Les données ont été archivées avec succès');
+                fetchArchives();
+            } else {
+                popup('danger', 'Une erreur s\'est produite lors de l\'archivage des données');
+            }
+        })
+        .catch(error => {
+            popup('danger', 'Une erreur s\'est produite lors de l\'archivage des données');
+            console.error('Error:', error);
+        });
+}
+
 // Fetch and display the list of archived schemas
 function fetchArchives() {
     // Reset the table and sideItemList
@@ -209,6 +256,11 @@ function fetchArchives() {
     document.querySelector(".listsection .tablewrap").style.display = "none";
     document.querySelector(".listsection h2").style.display = "none";
     document.querySelector(".listsection .chosedata").style.display = "flex";
+
+    // Hide buttons
+
+    document.querySelector(".listsection .archive").style.display = "none";
+    document.querySelector(".listsection .backbtn").display = "none";
 
     // Clear existing table content
     thead.innerHTML = "";
@@ -234,23 +286,30 @@ function fetchArchives() {
 function buildManagement(data) {
     backBtn = document.querySelector(".listsection .backbtn");
     backBtn.style.display = "none";
+    document.querySelector(".listsection .archive").style.display = "none";
     let sideItemList = document.querySelector('.sideItemList');
     data.forEach(schema => {
         let item = document.createElement('div');
         item.classList.add('itemlist');
-        item.onclick = function() { viewArchive(schema.candidates); this.classList.add('selected'); document.querySelectorAll('.itemlist').forEach(item => { if (item !== this) item.classList.remove('selected'); }); };
+        item.onclick = function() { viewArchive(schema.candidates, this); this.classList.add('selected'); document.querySelectorAll('.itemlist').forEach(item => { if (item !== this) item.classList.remove('selected'); }); };
         item.innerHTML = `<i class="fa-regular fa-database"></i><p>${schema.schema_name}</p>`;
         sideItemList.appendChild(item);
     });
 }
 
-function viewArchive(archives) {
+function viewArchive(archives, el) {
     backBtn = document.querySelector(".listsection .backbtn");
     backBtn.style.display = "none";
     document.querySelector(".listsection .submit").style.display = "none";
     const table = document.querySelector(".infoeditor table");
     const thead = table.querySelector("thead");
     const tbody = table.querySelector("tbody");
+
+    if (el.querySelector('p').innerHTML.includes('public')) {
+        document.querySelector(".listsection .archive").style.display = "block";
+    } else {
+        document.querySelector(".listsection .archive").style.display = "none";
+    }
 
     // Clear existing table content
 
@@ -325,6 +384,7 @@ document.addEventListener("DOMContentLoaded", function() {
 function viewInterview(interviews) {
     backBtn = document.querySelector(".listsection .backbtn");
     backBtn.style.display = "block";
+    document.querySelector(".listsection .archive").style.display = "none";
     backBtn.onclick = () => {
         document.querySelector('.itemlist.selected').click();
     };
