@@ -207,20 +207,12 @@ def start_interview():
 
 @api_bp.route("/api/end_interview", methods=['POST'])
 def end_interview():
-    try:
-        data = request.get_json()
-        if not data:
-            return jsonify({"error": "Missing data"}), 400
-        interview_id = data.get('id_interview')
-        if not interview_id:
-            return jsonify({"error": "Missing id_interview parameter"}), 400
-        error = database.end_interview(interview_id, status=True)
-        if error:
-            return jsonify({"error": error}), 400
-        return jsonify({"success": True})
-    except Exception as e:
-        print(f"Erreur dans end_interview: {e}")
-        return jsonify({"error": "Internal server error"}), 500
+    data = request.get_json()
+    if data:
+        error = api.end_interview(data)
+    if error:
+        return jsonify({"error": error}), 400
+    return jsonify({"success": True})
 
 @api_bp.route("/api/get_archives", methods=['GET'])
 def get_archives():

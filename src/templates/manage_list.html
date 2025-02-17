@@ -147,7 +147,7 @@ function startInterview(candidate, id_event, participant_name) {
   candidatebtn = document.querySelector(`#interview-${candidate.id_interview} .candidatebtn`);
   candidatebtn.innerHTML = `<i class="fa-regular fa-stop"></i> ${candidate.name_candidate} ${candidate.lastname_candidate}`;
   candidatebtn.onclick = () => {
-    EndInterview(candidate.id_interview, participant_name);
+    EndInterview(candidate.id_interview, participant_name, id_event);
   }
 
   nextcancelbtn = document.querySelector(`#interview-${candidate.id_interview} .nextcancelbtn`);
@@ -258,13 +258,13 @@ function cancelInterview(candidate, id_event, participant_name) {
   })
 }
 
-function EndInterview(id_interview, participant_name) {
+function EndInterview(id_interview, participant_name, id_event) {
   fetch('{{ url_for('api.end_interview') }}', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ id_interview: id_interview })
+    body: JSON.stringify({ id_interview: id_interview, id_event: id_event})
   })
   .then(response => {
     if (!response.ok) {

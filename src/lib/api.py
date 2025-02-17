@@ -332,7 +332,7 @@ def get_list(id, forced=False):
     if participants:
         for participant in participants:
             order = []
-            candidates, error = database.get_event_interview_candidate(id, participant['id_participant'])
+            candidates, error = database.get_event_interview_candidate(id, participant['id_participant'], happened=False)
             for candidate in candidates:
                 candidate = dict(candidate)
                 if cached is not None:
@@ -348,6 +348,9 @@ def get_list(id, forced=False):
                     weights = [candidate["priority"] for candidate in order]
                     order = weighted_shuffle(order, weights)
             for candidatee in order:
+                if candidatee == None:
+                    order.remove(candidatee)
+                    continue
                 if candidatee['start_time_interview'] is not None:
                     order.remove(candidatee)
                     order.insert(0, candidatee)
@@ -358,21 +361,24 @@ def get_list(id, forced=False):
         while hadswitch:
             hadswitch = False
             for part1 in interviews:
-                id1 = interviews[part1][0]["id_candidate"]
-                for part2 in interviews:
-                    if part1 != part2:
-                        id2 = interviews[part2][0]["id_candidate"]
-                        if id2 == id1:
-                            r = 1
-                            if interviews[part1][0]["start_time_interview"]:
-                                if n > 0:
-                                    r = min(int(random.gammavariate(2, 1)), len(interviews[part2]) - 1)
-                                interviews[part2][0], interviews[part2][r] = interviews[part2][r], interviews[part2][0]
-                            else:
-                                if n > 0:
-                                    r = min(int(random.gammavariate(2, 1)), len(interviews[part1]) - 1)
-                                interviews[part1][0], interviews[part1][r] = interviews[part1][r], interviews[part1][0]
-                            hadswitch = True
+                if len(interviews[part1]) > 1:
+                    id1 = interviews[part1][0]["id_candidate"]
+                    for part2 in interviews:
+                        if part1 != part2:
+                            if len(interviews[part2]) > 1:
+                                id2 = interviews[part2][0]["id_candidate"]
+                                if id2 == id1:
+                                    print('Detected same candidate in two interviews')
+                                    r = 1
+                                    if interviews[part1][0]["start_time_interview"] is None:
+                                        if n > 0:
+                                            r = min(int(random.gammavariate(2, 1)), len(interviews[part1]) - 1)
+                                        interviews[part1][0], interviews[part1][r] = interviews[part1][r], interviews[part1][0]
+                                    elif interviews[part2][0]["start_time_interview"] is None:
+                                        if n > 0:
+                                            r = min(int(random.gammavariate(2, 1)), len(interviews[part2]) - 1)
+                                        interviews[part2][0], interviews[part2][r] = interviews[part2][r], interviews[part2][0]
+                                    hadswitch = True
             n += 1
             if n > 10:
                 break
@@ -409,6 +415,12 @@ def end_interview(data):
         error = database.end_interview(interview_id, status=True)
         if error:
             return jsonify({"error": error}), 400
+        event_cache = cache["events"].get(str(data.get('id_event')))
+        if event_cache and "interviews" in event_cache:
+            for interviews in event_cache["interviews"].values():
+                for interview in interviews:
+                    if interview["id_interview"] == interview_id:
+                        interviews.remove(interview)
         updatecache_all(data.get('id_event'), "events")
 
 def skip_candidate(event_id, name_participant):
