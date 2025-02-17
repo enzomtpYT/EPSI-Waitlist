@@ -316,6 +316,40 @@ def get_employees():
 
     return employees_return, None
 
+def move_interview(data):
+    interview_id = data.get('id_interview')
+    event_id = data.get('id_event')
+    participant_name = data.get('name_participant')
+    new_index = data.get('new_index')
+    if not interview_id:
+        return "Missing id_interview parameter"
+    if not event_id:
+        return "Missing id_event parameter"
+    if not participant_name:
+        return "Missing name_participant parameter"
+    if new_index is None:
+        return "Missing new_index parameter"
+    
+    cached = cache["events"].get(str(event_id))
+    if cached is None:
+        return "Aucun évenement avec cet id"
+    event = cached.to_dict()
+    if event.get("interviews") is None:
+        return "Aucun entretien trouvé"
+    if event["interviews"].get(participant_name) is None:
+        return "Aucun participant trouvé"
+    interviews = event["interviews"][participant_name]
+    if new_index >= len(interviews):
+        return "Index out of range"
+    for i, interview in enumerate(interviews):
+        if interview["id_interview"] == int(interview_id):
+            interviews.insert(new_index, interviews.pop(i))
+            break
+    for i, interview in enumerate(interviews):
+        print(f"Setting position {i} for interview {interview['id_interview']}")
+        interview['position'] = i
+    threading.Thread(target=updatecache_all, args=(event_id, "events")).start()
+
 def get_list(id, forced=False):
     cached = cache["events"].get(str(id))
     if cached is not None and not forced:

@@ -125,7 +125,22 @@ function buildList(info) {
           if (evt.oldIndex == evt.newIndex) {
             return;
           }
-          console.log(evt.oldIndex, evt.newIndex, evt.item.id.split('-')[1], key);
+          fetch('{{ url_for('api.move_interview') }}', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id_event: info.id_event, id_interview: evt.item.id.split('-')[1], new_index: evt.newIndex, name_participant: key })
+          }).then(response => {
+            if (!response.ok) {
+              popup('danger', 'Une erreur est survenue lors de la récupération des données');
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          }).catch(error => {
+            popup('danger', 'Une erreur est survenue lors de la récupération des données');
+            console.error('Error:', error);
+          });
 	      },
     })
     list.appendChild(participant);

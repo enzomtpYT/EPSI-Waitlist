@@ -123,6 +123,16 @@ def skip_candidate():
         return jsonify({"error": error}), 400
     return jsonify({"success": True})
 
+@api_bp.route('/api/move_interview', methods=['POST'])
+def move_interview():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "Missing data"}), 400
+    error = api.move_interview(data)
+    if error:
+        return jsonify({"error": error}), 400
+    return jsonify({"success": True}), 200
+
 @api_bp.route("/api/delete/<string:type>", methods=['POST'])
 def delete_api(type):
     data = request.get_json()
