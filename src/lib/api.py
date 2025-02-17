@@ -374,9 +374,9 @@ def get_list(id, forced=False):
                                 interviews[part1][0], interviews[part1][r] = interviews[part1][r], interviews[part1][0]
                             hadswitch = True
             n += 1
-            for interview in interviews.values():
-                for i, candidate in enumerate(interview):
-                    candidate['position'] = i
+        for interview in interviews.values():
+            for i, candidate in enumerate(interview):
+                candidate['position'] = i
         event["interviews"] = interviews
     if not forced:
         cache["events"][str(id)] = event
