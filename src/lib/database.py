@@ -24,7 +24,7 @@ def get_db_connection():
 
 today = datetime.date.today()
 
-def copy_schema(target_schema, source_schema="public"):
+def archive_schema(target_schema, source_schema="public"):
     """
     Copie les tables et les contraintes d'un schéma source vers un schéma cible.
 

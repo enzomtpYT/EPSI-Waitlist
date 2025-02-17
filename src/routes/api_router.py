@@ -240,3 +240,12 @@ def get_candidate_interviews():
     if error:
         return jsonify({"error": error}), 400
     return jsonify(interviews)
+
+@api_bp.route("/api/archive_schema", methods=['POST'])
+def archive_schema():
+    data = request.get_json()
+    if data:
+        error = api.archive_schema(data)
+    if error:
+        return jsonify({"error": error}), 400
+    return jsonify({"success": True})

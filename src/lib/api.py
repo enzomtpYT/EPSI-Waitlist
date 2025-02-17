@@ -177,6 +177,19 @@ def process_event_waitlist(datas):
 
     return None
 
+def archive_schema(data):
+    if data.get('target') is None:
+        return "Missing target parameter"
+    
+    target = data.get('target')
+    source = data.get('source')
+    if source is None:
+        error = database.archive_schema(target)
+    else:
+        error = database.archive_schema(target, source)
+    if error:
+        return error
+
 def get_events():
     events, error = database.get_all_events()
     if error:
