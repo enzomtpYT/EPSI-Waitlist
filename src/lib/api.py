@@ -180,7 +180,7 @@ def process_event_waitlist(datas):
 def archive_schema(data):
     if data.get('target') is None:
         return "Missing target parameter"
-    
+
     target = data.get('target')
     source = data.get('source')
     if source is None:
@@ -342,7 +342,7 @@ def move_interview(data):
         return "Missing name_participant parameter"
     if new_index is None:
         return "Missing new_index parameter"
-    
+
     cached = cache["events"].get(str(event_id))
     if cached is None:
         return "Aucun évenement avec cet id"
@@ -402,7 +402,7 @@ def get_list(id, forced=False):
                     order.remove(candidatee)
                     order.insert(0, candidatee)
             interviews[participant['name_participant']] = order
-        
+
         hadswitch = True
         n = 0
         while hadswitch:
@@ -510,9 +510,9 @@ def delete(type, id):
 
 def add(type, data):
     error = None
-    
+
     if type == "event":
-        
+
         name_event = data.get("name_event")
         start_time_event = data.get("start_time_event")
         end_time_event = data.get("end_time_event")
@@ -522,7 +522,7 @@ def add(type, data):
             return "Champs manquants"
         event_id, error = database.create_event(name_event, date_event, start_time_event=start_time_event, end_time_event=end_time_event, tags=selected_tags)
         return error
-                
+
     elif type == "participant":
 
         name_participant = data.get("name_participant")
@@ -599,7 +599,7 @@ def add(type, data):
 
 def update(type, data):
     if type == "event":
-        
+
         id_event = data.get("id_event")
         name_event = data.get("name_event")
         start_time_event = data.get("start_time_event")
@@ -620,7 +620,7 @@ def update(type, data):
             for ntag in newtags:
                 if ntag not in currenttags:
                     database.add_tag_to_event(id_event, ntag['id_tag'])
-        
+
     elif type == "participant":
 
         id_participant = data.get("id_participant")
@@ -715,7 +715,17 @@ def update(type, data):
     elif type == "tag":
         error = database.update_tag(data)
     elif type == "interview":
-        error = database.update_interview(data)
+
+        feedback = data.get('feedback')
+        id_interview = int(data.get('id_interview'))
+        usertype = data.get('type')
+        if usertype == "participant":
+            type = "participant"
+        elif usertype == "candidate":
+            type = "candidate"
+        else:
+            return "Unknown type"
+        error = database.update_feedback(id_interview, feedback, usertype)
     else:
         return "Unknown type"
     return None

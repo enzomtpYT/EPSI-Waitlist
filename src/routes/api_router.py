@@ -167,7 +167,7 @@ def update_api(type):
 @api_bp.route("/api/download_pdf", methods=['POST'])
 def download_pdf_event():
     data = request.get_json()
-    
+
     if data and 'id_event' in data:
         try:
             pdf, error = api.generate_pdf(data['id_event'])

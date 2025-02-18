@@ -46,9 +46,9 @@ def archive_schema(target_schema, source_schema="public"):
 
     # Copy tables from the source schema to the target schema
     cursor.execute(f"""
-    DO $$ 
-    DECLARE 
-        r RECORD; 
+    DO $$
+    DECLARE
+        r RECORD;
         table_exists BOOLEAN;
     BEGIN
       -- Loop through all tables in the source schema and copy them to the target schema
@@ -236,7 +236,7 @@ def get_archived_schemas():
         WHERE schema_name = 'public' OR schema_name LIKE 'archive_%'
         ''')
         schemas = [row['schema_name'] for row in cursor.fetchall()]
-        
+
         result = []
         for schema in schemas:
             cursor.execute(f'''

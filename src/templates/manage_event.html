@@ -2,7 +2,7 @@
 
 {% block title %}Admin - Gérer Événement{% endblock %}
 
-{% block content %} 
+{% block content %}
 <div class="tableContent">
     <h1 style="padding: 0.5rem">Gérer les Événements</h1>
     <h2 style="padding-left: 0.5rem;" id="loading">Chargement...</h2>
@@ -19,16 +19,16 @@
             <form id="candform" style="display: none;">
                 <label for="name_event">Nom :</label>
                 <input type="text" id="name_event" name="name_event" value="">
-    
+
                 <label for="date_event">Date :</label>
                 <input type="date" id="date_event" name="date_event" value="">
-    
+
                 <label for="start_time_event">Heure de début :</label>
                 <input type="time" id="start_time_event" name="start_time_event" value="">
-    
+
                 <label for="end_time_event">Heure de fin :</label>
                 <input type="time" id="end_time_event" name="end_time_event" value="">
-    
+
                 <div style="display: flex; justify-content: space-between;">
                     <div>
                         <button id="confirmbtn" onclick="done(event)"><i class="fa-regular fa-save"></i> Enregistrer</button>
@@ -111,7 +111,7 @@
                     </table>
                 </div>
             </div>
-            
+
             <div class="listsection cand">
                 <h2>Ajouter des Candidats</h2>
                 <div class="tablewrap">
@@ -141,7 +141,7 @@
             <i class="fa-regular fa-arrow-left"></i> Retour
         </button>
 
-        <h1 style="flex-grow: 1;" class="title">Gerer la liste d'attente</h1>
+        <h1 style="flex-grow: 1;" class="title">Gérer la liste d'attente</h1>
     </div>
 
     <div class="list"></div>
@@ -154,8 +154,12 @@
         <h2>Feedback de l'entretien</h2>
         <h3 id="partfeedtitle">Feedback de l'intervenant :</h3>
         <div class="feedb" id="participantFeedback"></div>
+        <textarea id="participantFeedbackEdit" style="display: none;"></textarea>
         <h3 id="candfeedtitle">Feedback du candidat :</h3>
         <div class="feedb" id="candidateFeedback"></div>
+        <textarea id="candidateFeedbackEdit" style="display: none;"></textarea>
+        <button id="editFeedbackBtn" onclick="editFeedback()">Modifier</button>
+        <button id="saveFeedbackBtn" style="display: none;" onclick="saveFeedback()">Enregistrer</button>
     </div>
 </div>
 
@@ -330,7 +334,7 @@ function buildManageWaitlist(datas, event) {
     } else {
         let options = [].slice.call(document.querySelectorAll(`.listopt`));
         options.forEach(function (element) {
-            element.addEventListener("mousedown", 
+            element.addEventListener("mousedown",
                 function (e) {
                     e.preventDefault();
                     element.parentElement.focus();
@@ -552,7 +556,7 @@ function showInfos(infos) {
     document.querySelector('.listsection table tbody').innerHTML = '';
     if (infos.interviews.length === 0) {
         document.querySelector('.listsection table').style.display = 'none';
-        document.querySelector('.listsection h3').style.display = 'block';        
+        document.querySelector('.listsection h3').style.display = 'block';
     } else {
         document.querySelector('.listsection table').style.display = 'table';
         document.querySelector('.listsection h3').style.display = 'none';
@@ -637,28 +641,35 @@ function openfeedback(btn, inter) {
     let modal = document.querySelector('#feedbackModal');
     let participantFeedbackEl = modal.querySelector('#participantFeedback');
     let candidateFeedbackEl = modal.querySelector('#candidateFeedback');
+    let participantFeedbackEditEl = modal.querySelector('#participantFeedbackEdit');
+    let candidateFeedbackEditEl = modal.querySelector('#candidateFeedbackEdit');
     let partfeedtitle = modal.querySelector('#partfeedtitle');
     let candfeedtitle = modal.querySelector('#candfeedtitle');
     let participantFeedback = inter.feedback_participant;
     let candidateFeedback = inter.feedback_candidate;
 
-
     if (participantFeedback === null) {
         participantFeedbackEl.style.display = 'none';
+        participantFeedbackEditEl.style.display = 'none';
         partfeedtitle.style.display = 'none';
     } else {
         participantFeedbackEl.style.display = 'flex';
+        participantFeedbackEditEl.style.display = 'none';
         partfeedtitle.style.display = 'block';
         mark(participantFeedbackEl, participantFeedback);
+        participantFeedbackEditEl.value = participantFeedback;
     }
 
     if (candidateFeedback === null) {
         candidateFeedbackEl.style.display = 'none';
+        candidateFeedbackEditEl.style.display = 'none';
         candfeedtitle.style.display = 'none';
     } else {
         candidateFeedbackEl.style.display = 'flex';
+        candidateFeedbackEditEl.style.display = 'none';
         candfeedtitle.style.display = 'block';
         mark(candidateFeedbackEl, candidateFeedback);
+        candidateFeedbackEditEl.value = candidateFeedback;
     }
 
     if (candidateFeedback === null && participantFeedback === null) {
@@ -666,6 +677,84 @@ function openfeedback(btn, inter) {
     } else {
         toggleElement(modal);
     }
+
+    // Store the interview ID for saving later
+    modal.dataset.interviewId = inter.id_interview;
+}
+
+function editFeedback() {
+    let modal = document.querySelector('#feedbackModal');
+    let participantFeedbackEl = modal.querySelector('#participantFeedback');
+    let candidateFeedbackEl = modal.querySelector('#candidateFeedback');
+    let participantFeedbackEditEl = modal.querySelector('#participantFeedbackEdit');
+    let candidateFeedbackEditEl = modal.querySelector('#candidateFeedbackEdit');
+    let editFeedbackBtn = modal.querySelector('#editFeedbackBtn');
+    let saveFeedbackBtn = modal.querySelector('#saveFeedbackBtn');
+
+    participantFeedbackEl.style.display = 'none';
+    candidateFeedbackEl.style.display = 'none';
+    participantFeedbackEditEl.style.display = 'block';
+    candidateFeedbackEditEl.style.display = 'block';
+    editFeedbackBtn.style.display = 'none';
+    saveFeedbackBtn.style.display = 'block';
+}
+
+function saveFeedback() {
+    let modal = document.querySelector('#feedbackModal');
+    let participantFeedbackEditEl = modal.querySelector('#participantFeedbackEdit');
+    let candidateFeedbackEditEl = modal.querySelector('#candidateFeedbackEdit');
+    let editFeedbackBtn = modal.querySelector('#editFeedbackBtn');
+    let saveFeedbackBtn = modal.querySelector('#saveFeedbackBtn');
+    let interviewId = modal.dataset.interviewId;
+
+    let participantFeedbackData = {
+        id_interview: interviewId,
+        feedback: participantFeedbackEditEl.value,
+        type: 'participant'
+    };
+
+    let candidateFeedbackData = {
+        id_interview: interviewId,
+        feedback: candidateFeedbackEditEl.value,
+        type: 'candidate'
+    };
+
+    Promise.all([
+        fetch("{{ url_for('api.update_api', type='interview') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(participantFeedbackData)
+        }),
+        fetch("{{ url_for('api.update_api', type='interview') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(candidateFeedbackData)
+        })
+    ]).then(responses => {
+        for (let response of responses) {
+            if (!response.ok) {
+                popup('danger', 'Une erreur est survenue lors de la mise à jour des feedbacks');
+                throw new Error('Network response was not ok');
+            }
+        }
+        return Promise.all(responses.map(response => response.json()));
+    }).then(data => {
+        popup('success', 'Feedbacks mis à jour avec succès');
+        toggleElement(modal);
+        loadData();
+    }).catch(error => {
+        popup('danger', 'Une erreur est survenue lors de la mise à jour des feedbacks');
+        console.error('Error:', error);
+    });
+
+    participantFeedbackEditEl.style.display = 'none';
+    candidateFeedbackEditEl.style.display = 'none';
+    editFeedbackBtn.style.display = 'block';
+    saveFeedbackBtn.style.display = 'none';
 }
 
 function buildManagement(datas, tags) {
