@@ -79,8 +79,12 @@
         <h2>Feedback de l'entretien</h2>
         <h3 id="partfeedtitle">Feedback de l'intervenant :</h3>
         <div class="feedb" id="participantFeedback"></div>
+        <textarea id="participantFeedbackEdit" style="display: none;"></textarea>
         <h3 id="candfeedtitle">Feedback du candidat :</h3>
         <div class="feedb" id="candidateFeedback"></div>
+        <textarea id="candidateFeedbackEdit" style="display: none;"></textarea>
+        <button id="editFeedbackBtn" onclick="editFeedback()">Modifier</button>
+        <button id="saveFeedbackBtn" style="display: none;" onclick="saveFeedback()">Enregistrer</button>
     </div>
 </div>
 
@@ -224,6 +228,8 @@ function openfeedback(btn, inter) {
     let modal = document.querySelector('#feedbackModal');
     let participantFeedbackEl = modal.querySelector('#participantFeedback');
     let candidateFeedbackEl = modal.querySelector('#candidateFeedback');
+    let participantFeedbackEditEl = modal.querySelector('#participantFeedbackEdit');
+    let candidateFeedbackEditEl = modal.querySelector('#candidateFeedbackEdit');
     let partfeedtitle = modal.querySelector('#partfeedtitle');
     let candfeedtitle = modal.querySelector('#candfeedtitle');
     console.log(inter);
@@ -233,20 +239,26 @@ function openfeedback(btn, inter) {
 
     if (participantFeedback === null) {
         participantFeedbackEl.style.display = 'none';
+        participantFeedbackEditEl.style.display = 'none';
         partfeedtitle.style.display = 'none';
     } else {
         participantFeedbackEl.style.display = 'flex';
+        participantFeedbackEditEl.style.display = 'none';
         partfeedtitle.style.display = 'block';
         mark(participantFeedbackEl, participantFeedback);
+        participantFeedbackEditEl.value = participantFeedback;
     }
 
     if (candidateFeedback === null) {
         candidateFeedbackEl.style.display = 'none';
+        candidateFeedbackEditEl.style.display = 'none';
         candfeedtitle.style.display = 'none';
     } else {
         candidateFeedbackEl.style.display = 'flex';
+        candidateFeedbackEditEl.style.display = 'none';
         candfeedtitle.style.display = 'block';
         mark(candidateFeedbackEl, candidateFeedback);
+        candidateFeedbackEditEl.value = candidateFeedback;
     }
 
     if (candidateFeedback === null && participantFeedback === null) {
@@ -254,6 +266,84 @@ function openfeedback(btn, inter) {
     } else {
         toggleElement(modal);
     }
+
+    // Store the interview ID for saving later
+    modal.dataset.interviewId = inter.id_interview;
+}
+
+function editFeedback() {
+    let modal = document.querySelector('#feedbackModal');
+    let participantFeedbackEl = modal.querySelector('#participantFeedback');
+    let candidateFeedbackEl = modal.querySelector('#candidateFeedback');
+    let participantFeedbackEditEl = modal.querySelector('#participantFeedbackEdit');
+    let candidateFeedbackEditEl = modal.querySelector('#candidateFeedbackEdit');
+    let editFeedbackBtn = modal.querySelector('#editFeedbackBtn');
+    let saveFeedbackBtn = modal.querySelector('#saveFeedbackBtn');
+
+    participantFeedbackEl.style.display = 'none';
+    candidateFeedbackEl.style.display = 'none';
+    participantFeedbackEditEl.style.display = 'block';
+    candidateFeedbackEditEl.style.display = 'block';
+    editFeedbackBtn.style.display = 'none';
+    saveFeedbackBtn.style.display = 'block';
+}
+
+function saveFeedback() {
+    let modal = document.querySelector('#feedbackModal');
+    let participantFeedbackEditEl = modal.querySelector('#participantFeedbackEdit');
+    let candidateFeedbackEditEl = modal.querySelector('#candidateFeedbackEdit');
+    let editFeedbackBtn = modal.querySelector('#editFeedbackBtn');
+    let saveFeedbackBtn = modal.querySelector('#saveFeedbackBtn');
+    let interviewId = modal.dataset.interviewId;
+
+    let participantFeedbackData = {
+        id_interview: interviewId,
+        feedback: participantFeedbackEditEl.value,
+        type: 'participant'
+    };
+
+    let candidateFeedbackData = {
+        id_interview: interviewId,
+        feedback: candidateFeedbackEditEl.value,
+        type: 'candidate'
+    };
+
+    Promise.all([
+        fetch("{{ url_for('api.update_api', type='interview') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(participantFeedbackData)
+        }),
+        fetch("{{ url_for('api.update_api', type='interview') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(candidateFeedbackData)
+        })
+    ]).then(responses => {
+        for (let response of responses) {
+            if (!response.ok) {
+                popup('danger', 'Une erreur est survenue lors de la mise à jour des feedbacks');
+                throw new Error('Network response was not ok');
+            }
+        }
+        return Promise.all(responses.map(response => response.json()));
+    }).then(data => {
+        popup('success', 'Feedbacks mis à jour avec succès');
+        toggleElement(modal);
+        loadData();
+    }).catch(error => {
+        popup('danger', 'Une erreur est survenue lors de la mise à jour des feedbacks');
+        console.error('Error:', error);
+    });
+
+    participantFeedbackEditEl.style.display = 'none';
+    candidateFeedbackEditEl.style.display = 'none';
+    editFeedbackBtn.style.display = 'block';
+    saveFeedbackBtn.style.display = 'none';
 }
 
 function buildManagement(datas, tags) {
