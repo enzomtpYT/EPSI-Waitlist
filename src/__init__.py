@@ -13,9 +13,6 @@ from routes.manage_candidate import manage_candidate_bp
 from routes.manage_participant import manage_participant_bp
 from routes.manage_event import manage_event_bp
 from routes.manage_tag import manage_tag_bp
-from routes.participant_dashboard import participant_dashboard_bp
-from routes.candidate_dashboard import candidate_dashboard_bp
-from routes.interviews import interviews_bp
 from routes.settings import settings_bp
 from routes.manage_database import manage_database_bp
 from routes.dashboard import dashboard_bp
@@ -31,9 +28,6 @@ app.register_blueprint(manage_candidate_bp)
 app.register_blueprint(manage_participant_bp)
 app.register_blueprint(manage_event_bp)
 app.register_blueprint(manage_tag_bp)
-app.register_blueprint(participant_dashboard_bp)
-app.register_blueprint(candidate_dashboard_bp)
-app.register_blueprint(interviews_bp)
 app.register_blueprint(settings_bp)
 app.register_blueprint(manage_database_bp)
 app.register_blueprint(dashboard_bp)
