@@ -58,14 +58,3 @@
     border-radius: 10px;
     text-decoration: none;
 }
-
-.actionbtn > button {
-    margin: 5px 0;
-    width: 45%;
-}
-
-.actionbtn {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-}

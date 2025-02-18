@@ -2597,3 +2597,116 @@ def update_feedback(id_interview, feedback, type):
     finally:
         conn.close()
     return None
+
+# Dashboard functions
+
+def get_self_dashboard(session_token):
+    """
+    Récupère les informations du tableau de bord de l'utilisateur. Les informations dépendent du type de l'utilisateur.
+    
+    Args:
+        session_token (str): Le jeton de session de l'utilisateur.
+        
+    Returns:
+        Un tuple contenant les informations du tableau de bord (Dictionnaire python avec: Type utilisateur (candidat/participant), mail, username, Tags du candidat/participant, Nom et prénom pour candidat, Nom pour participant) et un message d'erreur si une erreur est survenue.
+    """
+    conn, cursor = get_db_connection()
+    if conn is None:
+        return None, "Erreur base de données"
+    try:
+        cursor.execute('''
+        SELECT Candidate.id_candidate
+        FROM Candidate
+        JOIN "User" ON Candidate.id_user = "User".id_user
+        WHERE "User".session_token = %s
+        ''', (session_token,))
+        candidate = cursor.fetchone()
+        if candidate:
+            cursor.execute('''
+            SELECT Candidate.email_candidate, "User".username, Candidate.lastname_candidate, Candidate.name_candidate, Candidate.id_candidate, "User".id_user
+            FROM Candidate
+            JOIN "User" ON Candidate.id_user = "User".id_user
+            WHERE Candidate.id_candidate = %s
+            ''', (candidate['id_candidate'],))
+            candidate_info = cursor.fetchone()
+            cursor.execute('''
+            SELECT Tag.id_tag, Tag.name_tag
+            FROM Tag
+            JOIN Candidate_tag ON Tag.id_tag = Candidate_tag.id_tag
+            WHERE Candidate_tag.id_candidate = %s
+            ''', (candidate['id_candidate'],))
+            tags = cursor.fetchall()
+            cursor.execute('''
+            SELECT Event.*, COALESCE(json_agg(json_build_object(
+                'id_interview', Interview.id_interview,
+                'id_event', Interview.id_event,
+                'id_candidate', Interview.id_candidate,
+                'id_participant', Interview.id_participant,
+                'start_time_interview', Interview.start_time_interview,
+                'end_time_interview', Interview.end_time_interview,
+                'feedback_candidate', Interview.feedback_candidate,
+                'feedback_participant', Interview.feedback_participant,
+                'happened', Interview.happened,
+                'name_participant', Participant.name_participant,
+                'lastname_candidate', Candidate.lastname_candidate,
+                'name_candidate', Candidate.name_candidate
+            )) FILTER (WHERE Interview.id_interview IS NOT NULL), '[]') AS interviews
+            FROM Event
+            LEFT JOIN Interview ON Event.id_event = Interview.id_event AND Interview.id_candidate = %s
+            LEFT JOIN Participant ON Interview.id_participant = Participant.id_participant
+            LEFT JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
+            GROUP BY Event.id_event
+            ''', (candidate['id_candidate'],))
+            events = cursor.fetchall()
+            return {"type": "candidate", "mail": candidate_info['email_candidate'], "username": candidate_info['username'], "tags": tags, "lastname": candidate_info['lastname_candidate'], "name": candidate_info['name_candidate'], "events": events, "id_type": candidate_info['id_candidate'], "id_user": candidate_info['id_user']}, None
+        
+        
+        cursor.execute('''
+        SELECT Participant.id_participant
+        FROM Participant
+        JOIN "User" ON Participant.id_user = "User".id_user
+        WHERE "User".session_token = %s
+        ''', (session_token,))
+        participant = cursor.fetchone()
+        if participant:
+            cursor.execute('''
+            SELECT Participant.email_participant, "User".username, Participant.name_participant, Participant.id_participant, "User".id_user
+            FROM Participant
+            JOIN "User" ON Participant.id_user = "User".id_user
+            WHERE Participant.id_participant = %s
+            ''', (participant['id_participant'],))
+            participant_info = cursor.fetchone()
+            cursor.execute('''
+            SELECT Tag.id_tag, Tag.name_tag
+            FROM Tag
+            JOIN Participant_tag ON Tag.id_tag = Participant_tag.id_tag
+            WHERE Participant_tag.id_participant = %s
+            ''', (participant['id_participant'],))
+            tags = cursor.fetchall()
+            cursor.execute('''
+            SELECT Event.*, COALESCE(json_agg(json_build_object(
+                'id_interview', Interview.id_interview,
+                'id_event', Interview.id_event,
+                'id_candidate', Interview.id_candidate,
+                'id_participant', Interview.id_participant,
+                'start_time_interview', Interview.start_time_interview,
+                'end_time_interview', Interview.end_time_interview,
+                'feedback_candidate', Interview.feedback_candidate,
+                'feedback_participant', Interview.feedback_participant,
+                'happened', Interview.happened,
+                'name_participant', Participant.name_participant,
+                'lastname_candidate', Candidate.lastname_candidate,
+                'name_candidate', Candidate.name_candidate
+            )) FILTER (WHERE Interview.id_interview IS NOT NULL), '[]') AS interviews
+            FROM Event
+            LEFT JOIN Interview ON Event.id_event = Interview.id_event AND Interview.id_participant = %s
+            LEFT JOIN Participant ON Interview.id_participant = Participant.id_participant
+            LEFT JOIN Candidate ON Interview.id_candidate = Candidate.id_candidate
+            GROUP BY Event.id_event
+            ''', (participant['id_participant'],))
+            events = cursor.fetchall()
+            return {"type": "participant", "name":participant_info['name_participant'], "mail": participant_info['email_participant'], "username": participant_info['username'], "tags": tags, "events": events, "id_type": participant_info['id_participant'], "id_user": participant_info['id_user']}, None
+        return None, "Utilisateur non trouvé"
+    except psycopg2.Error as e:
+        print(f"Erreur requête base de données: {e}")
+        return None, "Erreur requête base de données"

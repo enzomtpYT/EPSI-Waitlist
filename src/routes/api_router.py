@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, session
 from lib import api, database
 
 api_bp = Blueprint('api', __name__)
@@ -230,6 +230,16 @@ def get_archives():
     if error:
         return jsonify({"success": False, "error": error}), 500
     return jsonify(archives)
+
+@api_bp.route("/api/getself_dashboard", methods=['GET'])
+def getself_dashboard():
+    if 'token' not in session:
+        return jsonify({"error": "Missing token"}), 400
+    session_token = session['token']
+    datas, error = api.getself_dashboard(session_token)
+    if error:
+        return jsonify({"error": error}), 400
+    return jsonify(datas)
 
 @api_bp.route("/api/get_candidate_interviews", methods=['GET'])
 def get_candidate_interviews():

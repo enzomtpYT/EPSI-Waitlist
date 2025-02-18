@@ -719,3 +719,9 @@ def update(type, data):
     else:
         return "Unknown type"
     return None
+
+def getself_dashboard(session_token):
+    selfdashboard, error = database.get_self_dashboard(session_token)
+    if error:
+        return None, error
+    return timefixer(selfdashboard), None

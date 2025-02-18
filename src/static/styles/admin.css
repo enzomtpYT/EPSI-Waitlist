@@ -1,61 +1,3 @@
-.listsection th {
-    border-right: 1px solid #4f4f4f;
-    border-bottom: 1px solid #4f4f4f;
-    align-items: center;
-    text-align: center;
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0;
-    background-color: var(--main-color);
-}
-
-.listsection td {
-    border-right: 1px solid #4f4f4f;
-    align-items: center;
-    text-align: center;
-    padding: 0.5rem;
-    min-width: fit-content;
-    white-space: nowrap;
-}
-
-.listsection tr > td:last-child, .listsection tr > th:last-child {
-    border-right: none;
-}
-
-.listsection tbody > tr:nth-child(odd) {
-    background-color: var(--alt1);
-}
-
-.listsection tbody {
-    overflow: auto;
-    height: 1rem;
-}
-
-.tablewrap {
-    position: relative;
-    width:100%;
-    z-index: 1;
-    overflow: auto;
-    max-height: 100%;
-}
-
-.listsection table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    border-radius: 5px;
-}
-
-.listsection {
-    display: flex;
-    flex-direction: column;
-    padding: 1rem;
-    background-color: var(--main-color);
-    border-radius: 5px;
-    flex-grow: 1;
-    min-height: 12rem;
-}
-
 .admin-section {
     display: flex;
     flex-direction: column;
@@ -118,12 +60,6 @@
 
 .actionsinfo > .admin-section > h2 {
     flex-grow: 1;
-}
-
-.actionbtn {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
 }
 
 .manageinfos {

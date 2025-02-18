@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+
+{% block title %}Accueil candidat{% endblock %}
+
+{% block content %}
+<div style="display: flex; flex-direction: column; height: 100%;">
+    <h1 class="title">Bienvenue, PlaceholderName</h1>
+
+    <div class="section-separator">
+        <div class="section profile">
+            <h2>Profil</h2>
+            <div class="dashprofile">
+                <label for="name">Nom :</label>
+                <div class="iconified-input" title="Nom">
+                    <i class="fa-regular fa-user icon"></i>
+                    <input type="text" id="name" name="name" placeholder="Nom" value="">
+                </div>
+
+                <label style="display: none;" id="firstnamelabel" for="firstname">Prénom :</label>
+                <div style="display: none;" id="iconin" class="iconified-input" title="Prénom">
+                    <i class="fa-regular fa-user icon"></i>
+                    <input type="text" id="firstname" name="firstname" placeholder="Prénom" value="">
+                </div>
+
+                <label for="email">E-mail :</label>
+                <div class="iconified-input" title="Email">
+                    <i class="fa-regular fa-envelope icon"></i>
+                    <input type="email" id="email" name="email" placeholder="Email" value="">
+                </div>
+
+                <label for="username">Nom d'utilisateur :</label>
+                <div class="iconified-input" title="Nom d'utilisateur">
+                    <i class="fa-regular fa-user icon"></i>
+                    <input type="text" id="username" name="username" placeholder="Nom" value="">
+                </div>
+
+                <p>Tags :</p>
+                <div class="taglist"></div>
+
+                <button id="confirmbtn"><i class="fa-regular fa-save"></i> Mettre à jour</button>
+            </div>
+        </div>
+
+        <div class="section-stacker">
+            <div class="listsection section upcoming" style="height: 50%;">
+                <h2>Événements à venir:</h2>
+                <div class="tablewrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Date</th>
+                                <th>Heure de fin</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="listsection section history" style="height: 50%;">
+                <h2>Historique des Événements:</h2>
+                <div class="tablewrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Date</th>
+                                <th>Heure de fin</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="listsection section interview" style="display: none; height: 100%;">
+                <h2>Interviews de l'Événement:</h2>
+                <div class="tablewrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th id="type">Intervenant</th>
+                                <th>Durée de l'entretien</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <button style="margin-top: auto;" onclick="document.querySelector('.upcoming').style.display = 'flex'; document.querySelector('.history').style.display = 'flex'; document.querySelector('.interview').style.display = 'none';" class="backbtn"><i class="fa-regular fa-arrow-left"></i> Retour</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="feedbackModal" class="modal">
+    <div class="modal-content">
+        <i class="fa-regular fa-x close" onclick="toggleElement(this.parentElement.parentElement)"></i>
+        <h2>Feedback de l'entretien</h2>
+        <h3 id="partfeedtitle">Feedback de l'intervenant :</h3>
+        <div class="feedb" id="participantFeedback"></div>
+        <h3 id="candfeedtitle">Feedback du candidat :</h3>
+        <div class="feedb" id="candidateFeedback"></div>
+    </div>
+</div>
+
+<div id="editmodel" class="modal">
+    <div class="modal-content">
+        <i class="fa-regular fa-x close" onclick="toggleElement(this.parentElement.parentElement)"></i>
+        <h2>Editer le feedback</h2>
+        <form action="" method="post">
+            <textarea onkeyup="charcount(this)" class="feedbackarea" name="feedback" id="feedbackarea" placeholder="Description du feedback (limité à 2500 caractères)" maxlength="2500"></textarea>
+            <div id="the-count">
+              <span id="current">0</span>
+              <span id="maximum">/ 2500</span>
+            </div>
+            <button id="editinter" type="button">Envoyer</button>
+        </form>
+    </div>
+</div>
+
+<script>
+var editmodal = document.getElementById('editmodel');
+var modal = document.getElementById("feedbackModal");
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        toggleElement(modal);
+    }
+    if (event.target == editmodal) {
+        toggleElement(editmodal);
+    }
+}
+
+let type = null
+let id_user = null
+let id_type = null
+let feedback = null;
+
+function buildPage(datas) {
+    type = datas.type;
+    firstname = datas.name;
+    mail = datas.mail;
+    username = datas.username;
+    tags = datas.tags;
+    events = datas.events;
+    id_type = datas.id_type;
+    id_user = datas.id_user;
+
+    
+    document.getElementById('email').value = mail;
+    document.getElementById('username').value = username;
+    document.querySelector('#type').innerHTML = type === 'candidate' ? 'Intervenant' : 'Candidat';
+    for (let tag of tags) {
+        let tagel = document.createElement('span');
+        tagel.classList.add('tag');
+        tagel.innerHTML =  `<i class="fa-regular fa-tag"></i> ` + tag.name_tag;
+        document.querySelector('.taglist').appendChild(tagel);
+    }
+
+    if (type === 'candidate') {
+        lastname = datas.lastname;
+        document.querySelector('.title').innerHTML = `Bienvenue, ${firstname} ${lastname}`;
+        document.getElementById('name').value = lastname;
+        document.getElementById('firstname').value = firstname;
+        document.getElementById('iconin').style.display = 'flex';
+        document.getElementById('firstnamelabel').style.display = 'block';
+    } else if (type === 'participant') {
+        document.querySelector('.title').innerHTML = `Bienvenue, ${firstname}`;
+        document.getElementById('name').value = firstname;
+    }
+
+    for (let event of events) {
+        if (new Date(event.date_event) > new Date()) {
+            let eventel = document.createElement('tr');
+            let nameTd = document.createElement('td');
+            nameTd.textContent = event.name_event;
+            eventel.appendChild(nameTd);
+
+            let dateTd = document.createElement('td');
+            dateTd.textContent = event.date_event;
+            eventel.appendChild(dateTd);
+
+            let endTimeTd = document.createElement('td');
+            endTimeTd.textContent = event.end_time_event ? event.end_time_event : "Non renseigné";
+            eventel.appendChild(endTimeTd);
+
+            let actionTd = document.createElement('td');
+            actionTd.classList.add('actionbtn');
+            let viewButton = document.createElement('button');
+            viewButton.innerHTML = '<i class="fa-regular fa-eye"></i> Voir';
+            {# viewButton.onclick = function() { showinterview(event.interviews); }; #}
+            actionTd.appendChild(viewButton);
+            eventel.appendChild(actionTd);
+
+            document.querySelector('.upcoming tbody').appendChild(eventel);
+        } else {
+            let eventel = document.createElement('tr');
+            let nameTd = document.createElement('td');
+            nameTd.textContent = event.name_event;
+            eventel.appendChild(nameTd);
+
+            let dateTd = document.createElement('td');
+            dateTd.textContent = event.date_event;
+            eventel.appendChild(dateTd);
+
+            let endTimeTd = document.createElement('td');
+            endTimeTd.textContent = event.end_time_event ? event.end_time_event : "Non renseigné";
+            eventel.appendChild(endTimeTd);
+
+            let actionTd = document.createElement('td');
+            actionTd.classList.add('actionbtn');
+            let viewButton = document.createElement('button');
+            viewButton.innerHTML = '<i class="fa-regular fa-eye"></i> Voir';
+            viewButton.onclick = function() { showinterview(event.interviews); };
+            actionTd.appendChild(viewButton);
+            eventel.appendChild(actionTd);
+
+            document.querySelector('.history tbody').appendChild(eventel);
+        }
+    }
+}
+
+function loadData() {
+    fetch('{{ url_for('api.getself_dashboard') }}').then(response => response.json())
+    .then(data => {
+        buildPage(data);
+    });
+}
+
+function showinterview(interviews) {
+    if (interviews.length === 0) {
+        popup('info', 'Aucun sur cet événement');
+        return;
+    }
+    document.querySelector('.upcoming').style.display = 'none';
+    document.querySelector('.history').style.display = 'none';
+    document.querySelector('.interview').style.display = 'flex';
+    let tbody = document.querySelector('.interview tbody');
+    tbody.innerHTML = '';
+    interviews = interviews.filter(interview => interview !== null);
+    for (let interview of interviews) {
+        let eventel = document.createElement('tr');
+        let nameTd = document.createElement('td');
+        nameTd.textContent = type === 'candidate' ? interview.name_participant : `${interview.name_candidate} ${interview.lastname_candidate}`;
+        eventel.appendChild(nameTd);
+
+        let durationTd = document.createElement('td');
+        durationTd.textContent = interview.duration_interview ? interview.duration_interview + " minutes" : "Non renseigné";
+        eventel.appendChild(durationTd);
+
+        let actionTd = document.createElement('td');
+        actionTd.classList.add('actionbtn');
+        let editButton = document.createElement('button');
+        editButton.onclick = function() { openedit(this, interview); };
+        editButton.classList.add('edit-feedback');
+        editButton.innerHTML = '<i class="fa-regular fa-edit"></i> Editer mon feedback';
+        actionTd.appendChild(editButton);
+
+        let viewButton = document.createElement('button');
+        viewButton.onclick = function() { openfeedback(this, interview); };
+        viewButton.classList.add('feedback-btn');
+        viewButton.innerHTML = '<i class="fa-regular fa-eye"></i> Voir les feedbacks';
+        actionTd.appendChild(viewButton);
+
+        eventel.appendChild(actionTd);
+        tbody.appendChild(eventel);
+    }
+}
+
+function charcount(el) {
+    var current = document.getElementById('current');
+    var maximum = document.getElementById('maximum');
+    feedback = el.value;
+    var feedbackLength = feedback.length;
+    current.innerText = feedbackLength;
+    if (feedbackLength > 2300) {
+        current.style.color = 'red';
+        current.style.fontWeight = '900';
+    } else if (feedbackLength > 2000) {
+        current.style.color = 'orange';
+        current.style.fontWeight = '700';
+    } else {
+        current.style.color = 'var(--accent-color)';
+        current.style.fontWeight = '400';
+    }
+}
+
+function openfeedback(btn, inter) {
+    let modal = document.querySelector('#feedbackModal');
+    let participantFeedbackEl = modal.querySelector('#participantFeedback');
+    let candidateFeedbackEl = modal.querySelector('#candidateFeedback');
+    let partfeedtitle = modal.querySelector('#partfeedtitle');
+    let candfeedtitle = modal.querySelector('#candfeedtitle');
+    let participantFeedback = inter.feedback_participant;
+    let candidateFeedback = inter.feedback_candidate;
+
+
+    if (participantFeedback === null) {
+        participantFeedbackEl.style.display = 'none';
+        partfeedtitle.style.display = 'none';
+    } else {
+        participantFeedbackEl.style.display = 'flex';
+        partfeedtitle.style.display = 'block';
+        mark(participantFeedbackEl, participantFeedback);
+    }
+
+    if (candidateFeedback === null) {
+        candidateFeedbackEl.style.display = 'none';
+        candfeedtitle.style.display = 'none';
+    } else {
+        candidateFeedbackEl.style.display = 'flex';
+        candfeedtitle.style.display = 'block';
+        mark(candidateFeedbackEl, candidateFeedback);
+    }
+
+    if (candidateFeedback === null && participantFeedback === null) {
+        popup('info', 'Aucun feedback n\'a été enregistré pour cet entretien');
+    } else {
+        toggleElement(modal);
+    }
+}
+
+function submitInter(id_interview, type) {
+    {# feedback = document.getElementById('feedbackarea').value;
+    fetch('{{ url_for('api.update', type='feedback') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            id_interview: id_interview,
+            feedback: feedback,
+            type: type
+        })
+    }).then(response => response.json()) #}
+}
+
+function openedit(el, inter) {
+    var text = type === 'candidate' ? inter.feedback_candidate : inter.feedback_participant;
+    var farea = document.getElementById('feedbackarea');
+    document.querySelector('#editinter').onclick = function() {
+        submitInter(interview.id_interview, type);
+    }
+    if (text !== 'None') {
+        farea.value = text;
+        charcount(farea);
+    }
+    toggleElement(editmodal);
+}
+
+loadData();
+</script>
+{% endblock %}
