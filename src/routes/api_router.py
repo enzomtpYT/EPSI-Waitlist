@@ -241,16 +241,6 @@ def getself_dashboard():
         return jsonify({"error": error}), 400
     return jsonify(datas)
 
-@api_bp.route("/api/get_candidate_interviews", methods=['GET'])
-def get_candidate_interviews():
-    id_candidate = request.args.get('id_candidate')
-    if not id_candidate:
-        return jsonify({"error": "Missing id_candidate parameter"}), 400
-    interviews, error = database.get_candidate_interviews(id_candidate)
-    if error:
-        return jsonify({"error": error}), 400
-    return jsonify(interviews)
-
 @api_bp.route("/api/archive_schema", methods=['POST'])
 def archive_schema():
     data = request.get_json()
