@@ -326,26 +326,38 @@ function openfeedback(btn, inter) {
     }
 }
 
-function submitInter(id_interview, type) {
-    {# feedback = document.getElementById('feedbackarea').value;
-    fetch('{{ url_for('api.update', type='feedback') }}', {
+function submitInter(inter, type) {
+    feedback = document.getElementById('feedbackarea').value;
+    fetch('{{ url_for('api.update_api', type='interview') }}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            id_interview: id_interview,
+            id_interview: inter.id_interview,
             feedback: feedback,
             type: type
         })
-    }).then(response => response.json()) #}
+    }).then(response => {
+        if (!response.ok) {
+            popup('danger', 'Une erreur est survenue lors de la récupération des données');
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    }).then(data => {
+        popup('success', 'Feedback enregistré avec succès');
+        toggleElement(editmodal);
+        inter.feedback_candidate = feedback;
+    }).catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+    });
 }
 
 function openedit(el, inter) {
     var text = type === 'candidate' ? inter.feedback_candidate : inter.feedback_participant;
     var farea = document.getElementById('feedbackarea');
     document.querySelector('#editinter').onclick = function() {
-        submitInter(interview.id_interview, type);
+        submitInter(inter, type);
     }
     if (text !== 'None') {
         farea.value = text;

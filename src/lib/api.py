@@ -724,10 +724,10 @@ def update(type, data):
         elif usertype == "candidate":
             type = "candidate"
         else:
-            return "Unknown type"
+            return "Unknown type interview"
         error = database.update_feedback(id_interview, feedback, usertype)
     else:
-        return "Unknown type"
+        return "Unknown type update"
     return None
 
 def getself_dashboard(session_token):
