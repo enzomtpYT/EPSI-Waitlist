@@ -14,12 +14,8 @@
                     {% if user_role == 'admin' or user_role == 'superadmin' %}
                         <li class="navli"><a class="navelm" href="{{ url_for('manage_database.manage_database') }}">Base de Données</a></li>
                     {% endif %}
-                {% elif user_role == 'candidate' %}
-                    <li class="navli"><a class="navelm" href="{{ url_for('candidate_dashboard.dashboard') }}">Candidat</a></li>
-                    <li class="navli"><a class="navelm" href="{{ url_for('interviews.interviews') }}">Entretiens</a></li>
-                {% elif user_role == 'participant' %}
-                    <li class="navli"><a class="navelm" href="{{ url_for('participant_dashboard.dashboard') }}">Intervenant</a></li>
-                    <li class="navli"><a class="navelm" href="{{ url_for('interviews.interviews') }}">Entretiens</a></li>
+                {% elif user_role == 'candidate' or user_role == 'participant' %}
+                    <li class="navli"><a class="navelm" href="{{ url_for('dashboard.dashboard') }}">Dashboard</a></li>
                 {% endif %}
             {% endif %}
         </ul>
