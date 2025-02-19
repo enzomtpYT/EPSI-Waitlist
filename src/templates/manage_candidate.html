@@ -82,8 +82,12 @@
         <h2>Feedback de l'entretien</h2>
         <h3 id="partfeedtitle">Feedback de l'intervenant :</h3>
         <div class="feedb" id="participantFeedback"></div>
+        <textarea id="participantFeedbackEdit" style="display: none;"></textarea>
         <h3 id="candfeedtitle">Feedback du candidat :</h3>
         <div class="feedb" id="candidateFeedback"></div>
+        <textarea id="candidateFeedbackEdit" style="display: none;"></textarea>
+        <button id="editFeedbackBtn" onclick="editFeedback()">Modifier</button>
+        <button id="saveFeedbackBtn" style="display: none;" onclick="saveFeedback()">Enregistrer</button>
     </div>
 </div>
 
@@ -260,13 +264,8 @@ function openfeedback(btn, inter) {
         mark(candidateFeedbackEl, candidateFeedback);
         candidateFeedbackEditEl.value = candidateFeedback;
     }
-
-    if (candidateFeedback === null && participantFeedback === null) {
-        popup('info', 'Aucun feedback n\'a été enregistré pour cet entretien');
-    } else {
-        toggleElement(modal);
-    }
-
+    toggleElement(modal);
+    
     // Store the interview ID for saving later
     modal.dataset.interviewId = inter.id_interview;
 }
