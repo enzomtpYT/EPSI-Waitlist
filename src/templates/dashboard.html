@@ -347,7 +347,11 @@ function submitInter(inter, type) {
     }).then(data => {
         popup('success', 'Feedback enregistré avec succès');
         toggleElement(editmodal);
-        inter.feedback_candidate = feedback;
+        if (type === 'candidate') {
+            inter.feedback_candidate = feedback;
+        } else {
+            inter.feedback_participant = feedback;
+        }
     }).catch(error => {
         console.error('There was a problem with the fetch operation:', error);
     });
