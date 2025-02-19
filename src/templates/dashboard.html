@@ -42,6 +42,14 @@
         </div>
 
         <div class="section-stacker">
+            <div class="listsection section today" style="height: 20%; display: none;">
+                <h2>Événements du jour: PLACEHOLDER</h2>
+                <div style="display: flex; flex-direction: column; justify-content: space-around; height: 100%;">
+                    <span id="cdate">Date: PLACEHOLDER</span>
+                    <span id="chour">Heure de fin: PLACEHOLDER</span>
+                    <button style="display: none;" id="managelist"><i class="fa-regular fa-eye"></i> Voir ma liste</button>
+                </div>
+            </div>
             <div class="listsection section upcoming" style="height: 50%;">
                 <h2>Événements à venir:</h2>
                 <div class="tablewrap">
@@ -176,7 +184,11 @@ function buildPage(datas) {
     }
 
     for (let event of events) {
-        if (new Date(event.date_event) > new Date()) {
+        const eventDate = new Date(event.date_event);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        eventDate.setHours(0, 0, 0, 0);
+        if (eventDate.getTime() > today.getTime()) {
             let eventel = document.createElement('tr');
             let nameTd = document.createElement('td');
             nameTd.textContent = event.name_event;
@@ -199,7 +211,7 @@ function buildPage(datas) {
             eventel.appendChild(actionTd);
 
             document.querySelector('.upcoming tbody').appendChild(eventel);
-        } else {
+        } else if (eventDate.getTime() < today.getTime()) {
             let eventel = document.createElement('tr');
             let nameTd = document.createElement('td');
             nameTd.textContent = event.name_event;
@@ -222,6 +234,17 @@ function buildPage(datas) {
             eventel.appendChild(actionTd);
 
             document.querySelector('.history tbody').appendChild(eventel);
+        } else if (eventDate.getTime() === today.getTime()) {
+            document.querySelector('.today').style.display = 'flex';
+            document.querySelector('.upcoming').style.height = '40%';
+            document.querySelector('.history').style.height = '40%';
+            document.querySelector('.today h2').textContent = 'Événements du jour: ' + event.name_event;
+            document.querySelector('.today #chour').textContent = 'Heure de fin: ' + (event.end_time_event ? event.end_time_event : 'Non renseigné');
+            document.querySelector('.today #cdate').textContent = 'Date: ' + event.date_event;
+            if (type === 'participant') {
+                document.querySelector('.today button').style.display = 'block';
+                document.querySelector('.today button').onclick = function() { window.location.href = '{{ url_for('list.manage_list') }}'; };
+            }
         }
     }
 }
