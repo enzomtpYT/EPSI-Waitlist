@@ -384,7 +384,7 @@ def get_list(id, forced=False):
                 candidate = dict(candidate)
                 if cached is not None:
                     ccached = cached.to_dict()
-                    for cached_candidate in ccached["interviews"].get(participant['name_participant']):
+                    for cached_candidate in ccached["interviews"][participant['name_participant']]:
                         if cached_candidate is not None and cached_candidate['id_candidate'] == candidate['id_candidate']:
                             pos = cached_candidate['position']
                             if len(order) <= pos:
