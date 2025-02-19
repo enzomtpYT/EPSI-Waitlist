@@ -671,12 +671,7 @@ function openfeedback(btn, inter) {
         mark(candidateFeedbackEl, candidateFeedback);
         candidateFeedbackEditEl.value = candidateFeedback;
     }
-
-    if (candidateFeedback === null && participantFeedback === null) {
-        popup('info', 'Aucun feedback n\'a été enregistré pour cet entretien');
-    } else {
-        toggleElement(modal);
-    }
+    toggleElement(modal);
 
     // Store the interview ID for saving later
     modal.dataset.interviewId = inter.id_interview;
