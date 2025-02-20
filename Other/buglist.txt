@@ -1,6 +1,6 @@
 TO fix
 - page liste d'attente buggée (quand on actualise la page erreur côté serveur)
-- CSS pour les pages event a fix (manage_event & create_event)
+- CSS pour les pages event a fix (manage_candidate/participant/event) : quand on ouvre les feedbacks, s'il y en a beaucoup, on ne voit plus le haut de la box et donc la croix
 
 TO DO
 - ajouter permission pour les roles admin et superadmin de voir et accéder aux fonctionnalités de gestion de BDD

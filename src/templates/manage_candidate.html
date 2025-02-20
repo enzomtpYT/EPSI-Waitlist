@@ -287,11 +287,15 @@ function editFeedback() {
     let candidateFeedbackEditEl = modal.querySelector('#candidateFeedbackEdit');
     let editFeedbackBtn = modal.querySelector('#editFeedbackBtn');
     let saveFeedbackBtn = modal.querySelector('#saveFeedbackBtn');
+    let partfeedtitle = modal.querySelector('#partfeedtitle');
+    let candfeedtitle = modal.querySelector('#candfeedtitle');
 
     participantFeedbackEl.style.display = 'none';
     candidateFeedbackEl.style.display = 'none';
     participantFeedbackEditEl.style.display = 'block';
     candidateFeedbackEditEl.style.display = 'block';
+    partfeedtitle.style.display = 'block';
+    candfeedtitle.style.display = 'block';
     editFeedbackBtn.style.display = 'none';
     saveFeedbackBtn.style.display = 'block';
 }

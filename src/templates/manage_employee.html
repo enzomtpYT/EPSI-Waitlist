@@ -218,12 +218,89 @@ function openfeedback(btn, inter) {
         candfeedtitle.style.display = 'block';
         mark(candidateFeedbackEl, candidateFeedback);
     }
+    toggleElement(modal);
 
-    if (candidateFeedback === null && employeeFeedback === null) {
-        popup('info', 'Aucun feedback n\'a été enregistré pour cet entretien');
-    } else {
+    // Store the interview ID for saving later
+    modal.dataset.interviewId = inter.id_interview;
+}
+
+function editFeedback() {
+    let modal = document.querySelector('#feedbackModal');
+    let employeeFeedbackEl = modal.querySelector('#employeeFeedback');
+    let candidateFeedbackEl = modal.querySelector('#candidateFeedback');
+    let employeeFeedbackEditEl = modal.querySelector('#employeeFeedbackEdit');
+    let candidateFeedbackEditEl = modal.querySelector('#candidateFeedbackEdit');
+    let editFeedbackBtn = modal.querySelector('#editFeedbackBtn');
+    let saveFeedbackBtn = modal.querySelector('#saveFeedbackBtn');
+    let empfeedtitle = modal.querySelector('#empfeedtitle');
+    let candfeedtitle = modal.querySelector('#candfeedtitle');
+
+    employeeFeedbackEl.style.display = 'none';
+    candidateFeedbackEl.style.display = 'none';
+    employeeFeedbackEditEl.style.display = 'block';
+    candidateFeedbackEditEl.style.display = 'block';
+    empfeedtitle.style.display = 'block';
+    candfeedtitle.style.display = 'block';
+    editFeedbackBtn.style.display = 'none';
+    saveFeedbackBtn.style.display = 'block';
+}
+
+function saveFeedback() {
+    let modal = document.querySelector('#feedbackModal');
+    let employeeFeedbackEditEl = modal.querySelector('#employeeFeedbackEdit');
+    let candidateFeedbackEditEl = modal.querySelector('#candidateFeedbackEdit');
+    let editFeedbackBtn = modal.querySelector('#editFeedbackBtn');
+    let saveFeedbackBtn = modal.querySelector('#saveFeedbackBtn');
+    let interviewId = modal.dataset.interviewId;
+
+    let employeeFeedbackData = {
+        id_interview: interviewId,
+        feedback: employeeFeedbackEditEl.value,
+        type: 'employee'
+    };
+
+    let candidateFeedbackData = {
+        id_interview: interviewId,
+        feedback: candidateFeedbackEditEl.value,
+        type: 'candidate'
+    };
+
+    Promise.all([
+        fetch("{{ url_for('api.update_api', type='interview') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(employeeFeedbackData)
+        }),
+        fetch("{{ url_for('api.update_api', type='interview') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(candidateFeedbackData)
+        })
+    ]).then(responses => {
+        for (let response of responses) {
+            if (!response.ok) {
+                popup('danger', 'Une erreur est survenue lors de la mise à jour des feedbacks');
+                throw new Error('Network response was not ok');
+            }
+        }
+        return Promise.all(responses.map(response => response.json()));
+    }).then(data => {
+        popup('success', 'Feedbacks mis à jour avec succès');
         toggleElement(modal);
-    }
+        loadData();
+    }).catch(error => {
+        popup('danger', 'Une erreur est survenue lors de la mise à jour des feedbacks');
+        console.error('Error:', error);
+    });
+
+    employeeFeedbackEditEl.style.display = 'none';
+    candidateFeedbackEditEl.style.display = 'none';
+    editFeedbackBtn.style.display = 'block';
+    saveFeedbackBtn.style.display = 'none';
 }
 
 function buildManagement(datas) {
