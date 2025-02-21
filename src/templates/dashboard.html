@@ -101,6 +101,24 @@
                 </div>
                 <button style="margin-top: auto;" onclick="document.querySelector('.upcoming').style.display = 'flex'; document.querySelector('.history').style.display = 'flex'; document.querySelector('.interview').style.display = 'none';" class="backbtn"><i class="fa-regular fa-arrow-left"></i> Retour</button>
             </div>
+            <div class="listsection section todaylist" style="display: none; height: 100%;">
+                <h2>Ma liste:</h2>
+                <div class="tablewrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Tags</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <button style="margin-top: auto;" onclick="loadData();" class="backbtn"><i class="fa-regular fa-arrow-left"></i> Retour</button>
+            </div>
         </div>
     </div>
 </div>
@@ -243,10 +261,44 @@ function buildPage(datas) {
             document.querySelector('.today #cdate').textContent = 'Date: ' + event.date_event;
             if (type === 'participant') {
                 document.querySelector('.today button').style.display = 'block';
-                document.querySelector('.today button').onclick = function() { window.location.href = '{{ url_for('list.manage_list') }}'; };
-            }
+                document.querySelector('.today button').onclick = function() {
+                    loadList(event.id_event);
+                };
+            }            
         }
     }
+}
+
+function loadList(todayId) {
+    fetch('{{ url_for('api.get_list') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: todayId })
+    })
+    .then(response => {
+        if (!response.ok) {
+            popup('danger', 'Une erreur est survenue lors de la récupération des données');
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(datas => {
+        buildTodayList(datas);
+    })
+    .catch(error => {
+        popup('danger', 'Une erreur est survenue lors de la récupération des données');
+        console.error('Error:', error);
+    });   
+}
+
+function buildTodayList(data) {
+    document.querySelector('.todaylist').style.display = 'flex';
+    document.querySelector('.upcoming').style.display = 'none';
+    document.querySelector('.history').style.display = 'none';
+    document.querySelector('.today').style.display = 'none'
+    console.log(data);
 }
 
 function loadData() {
