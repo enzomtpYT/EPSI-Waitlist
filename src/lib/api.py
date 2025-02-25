@@ -369,11 +369,11 @@ def get_list(id, forced=False):
         updatecache_all(id, "events")
         return cached.to_dict(), None
     event, error = database.get_event(id)
-    event = dict(event)
     if error:
         return None, error
     elif event is None:
         return None, "Aucun évenement avec cet id"
+    event = dict(event)
     participants, error = database.get_event_participants(id)
     interviews = {}
     if participants:
