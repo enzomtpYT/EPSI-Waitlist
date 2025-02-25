@@ -682,13 +682,30 @@ button:active {
     justify-content: center;
 }
 
+.startinter {
+    background-color: #28a745;
+}
+
+.startinter:hover {
+    background-color: #218838;
+}
+
+.cancel, .endinter {
+    background-color: #dc3545;
+}
+
+.cancel:hover, .endinter:hover {
+    background-color: #c82333;
+}
+
 .disabled {
+    background-color: #4f4f4f;
     cursor: not-allowed;
     opacity: 0.5;
 }
 
 .disabled:hover {
-    background-color: var(--btn-color);
+    background-color: #4f4f4f
 }
 
 .disabled:active {
