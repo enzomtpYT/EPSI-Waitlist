@@ -449,12 +449,18 @@ def start_interview(data):
     if not id_interview:
         return jsonify({"error": "Missing id_interview parameter"}), 400
 
-    updated_id, error = database.editstart_interview(id_interview, start_time)
-
-    updatecache_all(data.get('id_event'), "events")
-
+    updated_id, event_id, error = database.editstart_interview(id_interview, start_time)
+    
     if error:
         return jsonify({"error": error}), 400
+    
+    if not event_id:
+        if data.get('id_event') is not None:
+            event_id = data.get('id_event')
+        else:
+            return jsonify({"error": "Missing id_event parameter"}), 400
+
+    updatecache_all(event_id, "events")
 
 def end_interview(data):
     if data.get('id_interview') is not None:

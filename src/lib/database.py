@@ -1401,32 +1401,33 @@ def editstart_interview(id_interview, start_time):
     Démarre un entretien en enregistrant l'heure de début.
 
     Args:
-        id_candidate (int): L'identifiant du candidat.
-        id_participant (int): L'identifiant du participant.
+        id_interview (int): L'identifiant de l'entretien.
         start_time (datetime): L'heure de début de l'entretien.
 
     Returns:
-        tuple: Un tuple contenant l'identifiant de l'entretien et un message d'erreur si une erreur est survenue.
+        tuple: Un tuple contenant l'identifiant de l'entretien, l'événement associé et un message d'erreur si une erreur est survenue.
     """
     conn, cursor = get_db_connection()
     if conn is None:
-        return None, "Erreur base de données"
+        return None, None, "Erreur base de données"
     try:
         cursor.execute('''
         UPDATE Interview
         SET start_time_interview = %s
         WHERE id_interview = %s
-        RETURNING id_interview
+        RETURNING id_interview, id_event
         ''', (start_time, id_interview))
         conn.commit()
         updated_id = cursor.fetchone()
         if updated_id:
-            return updated_id['id_interview'], None
+            cursor.execute('SELECT * FROM Event WHERE id_event = %s', (updated_id['id_event'],))
+            event = cursor.fetchone()
+            return updated_id['id_interview'], event, None
         else:
-            return None, "Entretien non trouvé ou déjà démarré"
+            return None, None, "Entretien non trouvé ou déjà démarré"
     except psycopg2.Error as e:
         print(f"Erreur lors du démarrage de l'entretien: {e}")
-        return None, "Erreur lors du démarrage de l'entretien"
+        return None, None, "Erreur lors du démarrage de l'entretien"
     finally:
         conn.close()
 
