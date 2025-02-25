@@ -23,7 +23,10 @@
                 <div class="tablewrap" style="flex-grow: 1; display: none;">
                     <table style="height: fit-content;"><thead><tr></tr></thead><tbody></tbody></table>
                 </div>
-                <button class="archive" onclick="toggleElement(document.querySelector('#inputmodal'))" style="display: none;"><i class="fa-regular fa-box-archive"></i> Archiver</button>
+                <div style="display: flex; flex-direction: row; justify-content: space-between;">
+                    <button class="archive" onclick="toggleElement(document.querySelector('#inputmodal'))" style="display: none;"><i class="fa-regular fa-box-archive"></i> Archiver</button>
+                    <button class="delete" onclick="wipeCandidates()" style="display: none;"><i class="fa-regular fa-trash"></i> Supprimer les données liées aux candidats</button>
+                </div>
                 <button class="backbtn" style="display: none;"><i class="fa-regular fa-arrow-left"></i> Retour</button>
                 <button class="submit" onclick="submit()" style="display: none;"><i class="fa-regular fa-check"></i> Confirmer</button>
                 <div onclick="document.querySelector('#fileInput').click()" class="chosedata">
@@ -260,6 +263,7 @@ function fetchArchives() {
     // Hide buttons
 
     document.querySelector(".listsection .archive").style.display = "none";
+    document.querySelector(".listsection .delete").style.display = "none";
     document.querySelector(".listsection .backbtn").display = "none";
 
     // Clear existing table content
@@ -287,6 +291,7 @@ function buildManagement(data) {
     backBtn = document.querySelector(".listsection .backbtn");
     backBtn.style.display = "none";
     document.querySelector(".listsection .archive").style.display = "none";
+    document.querySelector(".listsection .delete").style.display = "none";
     let sideItemList = document.querySelector('.sideItemList');
     data.forEach(schema => {
         let item = document.createElement('div');
@@ -307,6 +312,7 @@ function viewArchive(archives, el) {
 
     if (el.querySelector('p').innerHTML.includes('public')) {
         document.querySelector(".listsection .archive").style.display = "block";
+        document.querySelector(".listsection .delete").style.display = "";
     } else {
         document.querySelector(".listsection .archive").style.display = "none";
     }
@@ -478,6 +484,30 @@ function openfeedbacks(participantFeedback, candidateFeedback) {
         popup('info', 'Aucun feedback n\'a été enregistré pour cet entretien');
     } else {
         toggleElement(modal);
+    }
+}
+
+function wipeCandidates() {
+    if (confirm("Êtes-vous sûr de vouloir supprimer les données liées aux candidats ? Cette action est irréversible.")) {
+        fetch("{{ url_for('api.wipe_candidates') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                popup('success', 'Les données ont été supprimées avec succès');
+                fetchArchives();
+            } else {
+                popup('danger', 'Une erreur s\'est produite lors de la suppression des données');
+            }
+        })
+        .catch(error => {
+            popup('danger', 'Une erreur s\'est produite lors de la suppression des données');
+            console.error('Error:', error);
+        });
     }
 }
 

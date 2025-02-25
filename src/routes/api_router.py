@@ -249,3 +249,11 @@ def archive_schema():
     if error:
         return jsonify({"error": error}), 400
     return jsonify({"success": True})
+
+@api_bp.route("/api/wipe_candidates", methods=['POST'])
+def wipe_candidates():
+    # data = request.get_json()
+    error = api.wipe_candidates()
+    if error:
+        return jsonify({"error": error}), 400
+    return jsonify({"success": True})
