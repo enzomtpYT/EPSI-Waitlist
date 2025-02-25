@@ -164,6 +164,40 @@ def archive_schema(target_schema, source_schema="public"):
     conn.close()
     return None
 
+def wipe_candidates():
+    """
+    Supprime toutes les données de la table Candidate et toutes les données associées.
+
+    Returns:
+        str: Un message d'erreur si une erreur est survenue, None sinon.
+    """
+    conn, cursor = get_db_connection()
+    if conn is None:
+        return "Erreur base de données"
+    try:
+        # Supprime les données associées aux candidats dans les tables liées
+        cursor.execute("DELETE FROM public.Candidate_tag WHERE id_candidate IN (SELECT id_candidate FROM public.Candidate)")
+        cursor.execute("DELETE FROM public.Interview WHERE id_candidate IN (SELECT id_candidate FROM public.Candidate)")
+        cursor.execute("DELETE FROM public.Attends WHERE id_candidate IN (SELECT id_candidate FROM public.Candidate)")
+
+        # Supprime les candidats
+        cursor.execute("DELETE FROM public.Candidate")
+
+        # Supprime les utilisateurs associés aux candidats
+        cursor.execute("DELETE FROM public.\"User\" WHERE id_user IN (SELECT id_user FROM public.Candidate)")
+
+        # Supprime les événements
+        cursor.execute("DELETE FROM public.Event")
+
+        # Sauvegarde les modifications
+        conn.commit()
+        return None
+    except psycopg2.Error as e:
+        print(f"Erreur lors de la suppression des candidats: {e}")
+        return "Erreur lors de la suppression des candidats"
+    finally:
+        conn.close()
+
 def import_csv(jsoncsv):
     conn, cursor = get_db_connection()
     if conn is None:
@@ -2602,10 +2636,10 @@ def update_feedback(id_interview, feedback, type):
 def get_self_dashboard(session_token):
     """
     Récupère les informations du tableau de bord de l'utilisateur. Les informations dépendent du type de l'utilisateur.
-    
+
     Args:
         session_token (str): Le jeton de session de l'utilisateur.
-        
+
     Returns:
         Un tuple contenant les informations du tableau de bord (Dictionnaire python avec: Type utilisateur (candidat/participant), mail, username, Tags du candidat/participant, Nom et prénom pour candidat, Nom pour participant) et un message d'erreur si une erreur est survenue.
     """
@@ -2658,8 +2692,8 @@ def get_self_dashboard(session_token):
             ''', (candidate['id_candidate'],))
             events = cursor.fetchall()
             return {"type": "candidate", "mail": candidate_info['email_candidate'], "username": candidate_info['username'], "tags": tags, "lastname": candidate_info['lastname_candidate'], "name": candidate_info['name_candidate'], "events": events, "id_type": candidate_info['id_candidate'], "id_user": candidate_info['id_user']}, None
-        
-        
+
+
         cursor.execute('''
         SELECT Participant.id_participant
         FROM Participant

@@ -190,6 +190,10 @@ def archive_schema(data):
     if error:
         return error
 
+def wipe_candidates():
+    database.wipe_candidates()
+    return None
+
 def get_events():
     events, error = database.get_all_events()
     if error:

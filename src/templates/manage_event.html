@@ -638,20 +638,10 @@ function openfeedback(btn, inter) {
     let candidateFeedbackEl = modal.querySelector('#candidateFeedback');
     let participantFeedbackEditEl = modal.querySelector('#participantFeedbackEdit');
     let candidateFeedbackEditEl = modal.querySelector('#candidateFeedbackEdit');
-    let editFeedbackBtn = modal.querySelector('#editFeedbackBtn');
-    let saveFeedbackBtn = modal.querySelector('#saveFeedbackBtn');
     let partfeedtitle = modal.querySelector('#partfeedtitle');
     let candfeedtitle = modal.querySelector('#candfeedtitle');
     let participantFeedback = inter.feedback_participant;
     let candidateFeedback = inter.feedback_candidate;
-
-    // Reset visibility of elements
-    participantFeedbackEl.style.display = 'none';
-    candidateFeedbackEl.style.display = 'none';
-    participantFeedbackEditEl.style.display = 'none';
-    candidateFeedbackEditEl.style.display = 'none';
-    editFeedbackBtn.style.display = 'block';
-    saveFeedbackBtn.style.display = 'none';
 
     if (participantFeedback === null) {
         participantFeedbackEl.style.display = 'none';
@@ -690,15 +680,11 @@ function editFeedback() {
     let candidateFeedbackEditEl = modal.querySelector('#candidateFeedbackEdit');
     let editFeedbackBtn = modal.querySelector('#editFeedbackBtn');
     let saveFeedbackBtn = modal.querySelector('#saveFeedbackBtn');
-    let partfeedtitle = modal.querySelector('#partfeedtitle');
-    let candfeedtitle = modal.querySelector('#candfeedtitle');
 
     participantFeedbackEl.style.display = 'none';
     candidateFeedbackEl.style.display = 'none';
     participantFeedbackEditEl.style.display = 'block';
     candidateFeedbackEditEl.style.display = 'block';
-    partfeedtitle.style.display = 'block';
-    candfeedtitle.style.display = 'block';
     editFeedbackBtn.style.display = 'none';
     saveFeedbackBtn.style.display = 'block';
 }
