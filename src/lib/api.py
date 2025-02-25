@@ -465,16 +465,21 @@ def start_interview(data):
 def end_interview(data):
     if data.get('id_interview') is not None:
         interview_id = data.get('id_interview')
-        error = database.end_interview(interview_id, status=True)
+        event_id, error = database.end_interview(interview_id, status=True)
         if error:
             return jsonify({"error": error}), 400
-        event_cache = cache["events"].get(str(data.get('id_event')))
+        if not event_id:
+            if data.get('id_event') is not None:
+                event_id = data.get('id_event')
+            else:
+                return jsonify({"error": "Missing id_event parameter"}), 400
+        event_cache = cache["events"].get(str(event_id))
         if event_cache and "interviews" in event_cache:
             for interviews in event_cache["interviews"].values():
                 for interview in interviews:
                     if interview["id_interview"] == interview_id:
                         interviews.remove(interview)
-        updatecache_all(data.get('id_event'), "events")
+        updatecache_all(event_id, "events")
 
 def skip_candidate(event_id, name_participant):
     """" Skip le candidat actuel et le met en 2 ème position dans le cache """

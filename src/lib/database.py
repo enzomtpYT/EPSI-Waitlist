@@ -1439,23 +1439,25 @@ def end_interview(interview_id, status):
         id_interview (int): L'identifiant de l'entretien.
 
     Returns:
-        str: Un message d'erreur si une erreur est survenue, None sinon.
+        tuple: Un tuple contenant l'identifiant de l'événement et un message d'erreur si une erreur est survenue.
     """
     conn, cursor = get_db_connection()
     if conn is None:
-        return "Erreur base de données"
+        return None, "Erreur base de données"
     try:
         end_time = datetime.datetime.now()
         cursor.execute('''
         UPDATE Interview
         SET happened = %s, end_time_interview = %s, duration_interview = %s - start_time_interview
         WHERE id_interview = %s
+        RETURNING id_event
         ''', (status, end_time, end_time, interview_id))
+        event_id = cursor.fetchone()['id_event']
         conn.commit()
-        return None
+        return event_id, None
     except psycopg2.Error as e:
         print(f"Erreur lors de la fin de l'entretien: {e}")
-        return "Erreur lors de la fin de l'entretien"
+        return None, "Erreur lors de la fin de l'entretien"
     finally:
         conn.close()
 
