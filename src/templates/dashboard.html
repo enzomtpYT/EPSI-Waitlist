@@ -116,7 +116,7 @@
                         </tbody>
                     </table>
                 </div>
-                <button style="margin-top: auto;" onclick="document.querySelector('todaylist').style.display = 'none'; loadData();" class="backbtn"><i class="fa-regular fa-arrow-left"></i> Retour</button>
+                <button style="margin-top: auto;" onclick="document.querySelector('.todaylist').style.display = 'none'; document.querySelector('.upcoming').style.display = 'flex'; document.querySelector('.history').style.display = 'flex'; loadData();" class="backbtn"><i class="fa-regular fa-arrow-left"></i> Retour</button>
             </div>
         </div>
     </div>
@@ -267,6 +267,8 @@ function buildPage(datas) {
             }            
         }
     }
+    document.querySelector('.upcoming').style.display = 'flex';
+    document.querySelector('.history').style.display = 'flex';
 }
 
 function loadList(todayId) {
