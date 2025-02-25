@@ -680,3 +680,16 @@ button:active {
     flex-wrap: nowrap;
     justify-content: center;
 }
+
+.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.disabled:hover {
+    background-color: var(--btn-color);
+}
+
+.disabled:active {
+    transform: scale(1);
+}

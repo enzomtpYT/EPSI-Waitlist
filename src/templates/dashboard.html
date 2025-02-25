@@ -104,12 +104,11 @@
             <div class="listsection section todaylist" style="display: none; height: 100%;">
                 <h2>Ma liste:</h2>
                 <div class="tablewrap">
-                    <table>
+                    <table class="todayinterlist">
                         <thead>
                             <tr>
                                 <th>Nom</th>
                                 <th>Prénom</th>
-                                <th>Tags</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -117,7 +116,7 @@
                         </tbody>
                     </table>
                 </div>
-                <button style="margin-top: auto;" onclick="loadData();" class="backbtn"><i class="fa-regular fa-arrow-left"></i> Retour</button>
+                <button style="margin-top: auto;" onclick="document.querySelector('todaylist').style.display = 'none'; loadData();" class="backbtn"><i class="fa-regular fa-arrow-left"></i> Retour</button>
             </div>
         </div>
     </div>
@@ -150,6 +149,7 @@
 </div>
 
 <script>
+let timers = {};
 var editmodal = document.getElementById('editmodel');
 var modal = document.getElementById("feedbackModal");
 
@@ -298,7 +298,153 @@ function buildTodayList(data) {
     document.querySelector('.upcoming').style.display = 'none';
     document.querySelector('.history').style.display = 'none';
     document.querySelector('.today').style.display = 'none'
-    console.log(data);
+    i = 0;
+    data.interviews[firstname].forEach(interview => {
+        let row = document.createElement('tr');
+        let nameTd = document.createElement('td');
+        nameTd.textContent = interview.lastname_candidate;
+        row.appendChild(nameTd);
+
+        let firstnameTd = document.createElement('td');
+        firstnameTd.textContent = interview.name_candidate;
+        row.appendChild(firstnameTd);
+
+        let actionTd = document.createElement('td');
+        actionTd.classList.add('actionbtn');
+        actionTd.style.justifyContent = 'space-around';
+
+        let duration = document.createElement('span');
+        duration.id = `duration-${interview.id_interview}`;
+        duration.classList.add('duration');
+        duration.innerHTML = '<i class="fa-regular fa-stopwatch"></i> 00:00';
+        duration.title = 'Durée de l\'interview';
+        actionTd.appendChild(duration);
+
+        let startend = document.createElement('button');
+        startend.innerHTML = `<i class="fa-regular fa-play"></i> Commencer`
+        startend.classList.add('startend');
+        startend.classList.add('startinter');
+        startend.onclick = function() { startinter(interview, this); };
+        actionTd.appendChild(startend);
+
+        let cancel = document.createElement('button');
+        cancel.innerHTML = `<i class="fa-regular fa-xmark"></i> Annuler`
+        cancel.classList.add('cancel')
+        cancel.disabled = true;
+        cancel.classList.add('disabled');
+        cancel.onclick = function() { cancelinter(interview, this); }
+        actionTd.appendChild(cancel);
+
+        row.appendChild(actionTd);
+        document.querySelector('.todaylist tbody').appendChild(row);
+
+        if (i>0) {
+            startend.disabled = true;
+            startend.classList.add('disabled');
+        } else if (i===0 && interview.start_time_interview) {
+            startend.click();
+        }
+        
+        i++;
+    });
+}
+
+function startinter(interview, el) {
+    if (!interview.start_time_interview) {
+      startTime = new Date()
+    } else {
+      startTime = new Date(Date.parse(interview.start_time_interview));
+    }
+    startCountdown(interview.id_interview, startTime);
+
+    el.innerHTML = '<i class="fa-regular fa-stop"></i> Terminer';
+    el.classList.remove('startinter');
+    el.classList.add('endinter');
+    el.onclick = function() { endinter(interview, this); };
+
+    el.parentElement.querySelector('.cancel').classList.remove('disabled');
+    el.parentElement.querySelector('.cancel').disabled = false;
+
+    if (!interview.start_time_interview){
+      fetch('{{ url_for('api.start_interview') }}', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ id_interview: interview.id_interview, start_time: startTime })
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.error) {
+            popup('danger', 'Une erreur est survenue lors de la récupération des données');
+            const display = document.getElementById(`duration-${interview.id_interview}`);
+            clearInterval(timers[interview.id_interview]);
+            display.innerHTML = '<i class="fa-duotone fa-regular fa-stopwatch"></i> 00:00';
+            delete timers[interview.id_interview];
+          }
+      })
+      .catch(error => {
+          console.error('Error:', error);
+          popup('danger', 'Une erreur est survenue lors de la récupération des données');
+      });
+    }
+}
+
+function endinter(inter, el) {
+    fetch('{{ url_for('api.end_interview') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id_interview: inter.id_interview })
+    }).then(response => {
+        if (!response.ok) {
+            popup('danger', 'Une erreur est survenue lors de la récupération des données');
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    }).then(data => {
+        body = el.parentElement.parentElement.parentElement;
+        el.parentElement.parentElement.remove();
+        body.firstElementChild.querySelector('.startend').disabled = false;
+        body.firstElementChild.querySelector('.startend').classList.remove('disabled');
+        clearInterval(timers[inter.id_interview]);
+        delete timers[inter.id_interview];
+    }).catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+    });
+}
+
+function cancelinter(inter, el) {
+    fetch('{{ url_for('api.start_interview') }}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ id_interview: inter.id_interview, start_time: null })
+    }).then(response => {
+      if (!response.ok) {
+        popup('danger', 'Une erreur est survenue lors de la récupération des données');
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    }).then(data => {
+        clearInterval(timers[inter.id_interview]);
+        delete timers[inter.id_interview];
+        let startend = el.parentElement.querySelector('.startend');
+        startend.innerHTML = `<i class="fa-regular fa-play"></i> Commencer`
+        startend.classList.add('startend');
+        startend.classList.add('startinter');
+        startend.onclick = function() { startinter(inter, this); };
+        let duration = el.parentElement.querySelector('.duration');
+        duration.innerHTML = '<i class="fa-regular fa-stopwatch"></i> 00:00';
+        el.disabled = true;
+        el.classList.add('disabled');
+        inter.start_time_interview = null;
+        popup('info', 'Entretien annulé');    
+    }).catch(error => {
+      console.error('There was a problem with the fetch operation:', error);
+    });
 }
 
 function loadData() {
@@ -443,6 +589,17 @@ function openedit(el, inter) {
         charcount(farea);
     }
     toggleElement(editmodal);
+}
+
+function startCountdown(id_interview, startTime) {
+    const display = document.getElementById(`duration-${id_interview}`);
+    timers[id_interview] = setInterval(() => {
+        let now = new Date();
+        let elapsed = new Date(now - startTime);
+        let minutes = elapsed.getUTCMinutes();
+        let seconds = elapsed.getUTCSeconds();
+        display.innerHTML = `<i class="fa-duotone fa-regular fa-stopwatch"></i> ${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }, 1000);
 }
 
 loadData();
