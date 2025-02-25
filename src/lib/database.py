@@ -373,6 +373,7 @@ def get_event(event_id):
     try:
         cursor.execute('SELECT * FROM Event WHERE id_event = %s', (event_id,))
         event = cursor.fetchone()
+        event = dict(event)
         if event['has_timeslots']:
             cursor.execute('SELECT * FROM Timeslot WHERE id_event = %s', (event_id,))
             timeslots = cursor.fetchall()
@@ -1418,13 +1419,8 @@ def editstart_interview(id_interview, start_time):
         RETURNING id_interview, id_event
         ''', (start_time, id_interview))
         conn.commit()
-        updated_id = cursor.fetchone()
-        if updated_id:
-            cursor.execute('SELECT * FROM Event WHERE id_event = %s', (updated_id['id_event'],))
-            event = cursor.fetchone()
-            return updated_id['id_interview'], event, None
-        else:
-            return None, None, "Entretien non trouvé ou déjà démarré"
+        updated_ids = cursor.fetchone()
+        return updated_ids['id_interview'], updated_ids['id_event'], None
     except psycopg2.Error as e:
         print(f"Erreur lors du démarrage de l'entretien: {e}")
         return None, None, "Erreur lors du démarrage de l'entretien"
