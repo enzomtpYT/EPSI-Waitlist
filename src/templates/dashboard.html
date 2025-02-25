@@ -182,6 +182,7 @@ function buildPage(datas) {
     document.getElementById('email').value = mail;
     document.getElementById('username').value = username;
     document.querySelector('#type').innerHTML = type === 'candidate' ? 'Intervenant' : 'Candidat';
+    document.querySelector('.taglist').innerHTML = '';
     for (let tag of tags) {
         let tagel = document.createElement('span');
         tagel.classList.add('tag');
@@ -201,6 +202,8 @@ function buildPage(datas) {
         document.getElementById('name').value = firstname;
     }
 
+    document.querySelector('.upcoming tbody').innerHTML = '';
+    document.querySelector('.history tbody').innerHTML = '';
     for (let event of events) {
         const eventDate = new Date(event.date_event);
         const today = new Date();
@@ -301,6 +304,7 @@ function buildTodayList(data) {
     document.querySelector('.history').style.display = 'none';
     document.querySelector('.today').style.display = 'none'
     i = 0;
+    document.querySelector('.todaylist tbody').innerHTML = '';
     data.interviews[firstname].forEach(interview => {
         let row = document.createElement('tr');
         let nameTd = document.createElement('td');
