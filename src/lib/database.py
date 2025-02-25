@@ -845,7 +845,7 @@ def get_all_candidates():
         if candidates:
             return candidates, None
         else:
-            return None, "Pas de candidat"
+            return [], None
 
     except psycopg2.Error as e:
         print(f"Erreur requête base de données: {e}")
@@ -1147,7 +1147,7 @@ def get_all_participants():
         if participants:
             return participants, None
         else:
-            return None, "Pas d'intervenant"
+            return [], None
     except psycopg2.Error as e:
         print(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
@@ -1521,7 +1521,7 @@ def get_all_tags():
         if tags:
             return tags, None
         else:
-            return [], "Pas de tag"
+            return [], None
     except psycopg2.Error as e:
         print(f"Erreur requête base de données: {e}")
         return [], "Erreur requête base de données"
@@ -2417,7 +2417,7 @@ def get_all_employees():
         if employees:
             return employees, None
         else:
-            return None, "Pas d'employé"
+            return [], None
 
     except psycopg2.Error as e:
         print(f"Erreur requête base de données: {e}")
