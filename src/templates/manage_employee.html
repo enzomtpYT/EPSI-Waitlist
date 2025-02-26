@@ -18,13 +18,13 @@
         <div class="infoeditor">
             <form id="candform" style="display: none;">
                 <label for="employee_lastname">Nom :</label>
-                <input type="text" id="employee_lastname" name="employee_lastname" value="">
+                <input type="text" id="employee_lastname" name="employee_lastname" value="" required>
 
                 <label for="employee_name">Prénom :</label>
-                <input type="text" id="employee_name" name="employee_name" value="">
+                <input type="text" id="employee_name" name="employee_name" value="" required>
 
                 <label for="employee_email">E-mail :</label>
-                <input type="email" id="employee_email" name="employee_email" value="">
+                <input type="email" id="employee_email" name="employee_email" value="" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required>
 
                 <label for="username">Nom d'utilisateur :</label>
                 <input type="text" id="username" name="username" value="">
@@ -320,8 +320,35 @@ function buildManagement(datas) {
     document.querySelector('.tabmanagment').style.display = 'flex';
 }
 
+function validateForm() {
+    const lastname = document.getElementById('employee_lastname').value;
+    const name = document.getElementById('employee_name').value;
+    const email = document.getElementById('employee_email').value;
+    const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+
+    if (!lastname) {
+        popup('danger', 'Le nom est requis.');
+        return false;
+    }
+
+    if (!name) {
+        popup('danger', 'Le prénom est requis.');
+        return false;
+    }
+
+    if (!email || !emailPattern.test(email)) {
+        popup('danger', 'Un e-mail valide est requis.');
+        return false;
+    }
+
+    return true;
+}
+
 function done(event) {
     event.preventDefault();
+    if (!validateForm()) {
+        return;
+    }
     let employee = {
         id_employee: document.querySelector('#id_employee').value,
         id_user: document.querySelector('#id_user').value,

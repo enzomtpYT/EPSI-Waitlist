@@ -1,11 +1,7 @@
 TO fix
 -page liste d'attente : quand on clique sur supprimer cet entretien ou supprimer tous les entretiens ne fonctionnent pas
 -quand on import un csv, qu'on retourne sur public, et qu'on réessaie d'importer un csv, ça ne marche pas + bouton supprimer apparait au mauvais moment au mauvais endroit
--quand on crée un candidat, on peut remplir le champs email sans @smth.smth
--liste: dropdown menu pas fonctionel
-
 
 TO DO
 - ajouter permission pour les roles admin et superadmin de voir et accéder aux fonctionnalités de gestion de BDD
 - pour les feedbacks vérifier que chaque encart de modification/ajout ont la limite de charactère
-- une fois le schéma dupliqué/archivé, il faut pouvoir supprimer les données du schéma public

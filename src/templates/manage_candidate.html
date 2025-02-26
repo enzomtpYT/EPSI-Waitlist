@@ -18,13 +18,13 @@
         <div class="infoeditor">
             <form id="candform" style="display: none;">
                 <label for="candidate_lastname">Nom :</label>
-                <input type="text" id="candidate_lastname" name="candidate_lastname" value="">
+                <input type="text" id="candidate_lastname" name="candidate_lastname" value="" required>
 
                 <label for="candidate_name">Prénom :</label>
-                <input type="text" id="candidate_name" name="candidate_name" value="">
+                <input type="text" id="candidate_name" name="candidate_name" value="" required>
 
                 <label for="candidate_email">E-mail :</label>
-                <input type="email" id="candidate_email" name="candidate_email" value="">
+                <input type="email" id="candidate_email" name="candidate_email" value="" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required>
 
                 <label for="username">Nom d'utilisateur :</label>
                 <input type="text" id="username" name="username" value="">
@@ -405,8 +405,35 @@ function removeTag(tag, button) {
     if (button) button.remove();
 }
 
+function validateForm() {
+    const lastname = document.getElementById('candidate_lastname').value;
+    const name = document.getElementById('candidate_name').value;
+    const email = document.getElementById('candidate_email').value;
+    const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+
+    if (!lastname) {
+        popup('danger', 'Le nom est requis.');
+        return false;
+    }
+
+    if (!name) {
+        popup('danger', 'Le prénom est requis.');
+        return false;
+    }
+
+    if (!email || !emailPattern.test(email)) {
+        popup('danger', 'Un e-mail valide est requis.');
+        return false;
+    }
+
+    return true;
+}
+
 function done(event) {
     event.preventDefault();
+    if (!validateForm()) {
+        return;
+    }
     let candidate = {
         id_candidate: document.querySelector('#id_candidate').value,
         id_user: document.querySelector('#id_user').value,

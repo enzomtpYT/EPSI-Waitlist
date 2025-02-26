@@ -18,10 +18,10 @@
         <div class="infoeditor">
             <form id="candform" style="display: none;">
                 <label for="participant_name">Nom :</label>
-                <input type="text" id="participant_name" name="participant_name" value="">
+                <input type="text" id="participant_name" name="participant_name" value="" required>
 
                 <label for="participant_email">E-mail :</label>
-                <input type="email" id="participant_email" name="participant_email" value="">
+                <input type="email" id="participant_email" name="participant_email" value="" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required>
 
                 <label for="username">Nom d'utilisateur :</label>
                 <input type="text" id="username" name="username" value="">
@@ -400,8 +400,29 @@ function removeTag(tag, button) {
     if (button) button.remove();
 }
 
+function validateForm() {
+    const name = document.getElementById('participant_name').value;
+    const email = document.getElementById('participant_email').value;
+    const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
+
+    if (!name) {
+        popup('danger', 'Le nom est requis.');
+        return false;
+    }
+
+    if (!email || !emailPattern.test(email)) {
+        popup('danger', 'Un e-mail valide est requis.');
+        return false;
+    }
+
+    return true;
+}
+
 function done(event) {
     event.preventDefault();
+    if (!validateForm()) {
+        return;
+    }
     let participant = {
         id_participant: document.querySelector('#id_participant').value,
         id_user: document.querySelector('#id_user').value,
