@@ -73,4 +73,4 @@ def handleMessage(msg):
 
 if __name__ == "__main__":
     debug_mode = os.getenv('FLASK_ENV') == 'development'
-    server.run(app, host="0.0.0.0", port=os.getenv('SERVER_PORT'), debug=debug_mode)
+    server.run(app, host="0.0.0.0", port=os.getenv('DEV_SERVER_PORT', '8080'), debug=debug_mode)
