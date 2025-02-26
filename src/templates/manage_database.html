@@ -25,9 +25,9 @@
                 </div>
                 <div style="display: flex; flex-direction: row; justify-content: space-between;">
                     <button class="archive" onclick="toggleElement(document.querySelector('#inputmodal'))" style="display: none;"><i class="fa-regular fa-box-archive"></i> Archiver</button>
-                    <button class="backbtn" style="display: none;"><i class="fa-regular fa-arrow-left"></i> Retour</button>
                     <button class="submit" onclick="submit()" style="display: none;"><i class="fa-regular fa-check"></i> Confirmer</button>
-                    <button class="delete" onclick="wipeCandidates()" style="display: none;"><i class="fa-regular fa-trash"></i> Supprimer les données liées aux candidats</button>
+                    <button class="backbtn" style="display: none;"><i class="fa-regular fa-arrow-left"></i> Retour</button>
+                    <button class="delete" onclick="wipeCandidates()" style="display: none;"><i class="fa-regular fa-trash"></i> Supprimer les données liées aux candidats et événements</button>
                 </div>
                 <div onclick="document.querySelector('#fileInput').click()" class="chosedata">
                     <i class="fa-regular fa-file-arrow-down"></i>
@@ -313,8 +313,10 @@ function viewArchive(archives, el) {
     const tbody = table.querySelector("tbody");
 
     if (el.querySelector('p').innerHTML.includes('public')) {
-        document.querySelector(".listsection .archive").style.display = "block";
-        document.querySelector(".listsection .delete").style.display = "";
+        {% if user_role == 'admin' or user_role == 'superadmin' %}
+            document.querySelector(".listsection .archive").style.display = "block";
+            document.querySelector(".listsection .delete").style.display = "";
+        {% endif %}
     } else {
         document.querySelector(".listsection .archive").style.display = "none";
     }

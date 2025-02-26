@@ -201,6 +201,13 @@ def get_events():
 
     return timefixer(events), None
 
+def get_archives():
+    archives, error = database.get_archived_schemas()
+    if error:
+        return None, error
+
+    return timefixer(archives), None
+
 def process_event_participants(datas):
     participants = datas.get("participants", [])
     candidates = datas.get("candidates", [])
@@ -454,10 +461,10 @@ def start_interview(data):
         return jsonify({"error": "Missing id_interview parameter"}), 400
 
     updated_id, event_id, error = database.editstart_interview(id_interview, start_time)
-    
+
     if error:
         return jsonify({"error": error}), 400
-    
+
     if not event_id:
         if data.get('id_event') is not None:
             event_id = data.get('id_event')

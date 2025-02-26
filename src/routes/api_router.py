@@ -226,7 +226,7 @@ def end_interview():
 
 @api_bp.route("/api/get_archives", methods=['GET'])
 def get_archives():
-    archives, error = database.get_archived_schemas()
+    archives, error = api.get_archives()
     if error:
         return jsonify({"success": False, "error": error}), 500
     return jsonify(archives)
