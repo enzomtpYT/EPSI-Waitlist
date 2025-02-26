@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from lib import auth, database
+from lib import auth
+import os
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -24,7 +25,7 @@ def login():
         else:
             flash(f'Impossible de se connecter: {error}', "danger")
 
-    return render_template('login.html')
+    return render_template('login.html', CF_KEY=os.getenv('CF_KEY'))
 
 @auth_bp.route('/logout')
 def logout():

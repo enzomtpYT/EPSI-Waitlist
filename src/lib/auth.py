@@ -1,5 +1,5 @@
 from lib import database
-import bcrypt, hashlib, random, requests
+import bcrypt, hashlib, random, requests, os
 
 def verify_login(username, password):
     dbhashed_password, error = database.auth_get_hashedpassword(username)
@@ -38,7 +38,7 @@ def user_has_permission(user_id, permission_name):
     return permission_name in permissions
 
 def check_turnstile(response):
-    secretkey = "0x4AAAAAAA5lAF_NTbcBlcVnVcwfmmhB4VE"
+    secretkey = os.getenv('CF_SECRET')
     data = {
         "response": response,
         "secret": secretkey
