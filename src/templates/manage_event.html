@@ -129,7 +129,7 @@
                 </div>
             </div>
 
-            <button onclick="submitparts()" id="submit">Ajouter les participants</button>
+            <button id="submitpart">Ajouter les participants</button>
 
         </div>
     </div>
@@ -351,7 +351,7 @@ function buildManagePart(datas) {
     let tagSelector = document.querySelector(".tag-selector");
     let intervList = document.querySelector(".interves tbody");
     let candList = document.querySelector(".cand tbody");
-    tagSelector.innerHTML = "";
+    tagSelector.innerHTML = `<div class="tagfilter selectag" id="attend"><i class="fa-regular fa-tag"></i><p>Participants</p></div>`;
     intervList.innerHTML = "";
     candList.innerHTML = "";
 
@@ -462,7 +462,7 @@ function submitparts(id_event) {
         "candidates": []
     };
 
-    let intervList = document.querySelectorAll(".interv tbody tr");
+    let intervList = document.querySelectorAll(".interves tbody tr");
     intervList.forEach(interv => {
         let id = parseInt(interv.id);
         let attends = interv.querySelector(".checkbox").checked;
@@ -483,6 +483,8 @@ function submitparts(id_event) {
             "priority": priority
         });
     });
+
+    console.log(datas);
 
     fetch("{{ url_for('api.process_event_participants') }}", {
         method: "POST",
@@ -506,6 +508,9 @@ function submitparts(id_event) {
 
 
 function showInfos(infos) {
+    document.querySelector('#submitpart').onclick = function() {
+        submitparts(infos.id_event);
+    };
     document.querySelector('#name_event').value = infos.name_event;
     document.querySelector('#date_event').value = infos.date_event;
     document.querySelector('#start_time_event').value = infos.start_time_event;
