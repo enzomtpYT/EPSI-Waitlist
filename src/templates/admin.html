@@ -52,16 +52,14 @@
         </div>
     </div>
 
-    {% if user_role == 'admin' or user_role == 'superadmin' %}
-        <div class="admin-section">
-            <h2>Gestion Base de données</h2>
-            <div class="admin-buttons">
-                <a href="/admin/manage_database">
-                    <button type="button">Gérer la base</button>
-                </a>
-            </div>
+    <div class="admin-section">
+        <h2>Gestion Base de données</h2>
+        <div class="admin-buttons">
+            <a href="/admin/manage_database">
+                <button type="button">Gérer la base</button>
+            </a>
         </div>
-    {% endif %}
+    </div>
 
 </div>
 

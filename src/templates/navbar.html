@@ -11,9 +11,7 @@
                     <li class="navli"><a class="navelm" href="{{ url_for('manage_participant.manage_participant') }}">Intervenants</a></li>
                     <li class="navli"><a class="navelm" href="{{ url_for('manage_event.manage_event') }}">Événements</a></li>
                     <li class="navli"><a class="navelm" href="{{ url_for('manage_tag.manage_tag') }}">Tags</a></li>
-                    {% if user_role == 'admin' or user_role == 'superadmin' %}
-                        <li class="navli"><a class="navelm" href="{{ url_for('manage_database.manage_database') }}">Base de Données</a></li>
-                    {% endif %}
+                    <li class="navli"><a class="navelm" href="{{ url_for('manage_database.manage_database') }}">Base de Données</a></li>
                 {% elif user_role == 'candidate' or user_role == 'participant' %}
                     <li class="navli"><a class="navelm" href="{{ url_for('dashboard.dashboard') }}">Dashboard</a></li>
                 {% endif %}
