@@ -1,6 +1,5 @@
 from flask import request, session, redirect, url_for
 from flask_socketio import send
-from sock import socketio, app
 from lib import permission, database
 import os, time
 from routes.auth import auth_bp
@@ -16,6 +15,14 @@ from routes.manage_tag import manage_tag_bp
 from routes.settings import settings_bp
 from routes.manage_database import manage_database_bp
 from routes.dashboard import dashboard_bp
+from flask import Flask
+from flask_socketio import SocketIO
+from flask_misaka import Misaka
+import dotenv, os
+
+app = Flask(__name__)
+dotenv.load_dotenv()
+app.secret_key = os.getenv('FLASK_KEY')
 
 # Register the blueprints
 app.register_blueprint(auth_bp)
@@ -43,12 +50,6 @@ def checkroutes():
             return redirect(url_for('auth.login'))
     return permission.checkroutes(session)
 
-@socketio.on('message')
-def handleMessage(msg):
-    print('Message: ' + msg)
-    time.sleep(5)
-    send(msg, broadcast=True)
-
 @app.context_processor
 def inject_routes():
     user_role = None
@@ -61,6 +62,15 @@ def inject_routes():
         username = userinfo['username']
     return dict(parameters=request.args.to_dict(), session=session, user_role=user_role, perms=permissions, username=username)
 
+server = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+Misaka(app, no_intra_emphasis=True)
+
+@server.on('message')
+def handleMessage(msg):
+    print('Message: ' + msg)
+    time.sleep(5)
+    send(msg, broadcast=True)
+
 if __name__ == "__main__":
     debug_mode = os.getenv('FLASK_ENV') == 'development'
-    socketio.run(app, host="0.0.0.0", port=os.getenv('SERVER_PORT'), debug=debug_mode)
+    server.run(app, host="0.0.0.0", port=os.getenv('SERVER_PORT'), debug=debug_mode)
