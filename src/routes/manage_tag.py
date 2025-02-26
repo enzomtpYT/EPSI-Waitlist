@@ -11,7 +11,7 @@ def manage_tag():
         error = None
 
         if not name:
-            error = 'Le nom est obligatoire.'
+            flash("Le nom est obligatoire.", "danger")
 
         if error is None:
             error = database.edit_tag(name, id_tag)
@@ -19,8 +19,6 @@ def manage_tag():
                 flash("Tag mis à jour avec succès!", "success")
             else:
                 flash(f"Erreur lors de la mise à jour du tag: {error}", "danger")
-        else:
-            flash(error, "danger")
 
     tags, error = database.get_all_tags()
     if error:

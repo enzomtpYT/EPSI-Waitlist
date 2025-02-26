@@ -33,12 +33,14 @@
 </body>
 
 <script>
-{% with messages = get_flashed_messages(True) %}
-{% if messages %}
-    {% for category, message in messages %}
-        popup('{{ category }}', '{{ message }}');
-    {% endfor %}
-  {% endif %}
-{% endwith %}
+document.addEventListener('DOMContentLoaded', function() {
+    {% with messages = get_flashed_messages(True) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            popup('{{ category }}', '{{ message }}');
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+});
 </script>
 </html>

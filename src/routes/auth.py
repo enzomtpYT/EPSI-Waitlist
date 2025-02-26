@@ -12,17 +12,17 @@ def login():
         # Check if turnstile is correct (captcha)
         cfturnstile = request.form.get('cf-turnstile-response')
         if not auth.check_turnstile(cfturnstile):
-            flash('Captcha failed', 'error')
+            flash("Captcha raté", "danger")
             return redirect(url_for('auth.login'))
 
         # Check if credentials are correct
         vsession, error = auth.verify_login(username, password)
         if vsession:
             session['token'] = vsession
-            flash('Login successful', 'success')
+            flash("Connexion réussie", "success")
             return redirect(url_for('index.index'))
         else:
-            flash(f'Login failed {error}', 'error')
+            flash(f'Impossible de se connecter: {error}', "danger")
 
     return render_template('login.html')
 

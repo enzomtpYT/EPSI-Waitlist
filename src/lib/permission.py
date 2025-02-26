@@ -44,6 +44,6 @@ def checkroutes(session):
                 print('No token in session')
                 return redirect(url_for('auth.login'))
             if not auth.check_permission(session['token'], perm):
-                flash("You don't have permission to access this page.")
+                flash("You don't have permission to access this page.", "danger")
                 return redirect('/')
             print('User has permission')

@@ -1,4 +1,4 @@
-from flask import Blueprint, request, render_template, flash, redirect
+from flask import Blueprint, render_template
 from lib import database
 
 list_bp = Blueprint('list', __name__)

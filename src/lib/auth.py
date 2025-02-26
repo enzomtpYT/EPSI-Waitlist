@@ -3,9 +3,11 @@ import bcrypt, hashlib, random, requests
 
 def verify_login(username, password):
     dbhashed_password, error = database.auth_get_hashedpassword(username)
-    dbhashed_password = dbhashed_password['password_user'].encode('utf-8')
     if error:
         return False, error
+    if not dbhashed_password:
+        return False, "Aucun utilisateur trouvé."
+    dbhashed_password = dbhashed_password['password_user'].encode('utf-8')
     if bcrypt.checkpw(password.encode('utf-8'), dbhashed_password):
         session, error = database.auth_get_session(username)
         if error:
