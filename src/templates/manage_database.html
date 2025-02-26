@@ -25,10 +25,10 @@
                 </div>
                 <div style="display: flex; flex-direction: row; justify-content: space-between;">
                     <button class="archive" onclick="toggleElement(document.querySelector('#inputmodal'))" style="display: none;"><i class="fa-regular fa-box-archive"></i> Archiver</button>
+                    <button class="backbtn" style="display: none;"><i class="fa-regular fa-arrow-left"></i> Retour</button>
+                    <button class="submit" onclick="submit()" style="display: none;"><i class="fa-regular fa-check"></i> Confirmer</button>
                     <button class="delete" onclick="wipeCandidates()" style="display: none;"><i class="fa-regular fa-trash"></i> Supprimer les données liées aux candidats</button>
                 </div>
-                <button class="backbtn" style="display: none;"><i class="fa-regular fa-arrow-left"></i> Retour</button>
-                <button class="submit" onclick="submit()" style="display: none;"><i class="fa-regular fa-check"></i> Confirmer</button>
                 <div onclick="document.querySelector('#fileInput').click()" class="chosedata">
                     <i class="fa-regular fa-file-arrow-down"></i>
                     <h1>Choisir ou importer des données</h1>
@@ -204,6 +204,7 @@ function ImportCSV(ev) {
             document.querySelector(".listsection .submit").style.display = "block";
             document.querySelector(".listsection h2").style.display = "block";
             document.querySelector(".listsection .chosedata").style.display = "none";
+            document.querySelector(".listsection .delete").style.display = "none";
         });
     };
     reader.readAsText(file);
@@ -265,6 +266,7 @@ function fetchArchives() {
     document.querySelector(".listsection .archive").style.display = "none";
     document.querySelector(".listsection .delete").style.display = "none";
     document.querySelector(".listsection .backbtn").display = "none";
+    document.querySelector(".listsection .submit").style.display = "none";
 
     // Clear existing table content
     thead.innerHTML = "";
