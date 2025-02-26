@@ -383,7 +383,7 @@ def get_all_events():
                 event['interviews'] = interviews
             return events, None
         else:
-            return None, "Pas d'événement aujourd'hui"
+            return [], None
     except psycopg2.Error as e:
         print(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
