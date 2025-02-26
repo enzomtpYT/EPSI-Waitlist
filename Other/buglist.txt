@@ -1,5 +1,5 @@
 TO fix
--page liste d'attente : quand on clique sur supprimer cet entretien ou supprimer tous les entretiens ne fonctionnent pas
+NONE (for now)
 
 TO DO
 - ajouter permission pour les roles admin et superadmin de voir et accéder aux fonctionnalités de gestion de BDD

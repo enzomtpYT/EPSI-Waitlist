@@ -78,10 +78,16 @@ function buildList(info) {
             dropbtn1.type = 'submit';
             dropbtn1.classList.add('dropdown-item');
             dropbtn1.textContent = 'Supprimer cet entretien';
+            dropbtn1.onclick = (event) => {
+              deleteInterview(candidate.id_interview, event.target);
+            }
             const dropbtn2 = document.createElement('button');
             dropbtn2.type = 'submit';
             dropbtn2.classList.add('dropdown-item');
             dropbtn2.textContent = 'Supprimer tous les entretiens de ce candidat';
+            dropbtn2.onclick = () => {
+              CandDelAllInterEvent(candidate.id_candidate, info.id_event);
+            }
             dropdownContent.appendChild(dropbtn1);
             dropdownContent.appendChild(dropbtn2);
         dropdown.appendChild(candidatebtn);
@@ -196,6 +202,65 @@ function startInterview(candidate, id_event, participant_name) {
         popup('danger', 'Une erreur est survenue lors de la récupération des données');
     });
   }
+}
+
+function CandDelAllInterEvent(id_candidate, id_event) {
+  fetch('{{ url_for('api.CandDelAllInterEvent') }}', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ id_candidate: id_candidate, id_event: id_event })
+  }).then(response => {
+    if (!response.ok) {
+      popup('danger', 'Une erreur est survenue lors de la récupération des données');
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  }).then(data => {
+    data.forEach((id_interview) => {
+      const managecandidate = document.querySelector(`#interview-${id_interview}`);
+      managecandidate.remove();
+    });
+    cands = document.querySelectorAll('.candidates');
+    cands.forEach((cand) => {
+      if (cand.children.length > 0) {
+        cand.firstChild.classList.add('current');
+      }
+    });
+    popup('success', 'Entretiens supprimés');
+  }).catch(error => {
+    console.error('Error:', error);
+    popup('danger', 'Une erreur est survenue lors de la récupération des données');
+  });
+
+}
+
+function deleteInterview(id_interview, el) {
+  fetch('{{ url_for('api.delete_api', type='interview') }}', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ id: id_interview })
+  }).then(response => {
+    if (!response.ok) {
+      popup('danger', 'Une erreur est survenue lors de la récupération des données');
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  }).then(data => {
+    const managecandidate = el.parentElement.parentElement.parentElement;
+    parent = managecandidate.parentElement;
+    managecandidate.remove();
+    if (parent.children.length > 0) {
+      parent.firstChild.classList.add('current');
+    }
+    popup('success', 'Entretien supprimé');
+  }).catch(error => {
+    console.error('Error:', error);
+    popup('danger', 'Une erreur est survenue lors de la récupération des données');
+  });
 }
 
 function startCountdown(id_interview, startTime) {

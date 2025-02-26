@@ -1070,32 +1070,37 @@ def get_last_added_candidate():
 
 def remove_candidate_from_all_interviews_for_event(id_event, id_candidate):
     """
-    Supprime un candidat de tous les entretiens associés à un événement.
+    Supprime un candidat de tous les entretiens associés à un événement et retourne une liste des identifiants des entretiens supprimés.
 
     Args:
         id_event (int): L'identifiant de l'événement.
         id_candidate (int): L'identifiant du candidat.
 
     Returns:
-        str: Un message d'erreur si une erreur est survenue, None sinon.
+        tuple: Un tuple contenant une liste des identifiants des entretiens supprimés et un message d'erreur si une erreur est survenue, None sinon.
     """
     conn, cursor = get_db_connection()
     if conn is None:
         # Si la connexion échoue, renvoie une erreur
-        return "Erreur base de données"
+        return None, "Erreur base de données"
     try:
+        # Exécute la requête pour récupérer les identifiants des entretiens à supprimer
+        cursor.execute("SELECT id_interview FROM Interview WHERE id_event = %s AND id_candidate = %s", (id_event, id_candidate))
+        interviews = cursor.fetchall()
+        interview_ids = [interview['id_interview'] for interview in interviews]
+
         # Exécute la requête pour supprimer le candidat de tous les entretiens associés à l'événement
         cursor.execute("DELETE FROM Interview WHERE id_event = %s AND id_candidate = %s", (id_event, id_candidate))
         # Sauvegarde les modifications
         conn.commit()
+        return interview_ids, None
     except psycopg2.Error as e:
         # Gère les erreurs de requête SQL
         print(f"Erreur lors de la suppression du candidat: {e}")
-        return "Erreur lors de la suppression du candidat"
+        return None, "Erreur lors de la suppression du candidat"
     finally:
         # Ferme la connexion à la base de données
         conn.close()
-    return None
 
 def delete_candidate_from_event(id_event, id_candidate):
     """

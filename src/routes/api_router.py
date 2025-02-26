@@ -257,3 +257,12 @@ def wipe_candidates():
     if error:
         return jsonify({"error": error}), 400
     return jsonify({"success": True})
+
+@api_bp.route("/api/CandDelAllInterEvent", methods=['POST'])
+def CandDelAllInterEvent():
+    data = request.get_json()
+    if data:
+        deleted, error = api.CandDelAllInterEvent(data)
+    if error:
+        return jsonify({"error": error}), 400
+    return jsonify(deleted)

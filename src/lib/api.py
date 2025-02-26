@@ -371,7 +371,7 @@ def get_list(id, forced=False):
     cached = cache["events"].get(str(id))
     if cached is not None and not forced:
         updatecache_all(id, "events")
-        return cached.to_dict(), None
+        return timefixer(cached.to_dict()), None
     event, error = database.get_event(id)
     if error:
         return None, error
@@ -522,6 +522,17 @@ def delete(type, id):
     else:
         return "Unknown type"
     return error
+
+def CandDelAllInterEvent(data):
+    if data.get('id_event') is None:
+        return "Missing id_event parameter"
+    if data.get('id_candidate') is None:
+        return "Missing id_candidate parameter"
+    event_id = data.get('id_event')
+    candidate_id = data.get('id_candidate')
+    deleted, error = database.remove_candidate_from_all_interviews_for_event(event_id, candidate_id)
+    threading.Thread(target=updatecache_all, args=(event_id, "events")).start()
+    return deleted, error
 
 def add(type, data):
     error = None
