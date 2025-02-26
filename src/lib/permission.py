@@ -8,19 +8,32 @@ checks = {
     '/admin/manage_event': 'admin.dashboard.view.events',
     '/admin/manage_tag': 'admin.dashboard.view.tags',
     '/admin/manage_employee': 'admin.dashboard.view.employee',
-    '/admin/create_candidate': 'admin.dashboard.create.candidate',
-    '/admin/create_participant': 'admin.dashboard.create.participant',
-    '/admin/create_event': 'admin.dashboard.create.event',
-    '/admin/create_tag': 'admin.dashboard.create.tag',
-    '/admin/create_employee': 'admin.dashboard.create.employee',
-    '/admin/manage_candidate/candidate': 'admin.dashboard.create.candidate',
-    '/admin/manage_participant/participant': 'admin.dashboard.create.participant',
-    '/admin/manage_event/event': 'admin.dashboard.create.event',
-    '/admin/manage_employee/employee': 'admin.dashboard.create.employee',
+
+    '/api/add/candidate': 'admin.dashboard.create.candidate',
+    '/api/add/participant': 'admin.dashboard.create.participant',
+    '/api/add/event': 'admin.dashboard.create.event',
+    '/api/add/tag': 'admin.dashboard.create.tag',
+    '/api/add/employee': 'admin.dashboard.create.employee',
+
+    # '/api/update/candidate': 'admin.dashboard.update.candidate',
+    # '/api/update/participant': 'admin.dashboard.update.participant',
+    # '/api/update/event': 'admin.dashboard.update.event',
+    # '/api/update/tag': 'admin.dashboard.update.tag',
+    # '/api/update/employee': 'admin.dashboard.update.employee',
+
+    # '/api/delete/candidate': 'admin.dashboard.delete.candidate',
+    # '/api/delete/participant': 'admin.dashboard.delete.participant',
+    # '/api/delete/event': 'admin.dashboard.delete.event',
+    # '/api/delete/tag': 'admin.dashboard.delete.tag',
+    # '/api/delete/employee': 'admin.dashboard.delete.employee',
+
     '/participant/dashboard': 'participant.dashboard',
     '/candidate/dashboard': 'candidate.dashboard',
     '/interviews': 'interviews.view',
 
+    '/api/archive_schema': 'admin.database.archive',
+    '/api/wipe_candidate': 'admin.database.delete',
+    '/admin/manage_database': 'admin.database.view',
 }
 
 def checkroutes(session):
