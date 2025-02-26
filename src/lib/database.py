@@ -2069,10 +2069,9 @@ def get_user_role_with_token(session_token):
         ''', (session_token,))
         role = cursor.fetchone()
         if role:
-            return role['name_role']
+            return role['name_role'], None
         else:
-            print("Rôle non trouvé")
-            return None
+            return None, "Rôle non trouvé"
     except psycopg2.Error as e:
         print(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
