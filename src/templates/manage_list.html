@@ -168,7 +168,15 @@ function updateBusy(){
       }
     });
   }
+}
 
+function removeBusy(id_cand){
+  delete busycandidates[id_cand];
+  document.querySelectorAll(`.cand-${id_cand}`).forEach((cand) => {
+    startbtn = cand.querySelector('.candidatebtn');
+    startbtn.classList.remove('disabled');
+    startbtn.disabled = false;
+  });
 }
 
 function startInterview(candidate, id_event, participant_name) {
@@ -187,7 +195,7 @@ function startInterview(candidate, id_event, participant_name) {
   candidatebtn = document.querySelector(`#interview-${candidate.id_interview} .candidatebtn`);
   candidatebtn.innerHTML = `<i class="fa-regular fa-stop"></i> ${candidate.name_candidate} ${candidate.lastname_candidate}`;
   candidatebtn.onclick = () => {
-    EndInterview(candidate.id_interview, participant_name, id_event);
+    EndInterview(candidate.id_interview, participant_name, id_event, candidate);
   }
 
   nextcancelbtn = document.querySelector(`#interview-${candidate.id_interview} .nextcancelbtn`);
@@ -354,10 +362,11 @@ function cancelInterview(candidate, id_event, participant_name) {
     nextcancelbtn.title = 'Passer au candidat suivant';
     nextcancelbtn.classList.remove('cancelbtn');
     nextcancelbtn.onclick = (event) => NextCandidate(event, id_event, participant_name);
+    removeBusy(candidate.id_candidate);
   })
 }
 
-function EndInterview(id_interview, participant_name, id_event) {
+function EndInterview(id_interview, participant_name, id_event, candidate) {
   fetch('{{ url_for('api.end_interview') }}', {
     method: 'POST',
     headers: {
@@ -378,7 +387,10 @@ function EndInterview(id_interview, participant_name, id_event) {
     const managecandidate = document.querySelector(`#interview-${id_interview}`);
     managecandidate.remove();
     const participantcolumn = document.querySelector(`#participant-${participant_name} .candidates`);
-    participantcolumn.firstChild.classList.add('current');
+    if (participantcolumn.children.length > 0) {
+      participantcolumn.firstChild.classList.add('current');
+    }
+    removeBusy(candidate.id_candidate);
   })
   .catch(error => {
     popup('danger', 'Une erreur est survenue lors de la récupération des données');
