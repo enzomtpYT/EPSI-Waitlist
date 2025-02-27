@@ -392,44 +392,31 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function viewInterview(interviews) {
-    backBtn = document.querySelector(".listsection .backbtn");
-    backBtn.style.display = "block";
-    document.querySelector(".listsection .archive").style.display = "none";
-    backBtn.onclick = () => {
-        document.querySelector('.itemlist.selected').click();
-    };
-    const table = document.querySelector(".infoeditor table");
-    const thead = table.querySelector("thead");
-    const tbody = table.querySelector("tbody");
-
-    // Clear existing table content
-
-    thead.innerHTML = "";
-    tbody.innerHTML = "";
-
-    // Populate headers
-
-    const headers = ["Événement", "Date", "Intervenant", "Actions"];
-    const tr = document.createElement("tr");
-    headers.forEach((header) => {
-        const th = document.createElement("th");
-        th.textContent = header;
-        tr.appendChild(th);
-    });
-
-    thead.appendChild(tr);
-
-// Filter interviews to include only those with "happened" set to true
-    const filteredInterviews = interviews.filter(interview => interview.happened === true);
-
+    // Filter interviews to include only those with "happened" set to true
+    const filteredInterviews = interviews.filter(interview => interview !== null && interview.happened === true);
     if (filteredInterviews.length === 0) {
-        const tr = document.createElement("tr");
-        const td = document.createElement("td");
-        td.colSpan = 4;
-        td.textContent = "Aucun entretien trouvé.";
-        tr.appendChild(td);
-        tbody.appendChild(tr);
+        popup('info', 'Aucun entretien n\'a été enregistré pour ce candidat');
     } else {
+        const table = document.querySelector(".infoeditor table");
+        const thead = table.querySelector("thead");
+        const tbody = table.querySelector("tbody");
+
+        // Clear existing table content
+
+        thead.innerHTML = "";
+        tbody.innerHTML = "";
+
+        // Populate headers
+
+        const headers = ["Événement", "Date", "Intervenant", "Actions"];
+        const tr = document.createElement("tr");
+        headers.forEach((header) => {
+            const th = document.createElement("th");
+            th.textContent = header;
+            tr.appendChild(th);
+        });
+
+        thead.appendChild(tr);
         filteredInterviews.forEach(interview => {
             const tr = document.createElement("tr");
 
@@ -457,6 +444,12 @@ function viewInterview(interviews) {
             tr.appendChild(actionTd);
             tbody.appendChild(tr);
         });
+        backBtn = document.querySelector(".listsection .backbtn");
+        backBtn.style.display = "block";
+        document.querySelector(".listsection .archive").style.display = "none";
+        backBtn.onclick = () => {
+            document.querySelector('.itemlist.selected').click();
+        };
     }
 }
 

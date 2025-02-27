@@ -1,8 +1,7 @@
 TO fix
 - Cache instable a vérif
 - Affichage projecteur
--pop up d'erreur alors que pas d'erreur quand on démarre et valide des interviews
-- page archive bdd : affiche parfois un message d'erreur "aucun entretien trouvé" et parfois pas, remplacer le message par un pop up au lieu d'ouvrir la page
+- pop up d'erreur alors que pas d'erreur quand on démarre et valide des interviews
 - Dropdown menu manage list overflow disparait
 
 TO DO
