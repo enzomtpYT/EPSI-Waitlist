@@ -9,6 +9,7 @@
 <div class="listcontainer"></div>
 <script>
 let timers = {};
+let busycandidates = {};
 
 function loadData() {
     fetch('{{ url_for('api.get_list') }}', {
@@ -55,12 +56,14 @@ function buildList(info) {
     for (const [keyaa, candidate] of Object.entries(value)) {
       const managecandidate = document.createElement('div');
       managecandidate.classList.add('managecandidate');
+      managecandidate.classList.add(`cand-${candidate.id_candidate}`);
       if (keyaa == 0) {
         managecandidate.classList.add('current');
       }
       managecandidate.id = `interview-${candidate.id_interview}`;
       if (candidate.start_time_interview) {
         managecandidate.classList.add('undergoing')
+        busycandidates[candidate.id_candidate] = candidate.id_interview;
       }
 
       /* Dropdown */
@@ -150,8 +153,22 @@ function buildList(info) {
 	      },
     })
     list.appendChild(participant);
+    updateBusy();
   }
   return Promise.resolve();
+}
+
+function updateBusy(){
+  for (const [id_cand, id_inter] of Object.entries(busycandidates)) {
+    document.querySelectorAll(`.cand-${id_cand}`).forEach((cand) => {
+      if (cand.id.split('-')[1] != id_inter) {
+        startbtn = cand.querySelector('.candidatebtn');
+        startbtn.classList.add('disabled');
+        startbtn.disabled = true;
+      }
+    });
+  }
+
 }
 
 function startInterview(candidate, id_event, participant_name) {
@@ -161,6 +178,8 @@ function startInterview(candidate, id_event, participant_name) {
     startTime = new Date(Date.parse(candidate.start_time_interview));
   }
   startCountdown(candidate.id_interview, startTime);
+  busycandidates[candidate.id_candidate] = candidate.id_interview;
+  updateBusy();
 
   managecandidate = document.querySelector(`#interview-${candidate.id_interview}`)
   managecandidate.classList.add('undergoing');
