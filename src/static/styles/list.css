@@ -16,13 +16,10 @@
     flex-direction: column;
     margin: 0;
     border-left: 1px solid #e9ecef;
+    border-right: 1px solid #e9ecef;
     background-color: var(--alt2);
     min-width: fit-content;
-    flex-grow: 1;
-}
-
-.listcontainer > .column:first-child{
-    border: 0px;
+    flex: 1;
 }
 
 .candidates {
@@ -35,6 +32,7 @@
     color: var(--accent-color);
     max-height: 30vh;
     overflow-y: scroll;
+    flex-grow: 1;
 }
 
 .candidates > h4:first-of-type {
@@ -85,16 +83,19 @@
 
 .dropdown-content {
   display: none;
-  position: absolute;
+  position: fixed;
+  width: 8vw;
   background-color: #dc3545;
-  z-index: 1;
   border-radius: 0 0 10px 10px;
-  overflow: hidden;
+  z-index: 1;
 }
 
 .candidatebtn {
+    width: 8vw;
     transition: 0.1s;
-    min-width: fit-content;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .current .candidatebtn {
@@ -110,7 +111,7 @@
 }
 
 .dropdown-content .dropdown-item {
-  padding: 12px 16px;
+  padding: 6px 8px;
   display: block;
   background: none;
   min-width: fit-content;
@@ -121,7 +122,11 @@
     background-color: #dc3545;
 }
 
-.dropdown-content .dropdown-item:hover, .current.undergoing .candidatebtn:hover {
+.dropdown-content .dropdown-item:hover {
+  backdrop-filter: brightness(80%);
+}
+
+.current.undergoing .candidatebtn:hover {
   background-color: #c82333;
 }
 
