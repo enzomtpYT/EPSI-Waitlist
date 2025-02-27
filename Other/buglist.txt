@@ -1,7 +1,9 @@
 TO fix
 - Cache instable a vérif
 - Affichage projecteur
+-pop up d'erreur alors que pas d'erreur quand on démarre et valide des interviews
 
 TO DO
 - ajouter permission pour les roles admin et superadmin de voir et accéder aux fonctionnalités de gestion de BDD
 - Synchronisation inter-écran
+- impossibilité de démarrer une interview avec un candidat s'il a déjà une interview en cours
