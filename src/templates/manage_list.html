@@ -153,9 +153,21 @@ function buildList(info) {
 	      },
     })
     list.appendChild(participant);
-    updateBusy();
+    EditDisableds();
   }
   return Promise.resolve();
+}
+
+function EditDisableds(){
+  document.querySelectorAll('.candidatebtn').forEach((btn) => {
+    btn.classList.add('disabled');
+    btn.disabled = true;
+  });
+  document.querySelectorAll('.current .candidatebtn').forEach((btn) => {
+    btn.classList.remove('disabled');
+    btn.disabled = false;
+  });
+  updateBusy();
 }
 
 function updateBusy(){
@@ -187,7 +199,7 @@ function startInterview(candidate, id_event, participant_name) {
   }
   startCountdown(candidate.id_interview, startTime);
   busycandidates[candidate.id_candidate] = candidate.id_interview;
-  updateBusy();
+  EditDisableds();
 
   managecandidate = document.querySelector(`#interview-${candidate.id_interview}`)
   managecandidate.classList.add('undergoing');
@@ -255,6 +267,7 @@ function CandDelAllInterEvent(id_candidate, id_event) {
         cand.firstChild.classList.add('current');
       }
     });
+    EditDisableds();
     popup('success', 'Entretiens supprimés');
   }).catch(error => {
     console.error('Error:', error);
@@ -283,6 +296,7 @@ function deleteInterview(id_interview, el) {
     if (parent.children.length > 0) {
       parent.firstChild.classList.add('current');
     }
+    EditDisableds();
     popup('success', 'Entretien supprimé');
   }).catch(error => {
     console.error('Error:', error);
@@ -323,6 +337,7 @@ function NextCandidate(event, id_event, participant_name) {
     const newCurrent = current.parentElement.children[1];
     newCurrent.classList.add('current');
     newCurrent.parentNode.prepend(newCurrent);
+    EditDisableds();
   })
   .catch(error => {
     popup('danger', 'Une erreur est survenue lors de la récupération des données');
@@ -363,6 +378,7 @@ function cancelInterview(candidate, id_event, participant_name) {
     nextcancelbtn.classList.remove('cancelbtn');
     nextcancelbtn.onclick = (event) => NextCandidate(event, id_event, participant_name);
     removeBusy(candidate.id_candidate);
+    EditDisableds();
   })
 }
 
@@ -391,6 +407,7 @@ function EndInterview(id_interview, participant_name, id_event, candidate) {
       participantcolumn.firstChild.classList.add('current');
     }
     removeBusy(candidate.id_candidate);
+    EditDisableds();
   })
   .catch(error => {
     popup('danger', 'Une erreur est survenue lors de la récupération des données');
