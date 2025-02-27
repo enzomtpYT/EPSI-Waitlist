@@ -2,9 +2,8 @@ TO fix
 - Cache instable a vérif
 - Affichage projecteur
 -pop up d'erreur alors que pas d'erreur quand on démarre et valide des interviews
--page gérer les participants : tag participant est buggé
 - page archive bdd : affiche parfois un message d'erreur "aucun entretien trouvé" et parfois pas, remplacer le message par un pop up au lieu d'ouvrir la page
-- on peut démarrer des entretiens avec des candidats qui ne sont pas en haut de la liste
+- Dropdown menu manage list overflow disparait
 
 TO DO
 - ajouter permission pour les roles admin et superadmin de voir et accéder aux fonctionnalités de gestion de BDD

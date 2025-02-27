@@ -88,7 +88,7 @@
         <div class="tag-section">
             <h2>Filtrer par tags</h2>
             <div class="tag-selector">
-                <div class="tagfilter selectag" id="attend">
+                <div class="tagfilter" id="attend">
                     <i class="fa-regular fa-tag"></i>
                     <p>Participants</p>
                 </div>
@@ -351,7 +351,7 @@ function buildManagePart(datas) {
     let tagSelector = document.querySelector(".tag-selector");
     let intervList = document.querySelector(".interves tbody");
     let candList = document.querySelector(".cand tbody");
-    tagSelector.innerHTML = `<div class="tagfilter selectag" id="attend"><i class="fa-regular fa-tag"></i><p>Participants</p></div>`;
+    tagSelector.innerHTML = `<div class="tagfilter" id="attend"><i class="fa-regular fa-tag"></i><p>Participants</p></div>`;
     intervList.innerHTML = "";
     candList.innerHTML = "";
 
@@ -429,6 +429,7 @@ function buildManagePart(datas) {
     title.textContent = `Gérer les participants pour l'événement: ${datas.event.name_event}`;
     document.querySelector('.managecontent').style.display = 'flex';
     document.querySelector('.tableContent').style.display = 'none';
+    document.querySelector('#attend').click();
 }
 
 function toggletag(tag) {
