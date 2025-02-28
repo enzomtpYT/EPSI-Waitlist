@@ -2,6 +2,22 @@ TO fix
 - Cache instable a vérif
 - Affichage projecteur
 - pop up d'erreur alors que pas d'erreur quand on démarre et valide des interviews
+-fix couleur pop up erreur
+- adresse email invalide si lettre en majuscule dedans
+
+erreur quand on ouvre la liste d'attente :
+
+"
+Exception has occurred: KeyError
+'CGI'
+  File "C:\Users\charl\Code_Workplace\EPSI\2e_annee\Stage\Waitlist\src\lib\api.py", line 398, in get_list
+    for cached_candidate in ccached["interviews"][participant['name_participant']]:
+                            ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\charl\Code_Workplace\EPSI\2e_annee\Stage\Waitlist\src\lib\api.py", line 121, in updatecache_event
+    list, error = get_list(id, forced=True)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'CGI'
+"
 
 TO DO
 - ajouter permission pour les roles admin et superadmin de voir et accéder aux fonctionnalités de gestion de BDD

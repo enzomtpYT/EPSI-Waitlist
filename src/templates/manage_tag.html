@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}Admin - Gérer Tags{% endblock %}
+{% block title %}Admin - Gérer Étiquettes{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='styles/manage_tag.css') }}">
-<h1 class="title">Gérer les tags</h1>
+<h1 class="title">Gérer les étiquettes</h1>
 
 <div class="admin-section">
-    <h2>Liste des tags</h2>
+    <h2>Liste des étiquettes</h2>
     {% if tags %}
     <div class="taggrid">
         {% for tag in tags %}
