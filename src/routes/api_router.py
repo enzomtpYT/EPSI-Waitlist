@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request, session
 from lib import api, database
+from sock import app
 
 api_bp = Blueprint('api', __name__)
 
@@ -175,7 +176,7 @@ def generate_pdf_event():
                 return jsonify({"error": error}), 400
             return pdf
         except Exception as e:
-            print(f"Erreur dans generate_pdf_event: {e}")
+            app.logger.error(f"Erreur dans generate_pdf_event: {e}")
             return None
 
 @api_bp.route("/api/get_candidates", methods=['GET'])

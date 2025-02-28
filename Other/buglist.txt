@@ -1,4 +1,0 @@
-TO fix
-
-TO DO
-- ajouter permission pour les roles admin et superadmin de voir et accéder aux fonctionnalités de gestion de BDD

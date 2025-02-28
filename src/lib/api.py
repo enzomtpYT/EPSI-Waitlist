@@ -3,7 +3,7 @@ from flask import jsonify, make_response
 import datetime, random, threading
 from collections.abc import MutableMapping
 from fpdf import FPDF
-from sock import socket
+from sock import socket, app
 
 class CacheManager(MutableMapping):
     def __init__(self):
@@ -122,7 +122,7 @@ def updatecache_event(id):
     list, error = get_list(id, forced=True)
     if not error:
         if list != cached:
-            print(f"Cache updated for event {id}")
+            app.logger.info(f"Cache updated for event {id}")
             socket.emit(f'update{id}', list)
             cache["events"][str(id)] = list
 
@@ -373,7 +373,6 @@ def move_interview(data):
             interviews.insert(new_index, interviews.pop(i))
             break
     for i, interview in enumerate(interviews):
-        print(f"Setting position {i} for interview {interview['id_interview']}")
         interview['position'] = i
     socket.emit(f'update{event_id}', event)
     threading.Thread(target=updatecache_all, args=(event_id, "events")).start()
@@ -430,7 +429,7 @@ def get_list(id, forced=False):
                             if len(interviews[part2]) > 1:
                                 id2 = interviews[part2][0]["id_candidate"]
                                 if id2 == id1:
-                                    print('Detected same candidate in two interviews')
+                                    app.logger.info('Detected same candidate in two interviews')
                                     r = 1
                                     if interviews[part1][0]["start_time_interview"] is None:
                                         if n > 0:

@@ -62,7 +62,6 @@ def inject_routes():
 
 @socket.on('message')
 def handleMessage(msg):
-    print('Message: ' + msg)
     time.sleep(5)
     send(msg, broadcast=True)
 

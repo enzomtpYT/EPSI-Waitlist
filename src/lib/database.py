@@ -2,6 +2,7 @@ import psycopg2, datetime
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 import os
+from sock import app
 
 def get_db_connection():
     # Load environment variables from .env file
@@ -19,7 +20,7 @@ def get_db_connection():
         cursor = conn.cursor(cursor_factory=RealDictCursor)
         return conn, cursor
     except psycopg2.Error as e:
-        print(f"Erreur base de données: {e}")
+        app.logger.error(f"Erreur base de données: {e}")
         return None, None
 
 today = datetime.date.today()
@@ -193,7 +194,7 @@ def wipe_candidates():
         conn.commit()
         return None
     except psycopg2.Error as e:
-        print(f"Erreur lors de la suppression des candidats: {e}")
+        app.logger.error(f"Erreur lors de la suppression des candidats: {e}")
         return "Erreur lors de la suppression des candidats"
     finally:
         conn.close()
@@ -254,7 +255,7 @@ def import_csv(jsoncsv):
         conn.commit()
         return None
     except psycopg2.Error as e:
-        print(f"Erreur lors de l'importation des données CSV: {e}")
+        app.logger.error(f"Erreur lors de l'importation des données CSV: {e}")
         return "Erreur lors de l'importation des données CSV"
     finally:
         conn.close()
@@ -309,7 +310,7 @@ def get_archived_schemas():
             })
         return result, None
     except psycopg2.Error as e:
-        print(f"Erreur lors de la récupération des schémas archivés: {e}")
+        app.logger.error(f"Erreur lors de la récupération des schémas archivés: {e}")
         return None, "Erreur lors de la récupération des schémas archivés"
     finally:
         conn.close()
@@ -341,7 +342,7 @@ def create_event(name, date, has_timeslots=False, start_time_event=None, end_tim
                 cursor.execute('INSERT INTO Event_tag (id_event, id_tag) VALUES (%s, %s)', (event_id, tag['id_tag']))
         return event_id, None
     except psycopg2.Error as e:
-        print(f"Erreur lors de la création de l'événement: {e}")
+        app.logger.error(f"Erreur lors de la création de l'événement: {e}")
         return None, "Erreur lors de la création de l'événement"
     finally:
         conn.close()
@@ -385,7 +386,7 @@ def get_all_events():
         else:
             return [], None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -432,7 +433,7 @@ def get_event(event_id):
         event['interviews'] = interviews
         return event, None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -458,7 +459,7 @@ def edit_event(name, date, id_event, has_timeslots=False, start_time_event=None,
     try:
         cursor.execute('UPDATE Event SET name_event = %s, date_event = %s, has_timeslots = %s, start_time_event = %s, end_time_event = %s WHERE id_event = %s', (name, date, has_timeslots, start_time_event, end_time_event, id_event))
     except psycopg2.Error as e:
-        print(f"Erreur lors de la mise à jour de l'événnement: {e}")
+        app.logger.error(f"Erreur lors de la mise à jour de l'événnement: {e}")
         return "Erreur lors de la mise à jour de l'événnement"
     finally:
         conn.close()
@@ -488,7 +489,7 @@ def add_timeslot_to_event(id_event, start_timeslot, end_timeslot, nbr_spots):
         conn.commit()
         return None
     except psycopg2.Error as e:
-        print(f"Erreur lors de l'ajout des créneaux horaires: {e}")
+        app.logger.error(f"Erreur lors de l'ajout des créneaux horaires: {e}")
         return "Erreur lors de l'ajout des créneaux horaires"
     finally:
         conn.close()
@@ -516,7 +517,7 @@ def edit_timeslot(start_timeslot, end_timeslot, nbr_spots, id_timeslot):
         conn.commit()
         return None
     except psycopg2.Error as e:
-        print(f"Erreur lors de l'ajout des créneaux horaires: {e}")
+        app.logger.error(f"Erreur lors de l'ajout des créneaux horaires: {e}")
         return "Erreur lors de l'ajout des créneaux horaires"
     finally:
         conn.close()
@@ -539,7 +540,7 @@ def delete_timeslot(id_timeslot):
         conn.commit()
         return None
     except psycopg2.Error as e:
-        print(f"Erreur lors de la suppression de l'événement: {e}")
+        app.logger.error(f"Erreur lors de la suppression de l'événement: {e}")
         return "Erreur lors de la suppression de l'événement"
     finally:
         conn.close()
@@ -560,7 +561,7 @@ def delete_event(id_event):
     try:
         cursor.execute("DELETE FROM Event WHERE id_event = %s", (id_event,))
     except psycopg2.Error as e:
-        print(f"Erreur lors de la suppression de l'événement: {e}")
+        app.logger.error(f"Erreur lors de la suppression de l'événement: {e}")
         return "Erreur lors de la suppression de l'événement"
     finally:
         conn.close()
@@ -584,7 +585,7 @@ def get_today_events():
         else:
             return None, "Pas d'événement aujourd'hui"
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -612,7 +613,7 @@ def get_event_candidates(id_event):
         candidates = cursor.fetchall()
         return candidates, None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -640,7 +641,7 @@ def get_event_participants(id_event):
         participants = cursor.fetchall()
         return participants, None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -669,7 +670,7 @@ def upsert_event_attends(id_event, id_candidate, priority):
         conn.commit()
         return None
     except psycopg2.Error as e:
-        print(f"Erreur lors de l'insertion ou de la mise à jour du candidat: {e}")
+        app.logger.error(f"Erreur lors de l'insertion ou de la mise à jour du candidat: {e}")
         return "Erreur lors de l'insertion ou de la mise à jour du candidat"
     finally:
         conn.close()
@@ -697,7 +698,7 @@ def upsert_event_participates(id_event, id_participant):
         conn.commit()
         return None
     except psycopg2.Error as e:
-        print(f"Erreur lors de l'insertion ou de la mise à jour du participant: {e}")
+        app.logger.error(f"Erreur lors de l'insertion ou de la mise à jour du participant: {e}")
         return "Erreur lors de l'insertion ou de la mise à jour du participant"
     finally:
         conn.close()
@@ -774,7 +775,7 @@ def get_event_details(id_event):
             "tags": all_tags
         }, None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -813,7 +814,7 @@ def get_event_interview_candidate(todayevent, id_participant, happened=None):
         candid = cursor.fetchall()
         return candid, None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -852,7 +853,7 @@ def create_candidate(lastname, name, email):
         conn.commit()
         return candidate_id, user_id, None
     except psycopg2.Error as e:
-        print(f"Erreur lors de la création du candidat: {e}")
+        app.logger.error(f"Erreur lors de la création du candidat: {e}")
         return None, "Erreur lors de la création du candidat"
     finally:
         # Fermes la connexion à la base de données
@@ -882,7 +883,7 @@ def get_all_candidates():
             return [], None
 
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
 
     finally:
@@ -914,7 +915,7 @@ def get_candidate(candidate_id):
         return candidate, None
     except psycopg2.Error as e:
         # Gère les erreurs de requête SQL
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         # Ferme la connexion à la base de données
@@ -943,7 +944,7 @@ def edit_candidate(lastname, name, email, id_candidate):
         # Sauvegarde les modifications
         conn.commit()
     except psycopg2.Error as e:
-        print(f"Erreur lors de la mise à jour du candidat: {e}")
+        app.logger.error(f"Erreur lors de la mise à jour du candidat: {e}")
         return "Erreur lors de la mise à jour du candidat"
     finally:
         # Fermes la connexion à la base de données
@@ -971,7 +972,7 @@ def delete_candidate(id_candidate):
         conn.commit()
     except psycopg2.Error as e:
         # Gère les erreurs de requête SQL
-        print(f"Erreur lors de la suppression du candidat: {e}")
+        app.logger.error(f"Erreur lors de la suppression du candidat: {e}")
         return "Erreur lors de la suppression du candidat"
     finally:
         # Ferme la connexion à la base de données
@@ -1004,7 +1005,7 @@ def get_candidate_events(id_candidate):
 
         return events, None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         # Ferme la connexion à la base de données
@@ -1038,7 +1039,7 @@ def get_candidate_interviews(id_candidate):
 
         return interviews, None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         # Ferme la connexion à la base de données
@@ -1062,7 +1063,7 @@ def get_last_added_candidate():
         return candidate, None
     except psycopg2.Error as e:
         # Gère les erreurs de requête SQL
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         # Ferme la connexion à la base de données
@@ -1096,7 +1097,7 @@ def remove_candidate_from_all_interviews_for_event(id_event, id_candidate):
         return interview_ids, None
     except psycopg2.Error as e:
         # Gère les erreurs de requête SQL
-        print(f"Erreur lors de la suppression du candidat: {e}")
+        app.logger.error(f"Erreur lors de la suppression du candidat: {e}")
         return None, "Erreur lors de la suppression du candidat"
     finally:
         # Ferme la connexion à la base de données
@@ -1124,7 +1125,7 @@ def delete_candidate_from_event(id_event, id_candidate):
         conn.commit()
     except psycopg2.Error as e:
         # Gère les erreurs de requête SQL
-        print(f"Erreur lors de la suppression du candidat: {e}")
+        app.logger.error(f"Erreur lors de la suppression du candidat: {e}")
         return "Erreur lors de la suppression du candidat"
     finally:
         # Ferme la connexion à la base de données
@@ -1164,7 +1165,7 @@ def create_participant(name, email):
         conn.commit()
         return participant_id, user_id, None
     except psycopg2.Error as e:
-        print(f"Erreur lors de la création de l'intervenant: {e}")
+        app.logger.error(f"Erreur lors de la création de l'intervenant: {e}")
         return None, None, "Erreur lors de la création de l'intervenant"
     finally:
         # Fermes la connexion à la base de données
@@ -1188,7 +1189,7 @@ def get_all_participants():
         else:
             return [], None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -1216,7 +1217,7 @@ def get_participant(participant_id):
         participant = cursor.fetchone()
         return participant, None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -1240,7 +1241,7 @@ def edit_participant(name, email, id_participant):
         cursor.execute('UPDATE Participant SET name_participant = %s, email_participant = %s WHERE id_participant = %s', (name, email, id_participant))
         conn.commit()
     except psycopg2.Error as e:
-        print(f"Erreur lors de la mise à jour de l'intervenant: {e}")
+        app.logger.error(f"Erreur lors de la mise à jour de l'intervenant: {e}")
         return "Erreur lors de la mise à jour de l'intervenant"
     finally:
         conn.close()
@@ -1264,7 +1265,7 @@ def delete_participant(id_participant):
         cursor.execute('DELETE FROM "User" WHERE id_user = (SELECT id_user FROM Participant WHERE id_participant = %s)', (id_participant,))
         conn.commit()
     except psycopg2.Error as e:
-        print(f"Erreur lors de la suppression de l'intervenant: {e}")
+        app.logger.error(f"Erreur lors de la suppression de l'intervenant: {e}")
         return "Erreur lors de la suppression de l'intervenant"
     finally:
         conn.close()
@@ -1293,7 +1294,7 @@ def get_participant_events(id_participant):
         events = cursor.fetchall()
         return events, None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -1323,7 +1324,7 @@ def get_participant_interviews(id_participant):
         interviews = cursor.fetchall()
         return interviews, None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -1379,7 +1380,7 @@ def get_user_past_interviews(session_token):
         else:
             return None, "Utilisateur non trouvé"
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -1407,7 +1408,7 @@ def create_interview(id_event, id_participant, id_candidate):
         ''', (id_event, id_participant, id_candidate))
         conn.commit()
     except psycopg2.Error as e:
-        print(f"Erreur lors de la création de l'interview: {e}")
+        app.logger.error(f"Erreur lors de la création de l'interview: {e}")
         return "Erreur lors de la création de l'interview"
     finally:
         conn.close()
@@ -1431,7 +1432,7 @@ def get_interview(id_interview):
         interview = cursor.fetchone()
         return interview, None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -1461,7 +1462,7 @@ def editstart_interview(id_interview, start_time):
         updated_ids = cursor.fetchone()
         return updated_ids['id_interview'], updated_ids['id_event'], None
     except psycopg2.Error as e:
-        print(f"Erreur lors du démarrage de l'entretien: {e}")
+        app.logger.error(f"Erreur lors du démarrage de l'entretien: {e}")
         return None, None, "Erreur lors du démarrage de l'entretien"
     finally:
         conn.close()
@@ -1491,7 +1492,7 @@ def end_interview(interview_id, status):
         conn.commit()
         return event_id, None
     except psycopg2.Error as e:
-        print(f"Erreur lors de la fin de l'entretien: {e}")
+        app.logger.error(f"Erreur lors de la fin de l'entretien: {e}")
         return None, "Erreur lors de la fin de l'entretien"
     finally:
         conn.close()
@@ -1513,7 +1514,7 @@ def delete_interview(id_interview):
         cursor.execute("DELETE FROM Interview WHERE id_interview = %s", (id_interview,))
         conn.commit()
     except psycopg2.Error as e:
-        print(f"Erreur lors de la suppression de l'interview: {e}")
+        app.logger.error(f"Erreur lors de la suppression de l'interview: {e}")
         return "Erreur lors de la suppression de l'interview"
     finally:
         conn.close()
@@ -1539,7 +1540,7 @@ def create_tag(name):
         conn.commit()
         return None
     except psycopg2.Error as e:
-        print(f"Erreur lors de la création du tag: {e}")
+        app.logger.error(f"Erreur lors de la création du tag: {e}")
         return "Erreur lors de la création du tag"
     finally:
         conn.close()
@@ -1562,7 +1563,7 @@ def get_all_tags():
         else:
             return [], None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return [], "Erreur requête base de données"
     finally:
         conn.close()
@@ -1585,7 +1586,7 @@ def get_tag(tag_id):
         tag = cursor.fetchone()
         return tag, None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -1608,7 +1609,7 @@ def edit_tag(name, id_tag):
         cursor.execute('UPDATE Tag SET name_tag = %s WHERE id_tag = %s', (name, id_tag))
         conn.commit()
     except psycopg2.Error as e:
-        print(f"Erreur lors de la mise à jour du tag: {e}")
+        app.logger.error(f"Erreur lors de la mise à jour du tag: {e}")
         return "Erreur lors de la mise à jour du tag"
     finally:
         conn.close()
@@ -1631,7 +1632,7 @@ def delete_tag(id_tag):
         cursor.execute("DELETE FROM Tag WHERE id_tag = %s", (id_tag,))
         conn.commit()
     except psycopg2.Error as e:
-        print(f"Erreur lors de la suppression du candidat: {e}")
+        app.logger.error(f"Erreur lors de la suppression du candidat: {e}")
         return "Erreur lors de la suppression du candidat"
     finally:
         conn.close()
@@ -1658,7 +1659,7 @@ def get_candidate_tags(id_candidate):
         tags = cursor.fetchall()
         return tags, None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -1680,7 +1681,7 @@ def add_tag_to_candidate(id_candidate, id_tag):
         conn.commit()
         return None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return "Erreur requête base de données"
     finally:
         conn.close()
@@ -1702,7 +1703,7 @@ def remove_tag_from_candidate(id_candidate, id_tag):
         conn.commit()
         return None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return "Erreur requête base de données"
     finally:
         conn.close()
@@ -1728,7 +1729,7 @@ def get_participant_tags(id_participant):
         tags = cursor.fetchall()
         return tags, None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -1750,7 +1751,7 @@ def add_tag_to_participant(id_participant, id_tag):
         conn.commit()
         return None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return "Erreur requête base de données"
     finally:
         conn.close()
@@ -1772,7 +1773,7 @@ def remove_tag_from_participant(id_participant, id_tag):
         conn.commit()
         return None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return "Erreur requête base de données"
     finally:
         conn.close()
@@ -1798,7 +1799,7 @@ def get_event_tags(id_event):
         tags = cursor.fetchall()
         return tags, None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -1820,7 +1821,7 @@ def add_tag_to_event(id_event, id_tag):
         conn.commit()
         return None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return "Erreur requête base de données"
     finally:
         conn.close()
@@ -1842,7 +1843,7 @@ def remove_tag_from_event(id_event, id_tag):
         conn.commit()
         return None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return "Erreur requête base de données"
     finally:
         conn.close()
@@ -1867,7 +1868,7 @@ def delete_attends(id_candidate, id_event):
         cursor.execute("DELETE FROM Attends WHERE id_candidate = %s AND id_event = %s", (id_candidate, id_event))
         conn.commit()
     except psycopg2.Error as e:
-        print(f"Erreur lors de la suppression de la participation: {e}")
+        app.logger.error(f"Erreur lors de la suppression de la participation: {e}")
         return "Erreur lors de la suppression de la participation"
     finally:
         conn.close()
@@ -1891,7 +1892,7 @@ def delete_participates(id_event, id_participant):
         cursor.execute("DELETE FROM Participates WHERE id_participant = %s AND id_event = %s", (id_participant, id_event))
         conn.commit()
     except psycopg2.Error as e:
-        print(f"Erreur lors de la suppression de la participation: {e}")
+        app.logger.error(f"Erreur lors de la suppression de la participation: {e}")
         return "Erreur lors de la suppression de la participation"
     finally:
         conn.close()
@@ -1917,7 +1918,7 @@ def auth_get_session(username):
         session = cursor.fetchone()
         return session['session_token'], None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -1940,7 +1941,7 @@ def auth_get_hashedpassword(username):
         password_user = cursor.fetchone()
         return password_user, None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -1965,7 +1966,7 @@ def update_user_password(username, password, session_token):
         conn.commit()
         return None
     except psycopg2.Error as e:
-        print(f"Erreur lors de la mise à jour du mot de passe de l'utilisateur: {e}")
+        app.logger.error(f"Erreur lors de la mise à jour du mot de passe de l'utilisateur: {e}")
         return "Erreur lors de la mise à jour du mot de passe de l'utilisateur"
     finally:
         conn.close()
@@ -1990,7 +1991,7 @@ def auth_update_password(password, session_token, id_user):
         conn.commit()
         return None
     except psycopg2.Error as e:
-        print(f"Erreur lors de la mise à jour du mot de passe de l'utilisateur: {e}")
+        app.logger.error(f"Erreur lors de la mise à jour du mot de passe de l'utilisateur: {e}")
         return "Erreur lors de la mise à jour du mot de passe de l'utilisateur"
     finally:
         conn.close()
@@ -2014,7 +2015,7 @@ def auth_update_username(username, id_user):
         conn.commit()
         return None
     except psycopg2.Error as e:
-        print(f"Erreur lors de la mise à jour du nom d'utilisateur de l'utilisateur: {e}")
+        app.logger.error(f"Erreur lors de la mise à jour du nom d'utilisateur de l'utilisateur: {e}")
         return "Erreur lors de la mise à jour du nom d'utilisateur de l'utilisateur"
     finally:
         conn.close()
@@ -2046,7 +2047,7 @@ def get_user_permissions(user_id):
         permissions = cursor.fetchall()
         return [permission['name_permission'] for permission in permissions], None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -2078,7 +2079,7 @@ def get_user_role_with_token(session_token):
         else:
             return None, "Rôle non trouvé"
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -2111,7 +2112,7 @@ def auth_get_perms_from_session(session_token):
         permissions = cursor.fetchall()
         return [permission['name_permission'] for permission in permissions], None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -2138,7 +2139,7 @@ def auth_is_superuser(session_token):
         is_superuser = cursor.fetchone()
         return is_superuser is not None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return False
     finally:
         conn.close()
@@ -2184,7 +2185,7 @@ def auth_get_user_type(session_token):
             return "employee"
         return None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None
     finally:
         conn.close()
@@ -2232,7 +2233,7 @@ def auth_get_type_id(session_token):
             return user_type['id_employee'], None
         return None, "Type utilisateur non trouvé"
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -2249,7 +2250,7 @@ def get_user_role(user_id):
     """
     conn, cursor = get_db_connection()
     if conn is None:
-        print("Erreur base de données")
+        app.logger.error("Erreur base de données")
         return None
     try:
         cursor.execute('''
@@ -2264,7 +2265,7 @@ def get_user_role(user_id):
         else:
             return None, "Rôle non trouvé"
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None
     finally:
         conn.close()
@@ -2316,7 +2317,7 @@ def get_profile_info(session_token):
             return employee, None
         return None, "Profil non trouvé"
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -2357,7 +2358,7 @@ def update_profile_info(oldusername, newusername, email):
         conn.commit()
         return None
     except psycopg2.Error as e:
-        print(f"Erreur lors de la mise à jour des informations de profil: {e}")
+        app.logger.error(f"Erreur lors de la mise à jour des informations de profil: {e}")
         return "Erreur lors de la mise à jour des informations de profil"
     finally:
         conn.close()
@@ -2380,7 +2381,7 @@ def get_user(user_id):
         user = cursor.fetchone()
         return user, None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -2425,7 +2426,7 @@ def create_employee(lastname, name, email, role):
         conn.commit()
         return employee_id, user_id, None
     except psycopg2.Error as e:
-        print(f"Erreur lors de la création de l'employé: {e}")
+        app.logger.error(f"Erreur lors de la création de l'employé: {e}")
         return None, None, "Erreur lors de la création de l'employé"
     finally:
         # Ferme la connexion à la base de données
@@ -2458,7 +2459,7 @@ def get_all_employees():
             return [], None
 
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
 
     finally:
@@ -2491,7 +2492,7 @@ def get_employee(employee_id):
         return employee, None
     except psycopg2.Error as e:
         # Gère les erreurs de requête SQL
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         # Ferme la connexion à la base de données
@@ -2539,7 +2540,7 @@ def edit_employee(lastname, name, email, role, id_employee):
         conn.commit()
         return None
     except psycopg2.Error as e:
-        print(f"Erreur lors de la mise à jour de l'employé: {e}")
+        app.logger.error(f"Erreur lors de la mise à jour de l'employé: {e}")
         return "Erreur lors de la mise à jour de l'employé"
     finally:
         conn.close()
@@ -2565,7 +2566,7 @@ def delete_employee(id_employee):
         conn.commit()
     except psycopg2.Error as e:
         # Gère les erreurs de requête SQL
-        print(f"Erreur lors de la suppression de l'employé: {e}")
+        app.logger.error(f"Erreur lors de la suppression de l'employé: {e}")
         return "Erreur lors de la suppression de l'employé"
     finally:
         # Ferme la connexion à la base de données
@@ -2597,7 +2598,7 @@ def get_employee_interviews(id_employee):
         interviews = cursor.fetchall()
         return interviews, None
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
     finally:
         conn.close()
@@ -2629,7 +2630,7 @@ def update_feedback(id_interview, feedback, type):
             return "Type de feedback incorrect"
         conn.commit()
     except psycopg2.Error as e:
-        print(f"Erreur lors de la mise à jour du feedback: {e}")
+        app.logger.error(f"Erreur lors de la mise à jour du feedback: {e}")
         return "Erreur lors de la mise à jour du feedback"
     finally:
         conn.close()
@@ -2745,5 +2746,5 @@ def get_self_dashboard(session_token):
             return {"type": "participant", "name":participant_info['name_participant'], "mail": participant_info['email_participant'], "username": participant_info['username'], "tags": tags, "events": events, "id_type": participant_info['id_participant'], "id_user": participant_info['id_user']}, None
         return None, "Utilisateur non trouvé"
     except psycopg2.Error as e:
-        print(f"Erreur requête base de données: {e}")
+        app.logger.error(f"Erreur requête base de données: {e}")
         return None, "Erreur requête base de données"
