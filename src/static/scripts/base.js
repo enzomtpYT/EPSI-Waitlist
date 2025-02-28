@@ -57,6 +57,24 @@ function afterLoad() {
     /* End Resizer */
 }
 
+function SwitchTheme() {
+    document.querySelector("body").classList.toggle("DT");
+    document.querySelector("body").classList.toggle("WT");
+    localStorage.setItem("theme", document.querySelector("body").classList.contains("DT") ? "DT" : "WT");
+    document.querySelector('.background').src = document.querySelector("body").classList.contains("DT") ? "https://files.catbox.moe/foa83u.webp" : "";
+    document.querySelector('.ThemeSwitcher').innerHTML = document.querySelector("body").classList.contains("DT") ? `<i class="fa-regular fa-sun-bright"></i>` : `<i class="fa-regular fa-moon-stars"></i>`;
+}
+
+function InitTheme() {
+    if (localStorage.getItem("theme") == "DT") {
+        document.querySelector("body").classList.add("DT");
+    } else {
+        document.querySelector("body").classList.add("WT");
+    }
+    document.querySelector('.background').src = document.querySelector("body").classList.contains("DT") ? "https://files.catbox.moe/foa83u.webp" : "";
+    document.querySelector('.ThemeSwitcher').innerHTML = document.querySelector("body").classList.contains("DT") ? `<i class="fa-regular fa-sun-bright"></i>` : `<i class="fa-regular fa-moon-stars"></i>`;
+}
+
 updateLinks();
 observeMarkdownLinks();
-
+InitTheme();

@@ -18,12 +18,13 @@
             {% endif %}
         </ul>
         <ul class="navul">
+        <li class="navli"><a title="Switch Theme" onclick="SwitchTheme()" class="ThemeSwitcher"><i class="fa-regular fa-sun-bright"></i></a></li>
         {% if session.token %}
         <li class="navli"><a class="navbtn" href="{{ url_for('auth.logout') }}"><button class="authbtn">Se Déconnecter</button></a></li>
         {% else %}
         <li class="navli"><a class="navbtn" href="{{ url_for('auth.login') }}"><button class="authbtn">Se Connecter</button></a></li>
         {% endif %}
-    </ul>
+       </ul>
     </nav>
     <div class="vdivider"></div>
 {% endif %}

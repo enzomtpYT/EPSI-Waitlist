@@ -72,7 +72,8 @@
 }
 
 .current {
-    background-color: var(--alt1);
+    /* background-color: var(--alt1); */
+    background-color: var(--main-color);
 }
 
 .dropdown {
