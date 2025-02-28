@@ -323,7 +323,7 @@ function buildManagement(datas) {
 function validateForm() {
     const lastname = document.getElementById('employee_lastname').value;
     const name = document.getElementById('employee_name').value;
-    const email = document.getElementById('employee_email').value;
+    const email = document.getElementById('employee_email').value.toLowerCase();
     const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
 
     if (!lastname) {

@@ -408,7 +408,7 @@ function removeTag(tag, button) {
 function validateForm() {
     const lastname = document.getElementById('candidate_lastname').value;
     const name = document.getElementById('candidate_name').value;
-    const email = document.getElementById('candidate_email').value;
+    const email = document.getElementById('candidate_email').value.toLowerCase();
     const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
 
     if (!lastname) {

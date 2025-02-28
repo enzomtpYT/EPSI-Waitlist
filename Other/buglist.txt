@@ -1,6 +1,5 @@
 TO fix
 - fix couleur pop up erreur
-- adresse email invalide si lettre en majuscule dedans
 
 TO DO
 - ajouter permission pour les roles admin et superadmin de voir et accéder aux fonctionnalités de gestion de BDD
