@@ -32,7 +32,7 @@ else:
     async_mode = 'eventlet'
 
 
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode=async_mode, logger=True, engineio_logger=True)
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode=async_mode, logger=True, engineio_logger=True, ping_timeout=30, ping_interval=10)
 @socketio.on('connect')
 def test_connect():
     app.logger.info(f'Client connected {request.sid}')
