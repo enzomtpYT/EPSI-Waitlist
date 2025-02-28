@@ -26,7 +26,12 @@ app = Flask(__name__)
 dotenv.load_dotenv()
 app.secret_key = os.getenv('FLASK_KEY')
 Misaka(app, no_intra_emphasis=True)
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+if os.name == 'nt':
+    async_mode = 'threading'
+else:
+    async_mode = 'eventlet'
+
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode=async_mode, logger=True, engineio_logger=True)
 @socketio.on('connect')
 def test_connect():
     app.logger.info('Client connected')
