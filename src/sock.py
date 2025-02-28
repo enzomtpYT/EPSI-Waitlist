@@ -1,5 +1,5 @@
 from flask_socketio import SocketIO
-from flask import Flask
+from flask import Flask, request
 from flask_misaka import Misaka
 from flask_cors import CORS
 import dotenv, os
@@ -34,8 +34,8 @@ else:
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode=async_mode, logger=True, engineio_logger=True)
 @socketio.on('connect')
 def test_connect():
-    app.logger.info('Client connected')
+    app.logger.info(f'Client connected {request.sid}')
 @socketio.on('disconnect')
 def test_disconnect():
-    app.logger.info('Client disconnected')
+    app.logger.info(f'Client disconnected {request.sid}')
 CORS(app, resources={r"/*": {"origins": "*"}})
