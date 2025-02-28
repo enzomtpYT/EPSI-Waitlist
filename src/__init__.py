@@ -15,7 +15,7 @@ from routes.manage_tag import manage_tag_bp
 from routes.settings import settings_bp
 from routes.manage_database import manage_database_bp
 from routes.dashboard import dashboard_bp
-from sock import socket, app
+from sock import socketio, app
 import os
 
 # Register the blueprints
@@ -60,11 +60,11 @@ def inject_routes():
         username = userinfo['username']
     return dict(parameters=request.args.to_dict(), session=session, user_role=user_role, perms=permissions, username=username)
 
-@socket.on('message')
+@socketio.on('message')
 def handleMessage(msg):
     time.sleep(5)
     send(msg, broadcast=True)
 
 if __name__ == "__main__":
     debug_mode = os.getenv('FLASK_ENV') == 'development'
-    socket.run(app, host="0.0.0.0", port=os.getenv('DEV_SERVER_PORT', '8080'), debug=debug_mode)
+    socketio.run(app, host="0.0.0.0", port=os.getenv('DEV_SERVER_PORT', '8080'), debug=debug_mode)
