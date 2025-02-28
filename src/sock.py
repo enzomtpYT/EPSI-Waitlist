@@ -29,7 +29,7 @@ Misaka(app, no_intra_emphasis=True)
 if os.name == 'nt':
     async_mode = 'threading'
 else:
-    async_mode = 'eventlet'
+    async_mode = 'gevent'
     import eventlet
     eventlet.monkey_patch()
 
