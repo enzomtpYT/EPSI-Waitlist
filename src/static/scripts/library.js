@@ -1,5 +1,7 @@
 import('https://cdn.jsdelivr.net/npm/marked/marked.min.js')
- 
+
+const socket = io();
+
 function mark(element, text) {
     let dirty = marked.parse(text);
     let clean = DOMPurify.sanitize(dirty, {FORBID_TAGS: ['style']});

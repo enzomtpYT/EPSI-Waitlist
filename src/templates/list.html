@@ -9,6 +9,17 @@
 <script>
 let timers = {};
 
+// After DOM Load
+document.addEventListener('DOMContentLoaded', function() {
+  socket.on("update{{ id }}", (msg) => {
+    buildList(msg).then(() => {
+      document.querySelectorAll('.undergoing .candidatebtn').forEach((btn) => {
+        btn.click();
+      });
+    });
+  });
+});
+
 function loadData() {
     fetch('{{ url_for('api.get_list') }}', {
         method: 'POST',
