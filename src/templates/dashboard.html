@@ -267,7 +267,10 @@ function buildPage(datas) {
                 document.querySelector('.today button').onclick = function() {
                     loadList(event.id_event);
                 };
-            }            
+            }
+            socket.on(`update${event.id_event}`, (msg) => {
+              buildTodayList(msg);
+            });      
         }
     }
     document.querySelector('.upcoming').style.display = 'flex';
