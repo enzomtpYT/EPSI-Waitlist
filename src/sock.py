@@ -29,7 +29,7 @@ Misaka(app, no_intra_emphasis=True)
 if os.name == 'nt':
     async_mode = 'threading'
 else:
-    async_mode = 'threading'
+    async_mode = 'eventlet'
 
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode=async_mode, logger=True, engineio_logger=True)
 @socketio.on('connect')
