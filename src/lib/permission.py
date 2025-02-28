@@ -48,13 +48,14 @@ def checkroutes(session):
                 app.logger.info('User does not have permission')
                 return jsonify({"error": "Permission manquantes."}), 403
             app.logger.info('User has permission')
-        
+
         elif request.path.startswith(route):
             app.logger.info(f'Checking if user has permission {perm} for route {route}')
             if 'token' not in session:
                 app.logger.info('No token in session')
                 return redirect(url_for('auth.login'))
             if not auth.check_permission(session['token'], perm):
+                app.logger.info('User does not have permission')
                 flash("Permission manquantes pour accèder à cet page.", "danger")
                 return redirect('/')
             app.logger.info('User has permission')

@@ -1,5 +1,6 @@
 from lib import database
 import bcrypt, hashlib, random, requests, os
+from sock import app
 
 def verify_login(username, password):
     dbhashed_password, error = database.auth_get_hashedpassword(username)
@@ -53,6 +54,7 @@ def check_permission(session, permission_name):
     if database.auth_is_superuser(session):
         return True
     perms, error = database.auth_get_perms_from_session(session)
+    app.logger.info(perms)
     for perm in perms:
         if perm == '*':
             return True
