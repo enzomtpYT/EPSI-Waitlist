@@ -1,4 +1,4 @@
-from flask import flash, redirect, request, url_for
+from flask import flash, jsonify, redirect, request, url_for
 from lib import auth
 
 checks = {
@@ -38,12 +38,22 @@ checks = {
 
 def checkroutes(session):
     for route, perm in checks.items():
-        if request.path.startswith(route):
+        if route.startswith('/api') and request.path.startswith(route):
+            print(f'Checking if user has permission {perm} for route {route}')
+            if 'token' not in session:
+                print('No token in session')
+                return jsonify({"error": "Token manquant"}), 400
+            if not auth.check_permission(session['token'], perm):
+                print('User does not have permission')
+                return jsonify({"error": "Permission manquantes."}), 403
+            print('User has permission')
+        
+        elif request.path.startswith(route):
             print(f'Checking if user has permission {perm} for route {route}')
             if 'token' not in session:
                 print('No token in session')
                 return redirect(url_for('auth.login'))
             if not auth.check_permission(session['token'], perm):
-                flash("You don't have permission to access this page.", "danger")
+                flash("Permission manquantes pour l'accès à cet page.", "danger")
                 return redirect('/')
             print('User has permission')
