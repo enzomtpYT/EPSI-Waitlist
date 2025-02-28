@@ -27,4 +27,10 @@ dotenv.load_dotenv()
 app.secret_key = os.getenv('FLASK_KEY')
 Misaka(app, no_intra_emphasis=True)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+@socketio.on('connect')
+def test_connect():
+    app.logger.info('Client connected')
+@socketio.on('disconnect')
+def test_disconnect():
+    app.logger.info('Client disconnected')
 CORS(app, resources={r"/*": {"origins": "*"}})
