@@ -52,6 +52,12 @@
     gap: 0.5rem;
 }
 
+.plistmanagecandidate {
+    gap: 0.5rem;
+    display: flex;
+    color: #fff;
+}
+
 .current > .clickable {
     padding: 0.5rem 1rem;
     background-color: var(--alt2);
@@ -71,8 +77,30 @@
     display: inline;
 }
 
+.plistcurrent {
+    font-size: 1.2rem;
+    animation: glow 1s infinite alternate;
+}
+
+@keyframes glow {
+    from {
+      box-shadow: 0 0 4px -4px #aef4af;
+    }
+    to {
+      box-shadow: 0 0 4px 4px #aef4af;
+    }
+}
+
+.plistundergoing .shy {
+    display: inline;
+}
+
+.plistundergoing {
+    font-weight: 900;
+    animation: none;
+}
+
 .current {
-    /* background-color: var(--alt1); */
     background-color: var(--main-color);
 }
 

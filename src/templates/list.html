@@ -3,26 +3,95 @@
 {% block title %}Liste{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/list.css') }}">
+<h1 id="eventname" class="title"></h1>
+<div class="listcontainer"></div>
+<script>
+let timers = {};
 
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles/list.css') }}">
-  {% if datas.message %}
-    <h1>{{ datas.message }}</h1>
-  {% else %}
-    <h1>{{ datas.title }}</h1>
-    <div class="listcontainer">
-      {% for dict_item in datas.list %}
-          {% for key, value in dict_item.items() %}
-            <div class="column">
-              <h2 class="interv">{{ key }}</h2>
-              <div class="candidates">
-                {% for item in value %}
-                  <h4>{{ item.name_candidate }} - {{ item.lastname_candidate }}</h4>
-                {% endfor %}
-              </div>
-            </div>
-          {% endfor %}
-      {% endfor %}
-    </div>
-  {% endif %}
+function loadData() {
+    fetch('{{ url_for('api.get_list') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id: {{ id }} })
+    })
+    .then(response => {
+        if (!response.ok) {
+            popup('danger', 'Une erreur est survenue lors de la récupération des données');
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(datas => {
+      buildList(datas)
+    })
+    .catch(error => {
+        popup('danger', 'Une erreur est survenue lors de la récupération des données');
+        console.error('Error:', error);
+    });   
+}
 
+function buildList(info) {
+  document.querySelector('#eventname').textContent = info.name_event;
+  const list = document.querySelector('.listcontainer');
+  list.innerHTML = '';
+  for (const [key, value] of Object.entries(info.interviews)) {
+    const participant = document.createElement('div');
+    participant.classList.add('column');
+    participant.id = `participant-${key}`;
+    h2 = document.createElement('h2');
+    h2.classList.add('interv');
+    h2.textContent = key;
+    participant.appendChild(h2);
+    const candidates = document.createElement('div');
+    candidates.classList.add('candidates');
+    participant.appendChild(candidates);
+    list.appendChild(participant);
+    for (const [keyaa, candidate] of Object.entries(value)) {
+        const managecandidate = document.createElement('div');
+        managecandidate.classList.add('plistmanagecandidate');
+        if (keyaa == 0) {
+          managecandidate.classList.add('plistcurrent');
+        }
+        managecandidate.id = `interview-${candidate.id_interview}`;
+    
+        const name = document.createElement('span');
+        name.classList.add('plistname');
+        name.textContent = candidate.name_candidate;
+        managecandidate.appendChild(name);
+    
+        const duration = document.createElement('span');
+        duration.id = `duration-${candidate.id_interview}`;
+        duration.classList.add('duration');
+        duration.innerHTML = '<i class="fa-regular fa-stopwatch"></i> 00:00';
+        duration.title = 'Durée de l\'interview';
+        duration.classList.add('shy');
+        managecandidate.appendChild(duration);
+    
+        candidates.appendChild(managecandidate);
+        if (candidate.start_time_interview) {
+          managecandidate.classList.add('plistundergoing');
+          startCountdown(candidate.id_interview, new Date(candidate.start_time_interview));
+        }
+    }
+  }
+  return Promise.resolve();
+}
+
+function startCountdown(id_interview, startTime) {
+    const display = document.getElementById(`duration-${id_interview}`);
+    timers[id_interview] = setInterval(() => {
+        let now = new Date();
+        let elapsed = new Date(now - startTime);
+        let minutes = elapsed.getUTCMinutes();
+        let seconds = elapsed.getUTCSeconds();
+        display.innerHTML = `<i class="fa-duotone fa-regular fa-stopwatch"></i> ${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }, 1000);
+}
+
+loadData();
+
+</script>
 {% endblock %}
