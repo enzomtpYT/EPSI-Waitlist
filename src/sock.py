@@ -26,6 +26,10 @@ app = Flask(__name__)
 dotenv.load_dotenv()
 app.secret_key = os.getenv('FLASK_KEY')
 Misaka(app, no_intra_emphasis=True)
+if os.name == 'nt':
+    async_mode = 'threading'
+else:
+    async_mode = 'eventlet'
 
 
 socketio = SocketIO(app, cors_allowed_origins="*", logger=True, engineio_logger=True, ping_timeout=30, ping_interval=10)
