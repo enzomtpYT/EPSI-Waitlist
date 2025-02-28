@@ -6,7 +6,9 @@
             <li class="navli"><a class="navelm" href="{{ url_for('index.index') }}">Accueil</a></li>
             {% if session.token %}
                 {% if user_role == 'employee' or user_role == 'admin' or user_role == 'superadmin' %}
+                    {% if 'admin.dashboard.view.*' in permissions or 'admin.dashboard.view.employee' in permissions or '*' in permissions %}
                     <li class="navli"><a class="navelm" href="{{ url_for('manage_employee.manage_employee') }}">Employés</a></li>
+                    {% endif %}
                     <li class="navli"><a class="navelm" href="{{ url_for('manage_candidate.manage_candidate') }}">Candidats</a></li>
                     <li class="navli"><a class="navelm" href="{{ url_for('manage_participant.manage_participant') }}">Intervenants</a></li>
                     <li class="navli"><a class="navelm" href="{{ url_for('manage_event.manage_event') }}">Événements</a></li>
