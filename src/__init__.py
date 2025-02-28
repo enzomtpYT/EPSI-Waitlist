@@ -67,4 +67,4 @@ def handleMessage(msg):
 
 if __name__ == "__main__":
     debug_mode = os.getenv('FLASK_ENV') == 'development'
-    socketio.run(app, host="0.0.0.0", port=os.getenv('DEV_SERVER_PORT', '8080'), debug=debug_mode)
+    socketio.run(app, host="0.0.0.0", port=os.getenv('DEV_SERVER_PORT', 8080), debug=debug_mode)
