@@ -30,8 +30,6 @@ if os.name == 'nt':
     async_mode = 'threading'
 else:
     async_mode = 'gevent'
-    import eventlet
-    eventlet.monkey_patch()
 
 
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode=async_mode, logger=True, engineio_logger=True)
