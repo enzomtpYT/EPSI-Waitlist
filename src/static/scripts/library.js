@@ -1,6 +1,6 @@
 import('https://cdn.jsdelivr.net/npm/marked/marked.min.js')
 
-const socket = io({ transports: ['websocket'], secure: location.port == 443 });
+const socket = io(location.origin, { transports: ['polling', 'websocket'] });
 
 function mark(element, text) {
     let dirty = marked.parse(text);
