@@ -374,7 +374,7 @@ def move_interview(data):
             break
     for i, interview in enumerate(interviews):
         interview['position'] = i
-    socket.emit(f'update{event_id}', event)
+    socket.emit(f'update{event_id}', timefixer(event))
     threading.Thread(target=updatecache_all, args=(event_id, "events")).start()
 
 def get_list(id, forced=False):
