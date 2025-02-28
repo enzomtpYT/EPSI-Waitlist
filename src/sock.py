@@ -1,6 +1,7 @@
 from flask_socketio import SocketIO
 from flask import Flask
 from flask_misaka import Misaka
+from flask_cors import CORS
 import dotenv, os
 from logging.config import dictConfig
 
@@ -26,3 +27,4 @@ dotenv.load_dotenv()
 app.secret_key = os.getenv('FLASK_KEY')
 Misaka(app, no_intra_emphasis=True)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
+CORS(app, resources={r"/*": {"origins": "*"}})
