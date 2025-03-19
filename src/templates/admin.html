@@ -7,7 +7,7 @@
 
 <div class="admin-container">
 
-    {% if 'admin.dashboard.view.*' in permissions or 'admin.dashboard.view.employee' in permissions or '*' in permissions %}
+    {% if perms and ('admin.dashboard.view.*' in perms or 'admin.dashboard.view.employee' in perms or '*' in perms) %}
     <div class="admin-section">
         <h2>Gestion Employés</h2>
         <div class="admin-buttons">
